@@ -37,6 +37,7 @@ namespace DesktopFinstatApiTester.Windows
             Prompt,
             Pick,
             None,
+            Date,
         }
 
         protected class ApiCallParameter

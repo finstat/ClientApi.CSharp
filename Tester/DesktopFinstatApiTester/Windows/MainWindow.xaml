@@ -54,7 +54,7 @@
                 </Fluent:Backstage>
             </Fluent:Ribbon.Menu>
             <!--Tabs-->
-            <Fluent:RibbonTabItem Header="Detail API">
+            <Fluent:RibbonTabItem Header="Detail">
                 <Fluent:RibbonGroupBox Header="SK Detail">
                     <Fluent:Button x:Name="buttonFree" Header="Basic" Click="buttonFree_Click">
                         <Fluent:Button.LargeIcon>
@@ -119,7 +119,7 @@
                     </Fluent:Button>
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
-            <Fluent:RibbonTabItem Header="Monitoring API">
+            <Fluent:RibbonTabItem Header="Monitoring">
                 <Fluent:RibbonGroupBox Header="SK Categories">
                     <Fluent:Button x:Name="buttonMonitoringCategories" Header="Categories" Click="buttonMonitoringCategories_Click">
                         <Fluent:Button.LargeIcon>
@@ -356,6 +356,22 @@
                     <Fluent:Button x:Name="buttonDistraintStoredDetail" Header="Stored Detail" Click="buttonDistraintStoredDetail_Click">
                         <Fluent:Button.LargeIcon>
                             <Path Data="{DynamicResource IconDetailLarge}" Stroke="Black" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Fluent:Button.LargeIcon>
+                    </Fluent:Button>
+                </Fluent:RibbonGroupBox>
+            </Fluent:RibbonTabItem>
+            <Fluent:RibbonTabItem Header="BankruptcyRestructuring">
+                <Fluent:RibbonGroupBox Header="Persons">
+                    <Fluent:Button x:Name="buttonPersonBaR" Header="Person" Click="buttonPersonBaR_Click">
+                        <Fluent:Button.LargeIcon>
+                            <Path Data="{DynamicResource IconListLarge}" Stroke="Black" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Fluent:Button.LargeIcon>
+                    </Fluent:Button>
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox Header="ICO">
+                    <Fluent:Button x:Name="buttonCompanyBaR" Header="Company" Click="buttonCompanyBaR_Click">
+                        <Fluent:Button.LargeIcon>
+                            <Path Data="{DynamicResource IconListLarge}" Stroke="Black" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Fluent:Button.LargeIcon>
                     </Fluent:Button>
                 </Fluent:RibbonGroupBox>

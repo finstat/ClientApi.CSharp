@@ -88,5 +88,13 @@ namespace DesktopFinstatApiTester.Windows
             client.OnErrorResponseContent += Client_OnResponseContent;
             return client;
         }
+        private FinstatApi.ApiBankruptcyRestructuringClient CreateSKApiBankruptcyRestructuringClient()
+        {
+            var client = new FinstatApi.ApiBankruptcyRestructuringClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut);
+            client.OnRequest += Client_OnRequest;
+            client.OnResponse += Client_OnResponse;
+            client.OnErrorResponseContent += Client_OnResponseContent;
+            return client;
+        }
     }
 }

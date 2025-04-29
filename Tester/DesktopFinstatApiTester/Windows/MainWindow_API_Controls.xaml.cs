@@ -265,10 +265,23 @@ namespace DesktopFinstatApiTester.Windows
                     urlParameters.Add("lang", parameters.First());
                     urlParameters.Add("template", parameters.Skip(1).First());
                     break;
+                case "PersonBankruptcyProceedings":
+                    endPoint = "PersonBankruptcyProceedings";
+                    hashParam = $"{parameters.First()}|{parameters.Skip(1).First()}|{(parameters.Skip(2).First() as DateTime?)?.ToString("yyyy-MM-dd")}";
+                    urlParameters.Add("name", parameters.First());
+                    urlParameters.Add("surname", parameters.Skip(1).First());
+                    urlParameters.Add("dateofbirth", (parameters.Skip(2).First() as DateTime?)?.ToString("yyyy-MM-dd"));
+                    break;
+                case "CompanyBankruptcyRestructuring":
+                    endPoint = "CompanyBankruptcyRestructuring";
+                    hashParam = string.Join("", parameters?.Take(2));
+                    urlParameters.Add("ico", parameters.First());
+                    urlParameters.Add("name", parameters.Skip(1).First());
+                    break;
             }
             if (string.IsNullOrEmpty(endPoint))
             {
-                MessageBox.Show("No suitable API method", "Attention", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                MessageBox.Show($"No suitable API method for '{item.Request}'", "Attention", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                 return;
             }
 
@@ -560,6 +573,18 @@ namespace DesktopFinstatApiTester.Windows
                     switch (item.ApiSource)
                     {
                         case "SK": apiCall = SKStatementTemplateLegend; break;
+                    }
+                    break;
+                case "PersonBankruptcyProceedings":
+                    switch (item.ApiSource)
+                    {
+                        case "SK": apiCall = SKPersonBankruptcyProceedings; break;
+                    }
+                    break;
+                case "CompanyBankruptcyRestructuring":
+                    switch (item.ApiSource)
+                    {
+                        case "SK": apiCall = SKCompanyBankruptcyRestructuring; break;
                     }
                     break;
             }

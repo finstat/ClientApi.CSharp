@@ -71,6 +71,40 @@ namespace DesktopFinstatApiTester.Windows
             return null;
         }
 
+        private DateTime? GetDatePicker(ApiCallParameter parameter)
+        {
+            DateTimeWindow dialog = new DateTimeWindow()
+            {
+                Owner = this,
+            };
+
+            if (parameter != null && !string.IsNullOrEmpty(parameter?.Title))
+            {
+                dialog.Title = parameter?.Title;
+                dialog.datePickerInput.Text = parameter.Title;
+                dialog.datePickerInput.GotFocus += (sender, e) =>
+                {
+                    if (dialog.datePickerInput.Text == parameter?.Title)
+                    {
+                        dialog.datePickerInput.Text = string.Empty;
+                    }
+                };
+                dialog.datePickerInput.LostFocus += (sender, e) =>
+                {
+                    if (dialog.Date == null)
+                    {
+                        dialog.datePickerInput.Text = parameter?.Title;
+                    }
+                };
+            }
+
+            if (dialog.ShowDialog() == true)
+            {
+                return (dialog.datePickerInput.Text != parameter.Title && dialog.Date != null) ? dialog.Date : null;
+            }
+            return null;
+        }
+
         private string GetFolderBrowserDialog(ApiCallParameter parameter)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())

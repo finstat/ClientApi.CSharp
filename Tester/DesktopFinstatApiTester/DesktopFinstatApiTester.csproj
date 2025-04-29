@@ -82,6 +82,9 @@
     </ApplicationDefinition>
     <Compile Include="ViewModel\Limits.cs" />
     <Compile Include="ViewModel\ResponseItem.cs" />
+    <Compile Include="Windows\DateTimeWindow.xaml.cs">
+      <DependentUpon>DateTimeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -111,6 +114,9 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\MainWindow_SK_Auto.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\MainWindow_SK_BankruptciesRestructurings.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\MainWindow_SK_DailyDiff.xaml.cs">
@@ -162,6 +168,10 @@
     <Page Include="Controls\SettingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\DateTimeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\PickWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

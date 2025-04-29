@@ -66,6 +66,7 @@ namespace DesktopFinstatApiTester.Windows
                         {
                             case ParameterTypeEnum.String: parameter = GetInput(parameterType); break;
                             case ParameterTypeEnum.Int: parameter = GetInput(parameterType); break;
+                            case ParameterTypeEnum.Date: parameter = GetDatePicker(parameterType); break;
                             case ParameterTypeEnum.Folder: parameter = GetFolderBrowserDialog(parameterType); break;
                             case ParameterTypeEnum.File: parameter = GetFileBrowserDialog(parameterType); break;
                             case ParameterTypeEnum.Prompt: parameter = GetPrompt(parameterType); break;

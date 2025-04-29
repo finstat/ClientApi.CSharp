@@ -9,6 +9,7 @@
     <Import_RootNamespace>FinstatApi</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BankruptcyRestructuring\BankruptcyRestructuring.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Detail\BasicResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Detail\BaseResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Detail\DetailResult.cs" />
@@ -33,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Statement\StatementResult.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)BankruptcyRestructuring\" />
     <Folder Include="$(MSBuildThisFileDirectory)Diff\Statement\" />
   </ItemGroup>
 </Project>

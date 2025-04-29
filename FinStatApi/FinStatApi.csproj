@@ -68,6 +68,7 @@
     <Compile Include="ApiClient.cs" />
     <Compile Include="ApiDailyDiffClient.cs" />
     <Compile Include="ApiDailyStatement2014DiffClient.cs" />
+    <Compile Include="ApiBankruptcyRestructuringClient.cs" />
     <Compile Include="ApiReportingClient.cs" />
     <Compile Include="ApiStatementClient.cs" />
     <Compile Include="ApiDailyStatementDiffClient.cs" />
