@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -117,7 +118,30 @@ namespace FinstatApi
                     reqparm.Add(methodParams);
                 }
 
-                using (WebClient client = new WebClientWithTimeout(_timeout))
+                X509Certificate2 cert = null;
+#if DEBUG
+                if (_url.Contains("zdrojak.eu"))
+                {
+                    X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                    store.Open(OpenFlags.ReadOnly);
+                    X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
+                    if (certs.Count > 0)
+                    {
+                        cert = certs[0];
+                    }
+                    else
+                    {
+                        X509Store storeMachine = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                        storeMachine.Open(OpenFlags.ReadOnly);
+                        X509Certificate2Collection certsMachine = store.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
+                        if (certsMachine.Count > 0)
+                        {
+                            cert = certsMachine[0];
+                        }
+                    }
+                }
+#endif
+                using (WebClient client = new WebClientWithTimeout(_timeout, cert))
                 {
                     var requestHeaders = new Dictionary<string, string[]>();
                     if (reqparm != null)
