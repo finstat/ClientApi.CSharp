@@ -22,6 +22,7 @@ namespace FinstatApi
         public LiquidationResult Liquidation { get; set; }
         public DateTime? ORCancelled { get; set; }
         public ProceedingResult OtherProceeding { get; set; }
+        public PreventiveRestructuringResult PreventiveRestructuring { get; set; }
         public RPOPerson[] RPOPersons { get; set; }
         public DistraintsAuthorizationDetail[] DistraintsAuthorizations { get; set; }
 
@@ -91,6 +92,10 @@ namespace FinstatApi
             if (Liquidation != null)
             {
                 result.AppendLine(string.Format("Liquidation: {0}", Liquidation));
+            }
+            if (PreventiveRestructuring != null)
+            {
+                result.AppendLine(string.Format("PreventiveRestructuring: {0}", PreventiveRestructuring));
             }
             if (DistraintsAuthorizations != null && DistraintsAuthorizations.Length > 0)
             {
@@ -351,6 +356,26 @@ namespace FinstatApi
 
         public class BankruptResult : ProceedingResult
         {
+        }
+
+        public class PreventiveRestructuringResult
+        {
+            public string FileReference { get; set; }
+            public string CourtCode { get; set; }
+            public Source? Source { get; set; }
+            public DateTime? FirstDate { get; set; }
+            public DateTime? LastDate { get; set; }
+
+            public override string ToString()
+            {
+                StringBuilder dataString = new StringBuilder();
+                dataString.Append(base.ToString());
+                dataString.Append(string.Format("FileReference: {0}", FileReference));
+                dataString.Append(string.Format("CourtCode: {0}", CourtCode));
+                dataString.Append(string.Format("FirstDate: {0}", FirstDate));
+                dataString.Append(string.Format("LastDate: {0}", LastDate));
+                return dataString.ToString();
+            }
         }
 
         public class DistraintsAuthorizationDetail
