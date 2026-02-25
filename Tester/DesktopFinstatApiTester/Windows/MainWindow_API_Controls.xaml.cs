@@ -1,15 +1,14 @@
 ﻿using DesktopFinstatApiTester.ViewModel;
 using FinstatApi;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Text.Json;
 using System.Xml.Serialization;
 
 namespace DesktopFinstatApiTester.Windows

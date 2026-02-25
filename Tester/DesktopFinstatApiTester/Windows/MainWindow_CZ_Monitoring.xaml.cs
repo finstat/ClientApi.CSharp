@@ -1,6 +1,4 @@
 ﻿extern alias CZ;
-
-using System;
 using System.Windows;
 
 namespace DesktopFinstatApiTester.Windows
@@ -78,7 +76,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZMonitoringCategories(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.GetCategories(IsJSON());
+            var result = client.GetCategories(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

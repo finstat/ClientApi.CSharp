@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <AssemblyName>ApiCzTesterCore</AssemblyName>
+    <AssemblyName>ApiTester</AssemblyName>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\FinStatApiCZ\FinStatApiCZ.csproj" />
+    <ProjectReference Include="..\..\..\FinStatApi\FinStatApi.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

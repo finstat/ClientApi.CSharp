@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FinstatApi;
 using Microsoft.Extensions.Configuration;
 
-namespace ApiTesterCore
+namespace ApiTester
 {
     public class Program
     {

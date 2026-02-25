@@ -250,7 +250,7 @@ namespace FinstatApi
         /// <summary>
         /// Retrieves list of user monitoring categories
         /// </summary>
-        /// <returns>lLst of user monitoring categories.</returns>
+        /// <returns>List of user monitoring categories.</returns>
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!
@@ -258,12 +258,12 @@ namespace FinstatApi
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
         ///
-        public object GetCategories(bool json)
+        public async Task<MonitoringCategory[]> GetCategories(bool json)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "monitoringcategories")),
             });
-            return DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json);
+            return await DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json);
         }
     }
 }

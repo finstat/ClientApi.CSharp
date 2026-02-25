@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SK", "SK", "{8B0012E9-3BF2-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CZ", "CZ", "{7E17BACB-776B-42D7-968D-6881F29A01D6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTesterCore", "Tester\SK\ApiTesterCore\ApiTesterCore.csproj", "{95076824-D84A-4FD4-8C77-EC9CFC7EA9C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTester", "Tester\SK\ApiTester\ApiTester.csproj", "{95076824-D84A-4FD4-8C77-EC9CFC7EA9C0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiMonitoringTester", "Tester\SK\ApiMonitoringTester\ApiMonitoringTester.csproj", "{05D2D4A6-AC30-4A56-B2BD-296DB245CD32}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDistraintTester", "Teste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDailyDiffTester", "Tester\SK\ApiDailyDiffTester\ApiDailyDiffTester.csproj", "{A1B0B3D2-EECA-4463-8462-34CB1EC79417}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiCzTesterCore", "Tester\CZ\ApiCzTesterCore\ApiCzTesterCore.csproj", "{22259D01-0B18-4FDB-8C36-4E4357AC30B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiCzTester", "Tester\CZ\ApiCzTester\ApiCzTester.csproj", "{22259D01-0B18-4FDB-8C36-4E4357AC30B7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiMonitoringTester", "Tester\CZ\ApiMonitoringTester\ApiMonitoringTester.csproj", "{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0}"
 EndProject

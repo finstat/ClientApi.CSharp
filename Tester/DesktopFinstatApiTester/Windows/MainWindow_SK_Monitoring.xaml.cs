@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 
 namespace DesktopFinstatApiTester.Windows
 {
@@ -88,7 +87,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKMonitoringCategories(object[] parameters)
         {
             var client = CreateSKApiMonitoringClient();
-            var result = client.GetCategories(IsJSON());
+            var result = client.GetCategories(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

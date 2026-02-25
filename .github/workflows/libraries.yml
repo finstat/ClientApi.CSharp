@@ -38,35 +38,21 @@ jobs:
           dotnet build ./Tester/SK/ApiTester/ApiTester.csproj  -c Release -o "FinStatAPINETClient"
 
           dotnet build ./Tester/CZ/ApiMonitoringTester/ApiMonitoringTester.csproj  -c Release -o "FinStatCZAPINETClient"
-          dotnet build ./Tester/CZ/ApiTester/ApiTester.csproj  -c Release -o "FinStatCZAPINETClient"
-
-          dotnet build ./Tester/SK.Core/ApiDistraintTester/ApiDistraintTester.csproj  -c Release -o "FinStatAPINETCoreClient"
-          dotnet build ./Tester/SK.Core/ApiDailyDiffTester/ApiDailyDiffTester.csproj  -c Release -o "FinStatAPINETCoreClient"
-          dotnet build ./Tester/SK.Core/ApiMonitoringTester/ApiMonitoringTester.csproj  -c Release -o "FinStatAPINETCoreClient"
-          dotnet build ./Tester/SK.Core/ApiTesterCore/ApiTesterCore.csproj  -c Release -o "FinStatAPINETCoreClient"
-
-          dotnet build ./Tester/CZ.Core/ApiCzTesterCore/ApiCzTesterCore.csproj  -c Release -o "FinStatCZAPINETCoreClient"
-          dotnet build ./Tester/CZ.Core/ApiMonitoringTester/ApiMonitoringTester.csproj  -c Release -o "FinStatCZAPINETCoreClient"
+          dotnet build ./Tester/CZ/ApiCzTester/ApiCzTester.csproj  -c Release -o "FinStatCZAPINETClient"
 
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
             7z a -tzip "FinStatAPINETClient.zip" "./FinStatAPINETClient/*"
-            7z a -tzip "FinStatAPINETCoreClient.zip" "./FinStatAPINETCoreClient/*"
             7z a -tzip "FinStatCZAPINETClient.zip" "./FinStatCZAPINETClient/*"
-            7z a -tzip "FinStatCZAPINETCoreClient.zip" "./FinStatCZAPINETCoreClient/*"
           else
             tar czvf "FinStatAPINETClient.tar.gz" "FinStatAPINETClient"
-            tar czvf "FinStatAPINETCoreClient.tar.gz" "FinStatAPINETCoreClient"
             tar czvf "FinStatCZAPINETClient.tar.gz" "FinStatCZAPINETClient"
-            tar czvf "FinStatCZAPINETCoreClient.tar.gz" "FinStatCZAPINETCoreClient"
           fi
 
           # Delete output directory
           rm -r "FinStatAPINETClient"
-          rm -r "FinStatAPINETCoreClient"
           rm -r "FinStatCZAPINETClient"
-          rm -r "FinStatCZAPINETCoreClient"
 
       - name: Publish
         uses: softprops/action-gh-release@v1
