@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 
 namespace DesktopFinstatApiTester.ViewModel
 {
@@ -29,7 +28,8 @@ namespace DesktopFinstatApiTester.ViewModel
         public Limits Limits
         {
             get { return _limits; }
-            set {
+            set
+            {
                 if (_limits != null)
                 {
                     _limits.PropertyChanged -= _limits_PropertyChanged;
@@ -88,21 +88,13 @@ namespace DesktopFinstatApiTester.ViewModel
         {
             if (File.Exists(fileName))
             {
-                using (StreamReader file = File.OpenText(fileName))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    Settings = (Model.Settings)serializer.Deserialize(file, typeof(Model.Settings));
-                }
+                Settings = JsonSerializer.Deserialize<Model.Settings>(File.ReadAllText(fileName));
             }
         }
 
         public void Save()
         {
-            using (StreamWriter file = File.CreateText(fileName))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, Settings);
-            }
+            File.WriteAllText(fileName, JsonSerializer.Serialize(Settings));
         }
 
         private void ApiApplication_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

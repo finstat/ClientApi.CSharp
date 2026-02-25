@@ -19,7 +19,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyUltimateDiffList(object[] parameters)
         {
             var client = CreateSKApiDailyUltimateDiffClient();
-            var result = client.RequestListOfDailyUltimateDiffs(IsJSON());
+            var result = client.RequestListOfDailyUltimateDiffs(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -35,7 +35,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyUltimateDiffFile(object[] parameters)
         {
             var client = CreateSKApiDailyUltimateDiffClient();
-            var result = client.DownloadDailyUltimateDiffFile((string)parameters[0], (string)parameters[1]);
+            var result = client.DownloadDailyUltimateDiffFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

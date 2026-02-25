@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,40 +98,41 @@ namespace FinstatApi
 
         }
 
-        internal static  HttpClient CreateClient(int? timeoutMiliSeconds, bool isZdrojak)
+        internal static HttpClient CreateClient(int? timeoutMiliSeconds, bool isZdrojak)
         {
             X509Certificate2 cert = null;
             HttpClientHandler handler = null;
             HttpClient client = null;
 #if DEBUG
-                if (isZdrojak)
+            if (isZdrojak)
+            {
+                X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadOnly);
+                X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
+                if (certs.Count > 0)
                 {
-                    X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-                    store.Open(OpenFlags.ReadOnly);
-                    X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
-                    if (certs.Count > 0)
+                    cert = certs[0];
+                }
+                else
+                {
+                    X509Store storeMachine = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                    storeMachine.Open(OpenFlags.ReadOnly);
+                    X509Certificate2Collection certsMachine = storeMachine.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
+                    if (certsMachine.Count > 0)
                     {
-                        cert = certs[0];
-                    }
-                    else
-                    {
-                        X509Store storeMachine = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-                        storeMachine.Open(OpenFlags.ReadOnly);
-                        X509Certificate2Collection certsMachine = store.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
-                        if (certsMachine.Count > 0)
-                        {
-                            cert = certsMachine[0];
-                        }
+                        cert = certsMachine[0];
                     }
                 }
-#endif
-            if (cert != null)
-            {
                 handler = new HttpClientHandler();
-                handler.ClientCertificates.Add(cert);
+                handler.ServerCertificateCustomValidationCallback = (message, serverCert, chain, errors) => true;
+                if (cert != null)
+                {
+                    handler.ClientCertificates.Add(cert);
+                }
                 client = new HttpClient(handler);
             }
-            else
+#endif
+            if (client == null)
             {
                 client = new HttpClient();
             }
@@ -215,14 +214,13 @@ namespace FinstatApi
                 if (bytes != null)
                 {
                     var response = Encoding.UTF8.GetString(bytes);
-                    using (var reader = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(response))))
+                    if (json)
                     {
-                        if (json)
-                        {
-                            JsonSerializer serializer = new JsonSerializer();
-                            return (T)serializer.Deserialize(reader, typeof(T));
-                        }
-                        else
+                        return System.Text.Json.JsonSerializer.Deserialize<T>(response);
+                    }
+                    else
+                    {
+                        using (var reader = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(response))))
                         {
                             XmlSerializer serializer = new XmlSerializer(typeof(T));
                             return (T)serializer.Deserialize(reader);

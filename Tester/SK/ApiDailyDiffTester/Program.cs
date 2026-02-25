@@ -1,33 +1,45 @@
-﻿using System;
+﻿using FinstatApi;
+using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using System.IO.Compression;
 using System.IO;
-using System.Text;
 using System.Xml.Serialization;
-using FinstatApi;
-using FinstatApi.ViewModel;
 using FinstatApi.ViewModel.Diff;
-using Ionic.Zip;
 
 namespace ApiDailyDiffTester
 {
-    class Program
+    public class Program
     {
-        //private const string ApiUrlConst = "http://MYAPP/api/";
+        //private const string ApiUrlConst = "http://ipv4.fiddler:3376/api/";
         //private const string ApiUrlConst = "http://localhost:3376/api/";
         private const string ApiUrlConst = "https://www.finstat.sk/api/";
         private static string _apiKey = null;
         private static string _privateKey = null;
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            _apiKey = ConfigurationManager.AppSettings["api_key"];
+            /**
+             * Example of appsettings.json
+             *  {
+                  "api_key": "add_api_key",
+                  "private_key": "add_private_key"
+                }
+             */
+            var builder = new ConfigurationBuilder()
+                     .AddJsonFile("appsettings.json")
+                     ;
+
+            var configuration = builder.Build();
+            _apiKey = configuration["api_key"];
+            _privateKey = configuration["private_key"];
             if (string.IsNullOrEmpty(_apiKey) || _apiKey == "add_api_key")
             {
                 Console.Write("api_key missing in .config file, please enter manually: ");
                 _apiKey = Console.ReadLine().Trim();
             }
-
-            _privateKey = ConfigurationManager.AppSettings["private_key"];
             if (string.IsNullOrEmpty(_privateKey) || _privateKey == "add_private_key")
             {
                 Console.Write("private_key missing in .config file, please enter manually: ");
@@ -51,31 +63,33 @@ namespace ApiDailyDiffTester
             }
             Console.Write("Press any key to end...");
             Console.ReadKey();
+
         }
-
-
 
         /// <summary>
         /// Test pre stiahnutie zoznamu diff suborov z daily diff
         /// </summary>
         public static DailyDiffList GetListOfDiffs()
         {
-            try
+            DailyDiffList result = null;
+            ApiDailyDiffClient apiClient = new ApiDailyDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
+            apiClient.RequestListOfDailyDiffs().ContinueWith(task =>
             {
-                ApiDailyDiffClient apiClient = new ApiDailyDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
-                DailyDiffList result = apiClient.RequestListOfDailyDiffs();
-                Console.WriteLine("There are " + result.Files.Length + " files in daily diff export.");
-                for (int i = 0, count = result.Files.Length >= 10 ? 10 : result.Files.Length; i < count; i++)
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine(i + ": " + result.Files[i]);
+                    Console.WriteLine("Get current list of diff files fails with exception: " + task.Exception.InnerException);
                 }
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Get current list of diff files fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    Console.WriteLine("There are " + task.Result.Files.Length + " files in daily diff export.");
+                    for (int i = 0, count = task.Result.Files.Length >= 10 ? 10 : task.Result.Files.Length; i < count; i++)
+                    {
+                        Console.WriteLine(i + ": " + task.Result.Files[i]);
+                    }
+                    result = task.Result;
+                }
+            }).Wait();
+            return result;
         }
 
         /// <summary>
@@ -83,22 +97,25 @@ namespace ApiDailyDiffTester
         /// </summary>
         public static DailyDiffList GetListOfStatementDiffs()
         {
-            try
+            DailyDiffList result = null;
+            ApiDailyStatementDiffClient apiClient = new ApiDailyStatementDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
+            apiClient.RequestListOfDailyStatementDiffs().ContinueWith(task =>
             {
-                ApiDailyStatementDiffClient apiClient = new ApiDailyStatementDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
-                DailyDiffList result = apiClient.RequestListOfDailyStatementDiffs();
-                Console.WriteLine("There are " + result.Files.Length + " files in daily diff export.");
-                for (int i = 0, count = result.Files.Length >= 10 ? 10 : result.Files.Length; i < count; i++)
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine(i + ": " + result.Files[i]);
+                    Console.WriteLine("Get current list of diff files fails with exception: " + task.Exception.InnerException);
                 }
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Get current list of diff files fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    Console.WriteLine("There are " + task.Result.Files.Length + " files in daily diff export.");
+                    for (int i = 0, count = task.Result.Files.Length >= 10 ? 10 : task.Result.Files.Length; i < count; i++)
+                    {
+                        Console.WriteLine(i + ": " + task.Result.Files[i]);
+                    }
+                    result = task.Result;
+                }
+            }).Wait();
+            return result;
         }
 
         /// <summary>
@@ -106,22 +123,25 @@ namespace ApiDailyDiffTester
         /// </summary>
         public static DailyDiffList GetListOfUltimateDiffs()
         {
-            try
+            DailyDiffList result = null;
+            ApiDailyUltimateDiffClient apiClient = new ApiDailyUltimateDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
+            apiClient.RequestListOfDailyUltimateDiffs().ContinueWith(task =>
             {
-                ApiDailyUltimateDiffClient apiClient = new ApiDailyUltimateDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
-                DailyDiffList result = apiClient.RequestListOfDailyUltimateDiffs();
-                Console.WriteLine("There are " + result.Files.Length + " files in daily diff export.");
-                for (int i = 0, count = result.Files.Length >= 10 ? 10 : result.Files.Length; i < count; i++)
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine(i + ": " + result.Files[i]);
+                    Console.WriteLine("Get current list of diff files fails with exception: " + task.Exception.InnerException);
                 }
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Get current list of diff files fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    Console.WriteLine("There are " + task.Result.Files.Length + " files in daily diff export.");
+                    for (int i = 0, count = task.Result.Files.Length >= 10 ? 10 : task.Result.Files.Length; i < count; i++)
+                    {
+                        Console.WriteLine(i + ": " + task.Result.Files[i]);
+                    }
+                    result = task.Result;
+                }
+            }).Wait();
+            return result;
         }
 
         /// <summary>
@@ -129,101 +149,107 @@ namespace ApiDailyDiffTester
         /// </summary>
         private static string DownloadDiffFile(string fileName)
         {
-            try
+            string result = null;
+            ApiDailyDiffClient apiClient = new ApiDailyDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.DownloadDailyDiffFile(fileName, Directory.GetCurrentDirectory()).ContinueWith(task =>
             {
-                ApiDailyDiffClient apiClient = new ApiDailyDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                string pathToDownloadedFile = apiClient.DownloadDailyDiffFile(fileName, Directory.GetCurrentDirectory());
-                if (!string.IsNullOrEmpty(pathToDownloadedFile))
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine("File was succesfully downloaded to {0} with size {1}.", pathToDownloadedFile, new FileInfo(pathToDownloadedFile).Length);
+                    Console.WriteLine("Download file fails with exception: " + task.Exception.InnerException);
                 }
-                return pathToDownloadedFile;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Download file fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    result = task.Result;
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        Console.WriteLine("File was succesfully downloaded to {0} with size {1}.", result, new FileInfo(result).Length);
+                    }
+                }
+            }).Wait();
+            return result;
         }
 
-        /// <summary>
-        /// Test pre stiahnutie daily diff zip suboru
-        /// </summary>
         private static string DownloadStatementDiffFile(string fileName)
         {
-            try
+            string result = null;
+            ApiDailyStatementDiffClient apiClient = new ApiDailyStatementDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.DownloadDailyStatementDiffFile(fileName, Directory.GetCurrentDirectory()).ContinueWith(task =>
             {
-                ApiDailyStatementDiffClient apiClient = new ApiDailyStatementDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
-                string pathToDownloadedFile = apiClient.DownloadDailyStatementDiffFile(fileName, Directory.GetCurrentDirectory());
-                if (!string.IsNullOrEmpty(pathToDownloadedFile))
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine("File was succesfully downloaded to {0} with size {1}.", pathToDownloadedFile, new FileInfo(pathToDownloadedFile).Length);
+                    Console.WriteLine("Download file fails with exception: " + task.Exception.InnerException);
                 }
-                return pathToDownloadedFile;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Download file fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    result = task.Result;
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        Console.WriteLine("File was succesfully downloaded to {0} with size {1}.", result, new FileInfo(result).Length);
+                    }
+                }
+            }).Wait();
+            return result;
         }
 
-        /// <summary>
-        /// Test pre stiahnutie daily diff zip suboru
-        /// </summary>
         private static string DownloadUltimateDiffFile(string fileName)
         {
-            try
+            string result = null;
+            ApiDailyUltimateDiffClient apiClient = new ApiDailyUltimateDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.DownloadDailyUltimateDiffFile(fileName, Directory.GetCurrentDirectory()).ContinueWith(task =>
             {
-                ApiDailyUltimateDiffClient apiClient = new ApiDailyUltimateDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
-                string pathToDownloadedFile = apiClient.DownloadDailyUltimateDiffFile(fileName, Directory.GetCurrentDirectory());
-                if (!string.IsNullOrEmpty(pathToDownloadedFile))
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine("File was succesfully downloaded to {0} with size {1}.", pathToDownloadedFile, new FileInfo(pathToDownloadedFile).Length);
+                    Console.WriteLine("Download file fails with exception: " + task.Exception.InnerException);
                 }
-                return pathToDownloadedFile;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Download file fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    result = task.Result;
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        Console.WriteLine("File was succesfully downloaded to {0} with size {1}.", result, new FileInfo(result).Length);
+                    }
+                }
+            }).Wait();
+            return result;
         }
 
         /// <summary>
         /// Test pre stiahnutie zoznamu diff suborov zavierok z daily diff
         /// </summary>
-        public static KeyValue[] GetLegendOfStatementDiffs()
+        public static FinstatApi.ViewModel.KeyValue[] GetLegendOfStatementDiffs()
         {
-            try
+            FinstatApi.ViewModel.KeyValue[] result = null;
+            ApiDailyStatementDiffClient apiClient = new ApiDailyStatementDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
+            apiClient.RequestStatementLegend().ContinueWith(task =>
             {
-                ApiDailyStatementDiffClient apiClient = new ApiDailyStatementDiffClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 200000);
-                KeyValue[] result = apiClient.RequestStatementLegend();
-                Console.WriteLine("There are " + result.Length + " items in statement legend.");
-                for (int i = 0, count = result.Length; i < count; i++)
+                if (task.IsFaulted)
                 {
-                    Console.WriteLine(result[i]);
+                    Console.WriteLine("Get current list of diff files fails with exception: " + task.Exception.InnerException);
                 }
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Get current list of diff files fails with exception: " + apiException);
-                return null;
-            }
+                else
+                {
+                    result = task.Result;
+                    Console.WriteLine("There are " + result.Length + " items in statement legend.");
+                    for (int i = 0, count = result.Length; i < count; i++)
+                    {
+                        Console.WriteLine(result[i]);
+                    }
+                }
+            }).Wait();
+            return result;
         }
 
         private static FinstatApi.ViewModel.Diff.ExtendedResult[] ExtractAndDeserialize(string fileName)
         {
             try
             {
-                using (ZipFile zip = new ZipFile(fileName))
+                using (var zip = new ZipArchive(File.OpenRead(fileName), ZipArchiveMode.Read))
                 {
                     var enumerator = zip.Entries.GetEnumerator();
                     enumerator.MoveNext();
-                    ZipEntry firstItem = enumerator.Current;
+                    ZipArchiveEntry firstItem = enumerator.Current;
                     XmlSerializer serializer = new XmlSerializer(typeof(FinstatApi.ViewModel.Diff.ExtendedResult[]));
-                    return (FinstatApi.ViewModel.Diff.ExtendedResult[])serializer.Deserialize(firstItem.OpenReader());
+                    return (FinstatApi.ViewModel.Diff.ExtendedResult[])serializer.Deserialize(firstItem.Open());
                 }
             }
             catch (Exception exception)
@@ -233,17 +259,17 @@ namespace ApiDailyDiffTester
             }
         }
 
-        private static StatementResult[] ExtractAndDeserializeStatement(string fileName)
+        private static FinstatApi.ViewModel.Diff.StatementResult[] ExtractAndDeserializeStatement(string fileName)
         {
             try
             {
-                using (ZipFile zip = new ZipFile(fileName))
+                using (var zip = new ZipArchive(File.OpenRead(fileName), ZipArchiveMode.Read))
                 {
                     var enumerator = zip.Entries.GetEnumerator();
                     enumerator.MoveNext();
-                    ZipEntry firstItem = enumerator.Current;
-                    XmlSerializer serializer = new XmlSerializer(typeof(StatementResult[]));
-                    return (StatementResult[])serializer.Deserialize(firstItem.OpenReader());
+                    ZipArchiveEntry firstItem = enumerator.Current;
+                    XmlSerializer serializer = new XmlSerializer(typeof(FinstatApi.ViewModel.Diff.StatementResult[]));
+                    return (FinstatApi.ViewModel.Diff.StatementResult[])serializer.Deserialize(firstItem.Open());
                 }
             }
             catch (Exception exception)
@@ -257,13 +283,13 @@ namespace ApiDailyDiffTester
         {
             try
             {
-                using (ZipFile zip = new ZipFile(fileName))
+                using (var zip = new ZipArchive(File.OpenRead(fileName), ZipArchiveMode.Read))
                 {
                     var enumerator = zip.Entries.GetEnumerator();
                     enumerator.MoveNext();
-                    ZipEntry firstItem = enumerator.Current;
+                    ZipArchiveEntry firstItem = enumerator.Current;
                     XmlSerializer serializer = new XmlSerializer(typeof(FinstatApi.ViewModel.Diff.UltimateResult[]));
-                    return (FinstatApi.ViewModel.Diff.UltimateResult[])serializer.Deserialize(firstItem.OpenReader());
+                    return (FinstatApi.ViewModel.Diff.UltimateResult[])serializer.Deserialize(firstItem.Open());
                 }
             }
             catch (Exception exception)

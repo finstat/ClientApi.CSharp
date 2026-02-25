@@ -1,9 +1,6 @@
 ﻿extern alias CZ;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace DesktopFinstatApiTester.Windows
@@ -21,7 +18,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZMonitoringICOAdd(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.Add((string)parameters[0], (string)parameters[1], IsJSON());
+            var result = client.Add((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -37,7 +34,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZMonitoringICORemove(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.Remove((string)parameters[0], (string)parameters[1], IsJSON());
+            var result = client.Remove((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -52,7 +49,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZMonitoringICOList(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.GetMonitorings((string)parameters[0], IsJSON());
+            var result = client.GetMonitorings((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -67,7 +64,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZMonitoringICOReport(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.GetReport((string)parameters[0], IsJSON());
+            var result = client.GetReport((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

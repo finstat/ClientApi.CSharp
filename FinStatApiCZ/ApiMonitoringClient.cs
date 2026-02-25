@@ -1,12 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace FinstatApi
 {
@@ -44,6 +37,17 @@ namespace FinstatApi
             return await DoApiCall<bool>("/AddToMonitoring", list, json);
         }
 
+        public async Task<bool> Add(string ico, string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<bool>("/AddToMonitoring", list, json);
+        }
+
         /// <summary>
         /// Removes specified ico from monitoring.
         /// </summary>
@@ -65,6 +69,17 @@ namespace FinstatApi
             return await DoApiCall<bool>("/RemoveFromMonitoring", list, json);
         }
 
+        public async Task<bool> Remove(string ico, string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json);
+        }
+
         /// <summary>
         /// Retrieves list of current monitorings.
         /// </summary>
@@ -80,6 +95,16 @@ namespace FinstatApi
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "list")),
             });
+            return await DoApiCall<string[]>("/MonitoringList", list, json);
+        }
+
+        public async Task<string[]> GetMonitorings(string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "list")),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
             return await DoApiCall<string[]>("/MonitoringList", list, json);
         }
 
@@ -99,6 +124,35 @@ namespace FinstatApi
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "report")),
             });
             return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json);
+        }
+
+        public async Task<Monitoring[]> GetReport(string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "report")),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json);
+        }
+
+        /// <summary>
+        /// Retrieves list of user monitoring categories
+        /// </summary>
+        /// <returns>lLst of user monitoring categories.</returns>
+        /// <exception cref="FinstatApi.FinstatApiException">
+        /// Not valid API key!
+        /// or Url {0} not found!
+        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
+        /// </exception>
+        ///
+        public object GetCategories(bool json)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "monitoringcategories")),
+            });
+            return DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZAutoComplete(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestAutocomplete((string)parameters[0], IsJSON());
+            var result = client.RequestAutocomplete((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -36,7 +36,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZAutoLogin(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestAutoLogin((string)parameters[0], parameters.Length > 1 ? (string)parameters[1] : null);
+            var result = client.RequestAutoLogin((string)parameters[0], parameters.Length > 1 ? (string)parameters[1] : null).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

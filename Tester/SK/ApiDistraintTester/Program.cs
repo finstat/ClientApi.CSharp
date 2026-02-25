@@ -1,14 +1,14 @@
-﻿using System;
+﻿using FinstatApi;
+using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Text;
-using FinstatApi;
-using System.Text.RegularExpressions;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace ApiDistraintTester
 {
-    internal class Program
+    public class Program
     {
         public enum LicenceVersionEnum
         {
@@ -23,19 +23,30 @@ namespace ApiDistraintTester
         }
 
         //private const string ApiUrlConst = "http://localhost.fiddler:3376/api/";
-        private const string ApiUrlConst = "http://localhost:3376/api/";
+        //private const string ApiUrlConst = "http://localhost:3376/api/";
         //private const string ApiUrlConst = "https://cz.finstat.sk/api/";
-        //private const string ApiUrlConst = "https://www.finstat.sk/api/";
+        private const string ApiUrlConst = "https://www.finstat.sk/api/";
         private const string TestIcoConst = "35757442";
         private static string _apiKey = null;
         private static string _privateKey = null;
         private static bool _allow_payed_methods = false;
 
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            _apiKey = ConfigurationManager.AppSettings["api_key"];
-            _privateKey = ConfigurationManager.AppSettings["private_key"];
-            _allow_payed_methods = bool.Parse(ConfigurationManager.AppSettings["allow_payed_methods"]);
+            /**
+             * Example of appsettings.json
+             *  {
+                  "api_key": "add_api_key",
+                  "private_key": "add_private_key"
+                }
+             */
+            var builder = new ConfigurationBuilder()
+                     .AddJsonFile("appsettings.json")
+                     ;
+
+            var configuration = builder.Build();
+            _apiKey = configuration["api_key"];
+            _privateKey = configuration["private_key"];
             if (string.IsNullOrEmpty(_apiKey) || _apiKey == "add_api_key")
             {
                 Console.Write("api_key missing in .config file, please enter manually: ");
@@ -114,50 +125,67 @@ namespace ApiDistraintTester
 
         public static LicenceVersionEnum CheckApiVersion()
         {
-            try
+            ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            LicenceVersionEnum result = LicenceVersionEnum.ErrorToValidate;
+            bool ischecked = false;
+            if (!ischecked)
             {
-                ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                apiClient.RequestUltimateDetail(TestIcoConst);
-                return LicenceVersionEnum.Ultimate;
-            }
-            catch (FinstatApiException apiException)
-            {
-            }
-            try
-            {
-                ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                apiClient.RequestExtendedDetail(TestIcoConst);
-                return LicenceVersionEnum.Extended;
-            }
-            catch (FinstatApiException apiException)
-            {
-            }
-            try
-            {
-                ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                apiClient.RequestDetail(TestIcoConst);
-                return LicenceVersionEnum.Basic;
-            }
-            catch (FinstatApiException apiException)
-            {
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.AccessDisabled)
+                apiClient.RequestUltimateDetail(TestIcoConst).ContinueWith(task =>
                 {
-                    return LicenceVersionEnum.Disabled;
-                }
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.InsufficientAccess)
-                {
-                    return LicenceVersionEnum.InsufficientLicense;
-                }
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.LimitExceed)
-                {
-                    return LicenceVersionEnum.LimitExceed;
-                }
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.NotValidCustomerKey)
-                {
-                    return LicenceVersionEnum.NotValid;
-                }
+                    if (!task.IsFaulted && !task.IsCanceled)
+                    {
+                        result = LicenceVersionEnum.Ultimate;
+                        ischecked = true;
+                    }
+                }).Wait();
             }
-            return LicenceVersionEnum.ErrorToValidate;
+            if (!ischecked)
+            {
+                apiClient.RequestExtendedDetail(TestIcoConst).ContinueWith(task =>
+                {
+                    if (!task.IsFaulted && !task.IsCanceled)
+                    {
+                        result = LicenceVersionEnum.Extended;
+                        ischecked = true;
+                    }
+                }).Wait();
+            }
+            if (!ischecked)
+            {
+                apiClient.RequestDetail(TestIcoConst).ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        var apiException = (FinstatApiException)task.Exception.InnerException;
+                        if (apiException.FailType == FinstatApiException.FailTypeEnum.AccessDisabled)
+                        {
+                            result = LicenceVersionEnum.Disabled;
+                        }
+                        if (apiException.FailType == FinstatApiException.FailTypeEnum.InsufficientAccess)
+                        {
+                            result = LicenceVersionEnum.InsufficientLicense;
+                        }
+                        if (apiException.FailType == FinstatApiException.FailTypeEnum.LimitExceed)
+                        {
+                            result = LicenceVersionEnum.LimitExceed;
+                        }
+                        if (apiException.FailType == FinstatApiException.FailTypeEnum.NotValidCustomerKey)
+                        {
+                            result = LicenceVersionEnum.NotValid;
+                        }
+                    }
+                    else if (task.IsCanceled)
+                    {
+                        result = LicenceVersionEnum.ErrorToValidate;
+                    }
+                    else
+                    {
+                        result = LicenceVersionEnum.Basic;
+                        ischecked = true;
+                    }
+                }).Wait();
+            }
+            return result;
         }
 
         /// <summary>
@@ -170,18 +198,27 @@ namespace ApiDistraintTester
                 Console.WriteLine("Payed methods are not allowed for testing");
                 return null;
             }
-            try
+            ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.RequestDistraintSearch(ico, surname, dateOfBirth, city, companyName, fileReference).ContinueWith(task =>
             {
-                ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                var result = apiClient.RequestDistraintSearch(ico, surname, dateOfBirth, city, companyName, fileReference);
-                Console.WriteLine("Load OK with values\n {0}", result);
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Load Fails with exception: " + apiException);
-                return null;
-            }
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine("Load Fails with exception: " + task.Exception.InnerException);
+                    return null;
+                }
+                else if (task.IsCanceled)
+                {
+                    Console.WriteLine("Result was Canceled");
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine("Load OK with values\n {0}", task.Result);
+                    return task.Result;
+                }
+            }).Wait();
+
+            return null;
         }
 
         /// <summary>
@@ -194,18 +231,27 @@ namespace ApiDistraintTester
                 Console.WriteLine("Payed methods are not allowed for testing");
                 return null;
             }
-            try
+            ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.RequestDistraintDetail(token, ids).ContinueWith(task =>
             {
-                ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                var result = apiClient.RequestDistraintDetail(token, ids);
-                Console.WriteLine("Load OK with values\n {0}", result);
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Load Fails with exception: " + apiException);
-                return null;
-            }
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine("Load Fails with exception: " + task.Exception.InnerException);
+                    return null;
+                }
+                else if (task.IsCanceled)
+                {
+                    Console.WriteLine("Result was Canceled");
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine("Load OK with values\n {0}", task.Result);
+                    return task.Result;
+                }
+            }).Wait();
+
+            return null;
         }
 
         /// <summary>
@@ -213,18 +259,27 @@ namespace ApiDistraintTester
         /// </summary>
         public static DistraintResult Results(string ico, string surname, string dateOfBirth, string city, string companyName, string fileReference)
         {
-            try
+            ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.RequestDistraintResults(ico, surname, dateOfBirth, city, companyName, fileReference).ContinueWith(task =>
             {
-                ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                var result = apiClient.RequestDistraintResults(ico, surname, dateOfBirth, city, companyName, fileReference);
-                Console.WriteLine("Load OK with values\n {0}", result);
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Load Fails with exception: " + apiException);
-                return null;
-            }
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine("Load Fails with exception: " + task.Exception.InnerException);
+                    return null;
+                }
+                else if (task.IsCanceled)
+                {
+                    Console.WriteLine("Result was Canceled");
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine("Load OK with values\n {0}", task.Result);
+                    return task.Result;
+                }
+            }).Wait();
+
+            return null;
         }
 
         /// <summary>
@@ -232,18 +287,27 @@ namespace ApiDistraintTester
         /// </summary>
         public static DistraintResult Results(string token)
         {
-            try
+            ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.RequestDistraintResultsByToken(token).ContinueWith(task =>
             {
-                ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                var result = apiClient.RequestDistraintResultsByToken(token);
-                Console.WriteLine("Load OK with values\n {0}", result);
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Load Fails with exception: " + apiException);
-                return null;
-            }
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine("Load Fails with exception: " + task.Exception.InnerException);
+                    return null;
+                }
+                else if (task.IsCanceled)
+                {
+                    Console.WriteLine("Result was Canceled");
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine("Load OK with values\n {0}", task.Result);
+                    return task.Result;
+                }
+            }).Wait();
+
+            return null;
         }
 
         /// <summary>
@@ -251,39 +315,55 @@ namespace ApiDistraintTester
         /// </summary>
         public static DistraintDetailResults StoredDetail(string id)
         {
-            try
+            ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.RequestDistraintStoredDetail(id).ContinueWith(task =>
             {
-                ApiDistraintClient apiClient = new ApiDistraintClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                var result = apiClient.RequestDistraintStoredDetail(id);
-                Console.WriteLine("Load OK with values\n {0}", result);
-                return result;
-            }
-            catch (FinstatApiException apiException)
-            {
-                Console.WriteLine("Load Fails with exception: " + apiException);
-                return null;
-            }
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine("Load Fails with exception: " + task.Exception.InnerException);
+                    return null;
+                }
+                else if (task.IsCanceled)
+                {
+                    Console.WriteLine("Result was Canceled");
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine("Load OK with values\n {0}", task.Result);
+                    return task.Result;
+                }
+            }).Wait();
+
+            return null;
         }
+
 
         /// <summary>
         /// Test chyby: ak ico nie je vo finstat databaze
         /// </summary>
         public static void NotExistingCompany()
         {
-            try
+            ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
+            apiClient.RequestDetail("a12345678").ContinueWith(task =>
             {
-                ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 60000);
-                apiClient.RequestDetail("a12345678");
-            }
-            catch (FinstatApiException apiException)
-            {
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.NotFound)
+                if (task.IsFaulted && task.Exception != null && task.Exception.InnerException != null && (task.Exception.InnerException is FinstatApiException))
                 {
-                    Console.WriteLine("Not existing company: Test OK!");
-                    return;
+                    FinstatApiException ex = (FinstatApiException)task.Exception.InnerException;
+                    if (ex.FailType == FinstatApiException.FailTypeEnum.NotFound)
+                    {
+                        Console.WriteLine("Not existing company: Test OK!");
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
-            }
-            Console.WriteLine("Not existing company: Test FAIL!");
+                else
+                {
+                    Console.WriteLine("Not existing company: Test FAIL!");
+                }
+            }).Wait();
         }
 
         /// <summary>
@@ -291,20 +371,26 @@ namespace ApiDistraintTester
         /// </summary>
         public static void TimeoutRequest()
         {
-            try
+            ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 10);
+            apiClient.RequestDetail(TestIcoConst).ContinueWith(task =>
             {
-                ApiClient apiClient = new ApiClient(ApiUrlConst, _apiKey, _privateKey, "api test", "api test", 10);
-                apiClient.RequestDetail(TestIcoConst);
-            }
-            catch (FinstatApiException apiException)
-            {
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.Timeout)
+                if (task.IsFaulted && task.Exception != null && task.Exception.InnerException != null && (task.Exception.InnerException is FinstatApiException))
                 {
-                    Console.WriteLine("Request timeout: Test OK!");
-                    return;
+                    FinstatApiException ex = (FinstatApiException)task.Exception.InnerException;
+                    if (ex.FailType == FinstatApiException.FailTypeEnum.Timeout)
+                    {
+                        Console.WriteLine("Request timeout: Test OK!");
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
-            }
-            Console.WriteLine("Request timeout: Test FAIL!");
+                else
+                {
+                    Console.WriteLine("Request timeout: Test FAIL!");
+                }
+            }).Wait();
         }
 
         /// <summary>
@@ -312,20 +398,26 @@ namespace ApiDistraintTester
         /// </summary>
         public static void FailsWithNotValidCustomerKey()
         {
-            try
+            ApiClient apiClient = new ApiClient(ApiUrlConst, "not valid key", "not valid key", "api test", "api test", 60000);
+            apiClient.RequestDetail(TestIcoConst).ContinueWith(task =>
             {
-                ApiClient apiClient = new ApiClient(ApiUrlConst, "not valid key", "not valid key", "api test", "api test", 60000);
-                apiClient.RequestDetail(TestIcoConst);
-            }
-            catch (FinstatApiException apiException)
-            {
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.NotValidCustomerKey)
+                if (task.IsFaulted && task.Exception != null && task.Exception.InnerException != null && (task.Exception.InnerException is FinstatApiException))
                 {
-                    Console.WriteLine("Not valid customer key: Test OK!");
-                    return;
+                    FinstatApiException ex = (FinstatApiException)task.Exception.InnerException;
+                    if (ex.FailType == FinstatApiException.FailTypeEnum.NotValidCustomerKey)
+                    {
+                        Console.WriteLine("Not valid customer key: Test OK!");
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
-            }
-            Console.WriteLine("Not valid customer key: Test FAIL!");
+                else
+                {
+                    Console.WriteLine("Not valid customer key: Test FAIL!");
+                }
+            }).Wait();
         }
 
         /// <summary>
@@ -333,22 +425,26 @@ namespace ApiDistraintTester
         /// </summary>
         public static void UrlNotFound()
         {
-            try
+            ApiClient apiClient = new ApiClient("http://not.valid.sk/api", "not valid key", "not valid key", "api test", "api test", 60000);
+            apiClient.RequestDetail(TestIcoConst).ContinueWith((task) =>
             {
-                ApiClient apiClient = new ApiClient("http://not.valid.sk/api", "not valid key", "not valid key", "api test", "api test",
-                    60000);
-                apiClient.RequestDetail(TestIcoConst);
-            }
-            catch (FinstatApiException apiException)
-            {
-                if (apiException.FailType == FinstatApiException.FailTypeEnum.UrlNotFound)
+                if (task.IsFaulted && task.Exception != null && task.Exception.InnerException != null && (task.Exception.InnerException is FinstatApiException))
                 {
-                    Console.WriteLine("Url not found: Test OK!");
-                    return;
+                    FinstatApiException ex = (FinstatApiException)task.Exception.InnerException;
+                    if (ex.FailType == FinstatApiException.FailTypeEnum.UrlNotFound)
+                    {
+                        Console.WriteLine("Url not found: Test OK!");
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
                 }
-            }
-            Console.WriteLine("Url not found: Test FAIL!");
+                else
+                {
+                    Console.WriteLine("Url not found: Test FAIL!");
+                }
+            }).Wait();
         }
-
     }
 }

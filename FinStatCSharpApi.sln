@@ -1,63 +1,39 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.3.11520.95 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tester", "Tester", "{AAEB862A-A701-4348-BB6A-228955EA4EA3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SK", "SK", "{9ADCDBE4-48D2-4D85-B1A5-E97D917B4651}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinStatApi", "FinStatApi\FinStatApi.csproj", "{C3BDDE1C-98BD-4FD2-9712-749BF54CD1E2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CZ", "CZ", "{8660F3EA-C848-46DB-ABF9-7E7DF729BBF2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SK", "SK", "{8B0012E9-3BF2-4487-93DB-059213DEB554}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTester", "Tester\CZ\ApiTester\ApiTester.csproj", "{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CZ", "CZ", "{7E17BACB-776B-42D7-968D-6881F29A01D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinStatApi", "FinStatApi\FinStatApi.csproj", "{F0B05A37-F223-45C0-A692-37C4A7906D63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTesterCore", "Tester\SK\ApiTesterCore\ApiTesterCore.csproj", "{95076824-D84A-4FD4-8C77-EC9CFC7EA9C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiMonitoringTester", "Tester\CZ\ApiMonitoringTester\ApiMonitoringTester.csproj", "{782E8B76-6158-42BA-BDF3-E75719501CDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiMonitoringTester", "Tester\SK\ApiMonitoringTester\ApiMonitoringTester.csproj", "{05D2D4A6-AC30-4A56-B2BD-296DB245CD32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDailyDiffTester", "Tester\SK\ApiDailyDiffTester\ApiDailyDiffTester.csproj", "{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDistraintTester", "Tester\SK\ApiDistraintTester\ApiDistraintTester.csproj", "{F27E9C52-0CAB-4CA8-BFFE-0E21AABBAEF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDistraintTester", "Tester\SK\ApiDistraintTester\ApiDistraintTester.csproj", "{F866F61E-DB3C-417B-A8C9-199DBBA770CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDailyDiffTester", "Tester\SK\ApiDailyDiffTester\ApiDailyDiffTester.csproj", "{A1B0B3D2-EECA-4463-8462-34CB1EC79417}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiMonitoringTester", "Tester\SK\ApiMonitoringTester\ApiMonitoringTester.csproj", "{AF95BECB-0B97-44CC-80C9-A96E395012B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiCzTesterCore", "Tester\CZ\ApiCzTesterCore\ApiCzTesterCore.csproj", "{22259D01-0B18-4FDB-8C36-4E4357AC30B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTester", "Tester\SK\ApiTester\ApiTester.csproj", "{C2491EFA-B21D-47CC-ABB3-BE79087CA805}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinStatApi.Standard", "FinStatApi.Standard\FinStatApi.Standard.csproj", "{C3BDDE1C-98BD-4FD2-9712-749BF54CD1E2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SK.Core", "SK.Core", "{8B0012E9-3BF2-4487-93DB-059213DEB554}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CZ.Core", "CZ.Core", "{7E17BACB-776B-42D7-968D-6881F29A01D6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTesterCore", "Tester\SK.Core\ApiTesterCore\ApiTesterCore.csproj", "{95076824-D84A-4FD4-8C77-EC9CFC7EA9C0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiMonitoringTester", "Tester\SK.Core\ApiMonitoringTester\ApiMonitoringTester.csproj", "{05D2D4A6-AC30-4A56-B2BD-296DB245CD32}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDistraintTester", "Tester\SK.Core\ApiDistraintTester\ApiDistraintTester.csproj", "{F27E9C52-0CAB-4CA8-BFFE-0E21AABBAEF7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDailyDiffTester", "Tester\SK.Core\ApiDailyDiffTester\ApiDailyDiffTester.csproj", "{A1B0B3D2-EECA-4463-8462-34CB1EC79417}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiCzTesterCore", "Tester\CZ.Core\ApiCzTesterCore\ApiCzTesterCore.csproj", "{22259D01-0B18-4FDB-8C36-4E4357AC30B7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiMonitoringTester", "Tester\CZ.Core\ApiMonitoringTester\ApiMonitoringTester.csproj", "{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiMonitoringTester", "Tester\CZ\ApiMonitoringTester\ApiMonitoringTester.csproj", "{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{4BC70451-954C-433B-97B3-046F2EAE2A23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinStatApiCZ", "FinStatApiCz\FinStatApiCZ.csproj", "{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinStatApiCZ.Standard", "FinStatApiCZ.Standard\FinStatApiCZ.Standard.csproj", "{A01B7FD0-8A0B-4B92-9DBA-36B29A9D0D63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinStatApiCZ", "FinStatApiCZ\FinStatApiCZ.csproj", "{A01B7FD0-8A0B-4B92-9DBA-36B29A9D0D63}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FinStatApi.Client", "Shared\FinStatApi.Client\FinStatApi.Client.shproj", "{01A52A45-B92B-42EC-BBD5-5A28FFAC7F9C}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FinStatApi.Client.Core", "Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.shproj", "{22BC4041-5F65-4504-85BB-8FA844E2AD60}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FinStatApi.Client.Framework", "Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.shproj", "{BF93A508-99F4-45C2-BFE1-55DDDC696AA0}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FinStatApi.ViewModel", "Shared\FinstatApi.ViewModel\FinStatApi.ViewModel.shproj", "{3100699C-4DA1-409F-BB3E-15227EFA070F}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FinStatApiCZ.ViewModel", "Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.shproj", "{69C28EE8-7B16-450F-8C34-933FDABEE38D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopFinstatApiTester", "Tester\DesktopFinstatApiTester\DesktopFinstatApiTester.csproj", "{88EC8F97-0B1B-49F9-B8AC-70D38090C6C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DesktopFinstatApiTester", "Tester\DesktopFinstatApiTester\DesktopFinstatApiTester.csproj", "{88EC8F97-0B1B-49F9-B8AC-70D38090C6C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,62 +43,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Debug|x86.Build.0 = Debug|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Release|x86.ActiveCfg = Release|Any CPU
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E}.Release|x86.Build.0 = Release|Any CPU
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Debug|x86.ActiveCfg = Debug|x86
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Debug|x86.Build.0 = Debug|x86
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Release|x86.ActiveCfg = Release|x86
-		{F0B05A37-F223-45C0-A692-37C4A7906D63}.Release|x86.Build.0 = Release|x86
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Debug|x86.Build.0 = Debug|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Release|x86.ActiveCfg = Release|Any CPU
-		{782E8B76-6158-42BA-BDF3-E75719501CDF}.Release|x86.Build.0 = Release|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Debug|x86.Build.0 = Debug|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Release|x86.ActiveCfg = Release|Any CPU
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895}.Release|x86.Build.0 = Release|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Debug|x86.Build.0 = Debug|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Release|x86.ActiveCfg = Release|Any CPU
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA}.Release|x86.Build.0 = Release|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Debug|x86.Build.0 = Debug|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Release|x86.ActiveCfg = Release|Any CPU
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1}.Release|x86.Build.0 = Release|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Debug|x86.Build.0 = Debug|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Release|x86.ActiveCfg = Release|Any CPU
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805}.Release|x86.Build.0 = Release|Any CPU
 		{C3BDDE1C-98BD-4FD2-9712-749BF54CD1E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C3BDDE1C-98BD-4FD2-9712-749BF54CD1E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3BDDE1C-98BD-4FD2-9712-749BF54CD1E2}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -179,14 +99,6 @@ Global
 		{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0}.Release|x86.ActiveCfg = Release|Any CPU
 		{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0}.Release|x86.Build.0 = Release|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Debug|x86.Build.0 = Debug|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Release|x86.ActiveCfg = Release|Any CPU
-		{BC9D1C9F-669A-41A8-8FE1-1B4DE68A792C}.Release|x86.Build.0 = Release|Any CPU
 		{A01B7FD0-8A0B-4B92-9DBA-36B29A9D0D63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A01B7FD0-8A0B-4B92-9DBA-36B29A9D0D63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A01B7FD0-8A0B-4B92-9DBA-36B29A9D0D63}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -208,14 +120,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9ADCDBE4-48D2-4D85-B1A5-E97D917B4651} = {AAEB862A-A701-4348-BB6A-228955EA4EA3}
-		{8660F3EA-C848-46DB-ABF9-7E7DF729BBF2} = {AAEB862A-A701-4348-BB6A-228955EA4EA3}
-		{E9C3DD2C-32B6-48A0-BE84-02F931AA2F6E} = {8660F3EA-C848-46DB-ABF9-7E7DF729BBF2}
-		{782E8B76-6158-42BA-BDF3-E75719501CDF} = {8660F3EA-C848-46DB-ABF9-7E7DF729BBF2}
-		{DD8E54E7-5F68-4FE8-8029-5EB53BF61895} = {9ADCDBE4-48D2-4D85-B1A5-E97D917B4651}
-		{F866F61E-DB3C-417B-A8C9-199DBBA770CA} = {9ADCDBE4-48D2-4D85-B1A5-E97D917B4651}
-		{AF95BECB-0B97-44CC-80C9-A96E395012B1} = {9ADCDBE4-48D2-4D85-B1A5-E97D917B4651}
-		{C2491EFA-B21D-47CC-ABB3-BE79087CA805} = {9ADCDBE4-48D2-4D85-B1A5-E97D917B4651}
 		{8B0012E9-3BF2-4487-93DB-059213DEB554} = {AAEB862A-A701-4348-BB6A-228955EA4EA3}
 		{7E17BACB-776B-42D7-968D-6881F29A01D6} = {AAEB862A-A701-4348-BB6A-228955EA4EA3}
 		{95076824-D84A-4FD4-8C77-EC9CFC7EA9C0} = {8B0012E9-3BF2-4487-93DB-059213DEB554}
@@ -225,8 +129,6 @@ Global
 		{22259D01-0B18-4FDB-8C36-4E4357AC30B7} = {7E17BACB-776B-42D7-968D-6881F29A01D6}
 		{ABD1A5B6-0F1B-43D3-88DC-C23EC7A92AE0} = {7E17BACB-776B-42D7-968D-6881F29A01D6}
 		{01A52A45-B92B-42EC-BBD5-5A28FFAC7F9C} = {4BC70451-954C-433B-97B3-046F2EAE2A23}
-		{22BC4041-5F65-4504-85BB-8FA844E2AD60} = {4BC70451-954C-433B-97B3-046F2EAE2A23}
-		{BF93A508-99F4-45C2-BFE1-55DDDC696AA0} = {4BC70451-954C-433B-97B3-046F2EAE2A23}
 		{3100699C-4DA1-409F-BB3E-15227EFA070F} = {4BC70451-954C-433B-97B3-046F2EAE2A23}
 		{69C28EE8-7B16-450F-8C34-933FDABEE38D} = {4BC70451-954C-433B-97B3-046F2EAE2A23}
 		{88EC8F97-0B1B-49F9-B8AC-70D38090C6C8} = {AAEB862A-A701-4348-BB6A-228955EA4EA3}
@@ -236,21 +138,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{01a52a45-b92b-42ec-bbd5-5a28ffac7f9c}*SharedItemsImports = 13
-		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{22bc4041-5f65-4504-85bb-8fa844e2ad60}*SharedItemsImports = 13
 		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{3100699c-4da1-409f-bb3e-15227efa070f}*SharedItemsImports = 13
 		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{69c28ee8-7b16-450f-8c34-933fdabee38d}*SharedItemsImports = 13
-		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
 		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
 		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
-		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 5
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 5
-		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 5
-		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{bf93a508-99f4-45c2-bfe1-55dddc696aa0}*SharedItemsImports = 13
-		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
 		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
 		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
-		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 5
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 5
-		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

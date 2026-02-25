@@ -16,7 +16,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKReportingTopics(object[] parameters)
         {
             var client = CreateSKApiReportingClient();
-            var result = client.RequestTopics();
+            var result = client.RequestTopics().GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -31,7 +31,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKReportingList(object[] parameters)
         {
             var client = CreateSKApiReportingClient();
-            var result = client.RequestList((string)parameters[0]);
+            var result = client.RequestList((string)parameters[0]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -47,7 +47,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDownloadReportingOutput(object[] parameters)
         {
             var client = CreateSKApiReportingClient();
-            var result = client.DownloadReportFile((string)parameters[0], (string)parameters[1]);
+            var result = client.DownloadReportFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

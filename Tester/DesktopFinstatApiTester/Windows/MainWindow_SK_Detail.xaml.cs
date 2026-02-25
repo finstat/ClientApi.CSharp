@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 
 namespace DesktopFinstatApiTester.Windows
 {
@@ -18,7 +14,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKBasic(object[] parameters)
         {
             var client = CreateSKApiClient();
-            var result = client.RequestBasic((string)parameters[0], IsJSON());
+            var result = client.RequestBasic((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -33,7 +29,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDetail(object[] parameters)
         {
             var client = CreateSKApiClient();
-            var result = client.RequestDetail((string)parameters[0], IsJSON());
+            var result = client.RequestDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -48,7 +44,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKExtended(object[] parameters)
         {
             var client = CreateSKApiClient();
-            var result = client.RequestExtendedDetail((string)parameters[0], IsJSON());
+            var result = client.RequestExtendedDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -63,7 +59,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKUltimate(object[] parameters)
         {
             var client = CreateSKApiClient();
-            var result = client.RequestUltimateDetail((string)parameters[0], IsJSON());
+            var result = client.RequestUltimateDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

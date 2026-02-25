@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <AssemblyName>ApiMonitoringTester</AssemblyName>
+    <AssemblyName>ApiTesterCore</AssemblyName>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 

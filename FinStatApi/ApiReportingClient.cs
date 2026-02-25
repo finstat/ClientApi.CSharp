@@ -1,11 +1,7 @@
-﻿using FinstatApi.ViewModel;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -31,14 +27,13 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public Reporting.ReportingTopic[] RequestTopics(bool json = false)
+        public async Task<Reporting.ReportingTopic[]> RequestTopics(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "reporting-topics") },
-            };
-            return DoApiCall<Reporting.ReportingTopic[]>("/GetReportingTopics", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "reporting-topics")),
+            });
+
+            return await DoApiCall<Reporting.ReportingTopic[]>("/GetReportingTopics", list, json);
         }
 
         // <summary>
@@ -51,16 +46,15 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exceptio
-        public Reporting.ReportOutput[] RequestList(string topic, bool json = false)
+        public async Task<Reporting.ReportOutput[]> RequestList(string topic, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "topic", topic },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "reporting-list|" + topic) },
-            };
-            return DoApiCall<Reporting.ReportOutput[]>("/GetReportingList", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("topic", topic),
+                new KeyValuePair<string, string>("Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "reporting-list|" + topic)),
+            });
+            return await DoApiCall<Reporting.ReportOutput[]>("/GetReportingList", list, json);
         }
+
 
         /// <summary>
         /// Downloads reporting excel File .
@@ -72,17 +66,15 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public string DownloadReportFile(string fileName, string exportPath)
+        public async Task<string> DownloadReportFile(string fileName, string exportPath)
         {
             try
             {
-                System.Collections.Specialized.NameValueCollection reqparm =
-                new System.Collections.Specialized.NameValueCollection
-                {
-                    { "FileName", fileName },
-                    { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, fileName) },
-                };
-                byte[] responsebytes = DoApiCall("/GetReportingOutput", reqparm);
+                var list = new List<KeyValuePair<string, string>>(new[] {
+                     new KeyValuePair<string, string>("FileName", fileName ),
+                     new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, fileName)),
+                });
+                var responsebytes = await DoApiCall("/GetReportingOutput", list);
                 if (responsebytes != null)
                 {
                     string fullExportPath = Path.Combine(exportPath, fileName + ".xlsx");
@@ -98,6 +90,10 @@ namespace FinstatApi
             catch (FinstatApiException e)
             {
                 throw e;
+            }
+            catch (TaskCanceledException e)
+            {
+                throw new FinstatApiException(FinstatApiException.FailTypeEnum.Timeout, "Timeout exception while processing Finstat api request!", e);
             }
             catch (Exception e)
             {

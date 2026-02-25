@@ -1,11 +1,7 @@
-﻿using FinstatApi.ViewModel;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -31,15 +27,13 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public Statement.StatementItem[] RequestStatements(string ico, bool json = false)
+        public async Task<Statement.StatementItem[]> RequestStatements(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
-            return DoApiCall<Statement.StatementItem[]>("/GetStatements", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<Statement.StatementItem[]>("/GetStatements", list, json);
         }
 
         // <summary>
@@ -52,19 +46,17 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exceptio
-        public Statement.AbstractStatementResult RequestStatementDetail(string ico, int year, Statement.TemplateTypeEnum template, bool json = false)
+        public async Task<Statement.AbstractStatementResult> RequestStatementDetail(string ico, int year, Statement.TemplateTypeEnum template, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "year", year.ToString() },
-                { "template", template.ToString() },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, ico + "|" + year) },
-            };
-            return (template == Statement.TemplateTypeEnum.TemplateNujPU || template == Statement.TemplateTypeEnum.TemplateROPO)
-                 ? (DoApiCall<Statement.NonProfitStatementResult>("/GetStatementDetail", reqparm, json) as Statement.AbstractStatementResult)
-                 : (DoApiCall<Statement.StatementResult>("/GetStatementDetail", reqparm, json) as Statement.AbstractStatementResult);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("year", year.ToString()),
+                new KeyValuePair<string, string>("template", template.ToString()),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico + "|" + year)),
+            });
+            return (new[] { Statement.TemplateTypeEnum.TemplateNujPU, Statement.TemplateTypeEnum.TemplateROPO }.Contains(template))
+                 ? (await DoApiCall<Statement.NonProfitStatementResult>("/GetStatementDetail", list, json) as Statement.AbstractStatementResult)
+                 : (await DoApiCall<Statement.StatementResult>("/GetStatementDetail", list, json) as Statement.AbstractStatementResult);
         }
 
         /// <summary>
@@ -77,18 +69,16 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public Statement.AbstractStatementLegendResult RequestStatementLegend(Statement.TemplateTypeEnum template, string lang = "sk", bool json = false)
+        public async Task<Statement.AbstractStatementLegendResult> RequestStatementLegend(Statement.TemplateTypeEnum template, string lang = "sk", bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "lang", lang },
-                { "template", template.ToString() },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, lang) },
-            };
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("lang", lang),
+                new KeyValuePair<string, string>("template", template.ToString()),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, lang)),
+            });
             return (template == Statement.TemplateTypeEnum.TemplateNujPU || template == Statement.TemplateTypeEnum.TemplateROPO)
-                ? (DoApiCall<Statement.NonProfitStatementLegendResult>("/GetStatementTemplateLegend", reqparm, json) as Statement.AbstractStatementLegendResult)
-                : (DoApiCall<Statement.StatementLegendResult>("/GetStatementTemplateLegend", reqparm, json) as Statement.AbstractStatementLegendResult);
+                ? (await DoApiCall<Statement.NonProfitStatementLegendResult>("/GetStatementTemplateLegend", list, json) as Statement.AbstractStatementLegendResult)
+                : (await DoApiCall<Statement.StatementLegendResult>("/GetStatementTemplateLegend", list, json) as Statement.AbstractStatementLegendResult);
         }
     }
 }

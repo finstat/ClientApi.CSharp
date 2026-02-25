@@ -19,7 +19,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyDiffList(object[] parameters)
         {
             var client = CreateSKApiDailyDiffClient();
-            var result = client.RequestListOfDailyDiffs(IsJSON());
+            var result = client.RequestListOfDailyDiffs(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -35,7 +35,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyDiffFile(object[] parameters)
         {
             var client = CreateSKApiDailyDiffClient();
-            var result = client.DownloadDailyDiffFile((string)parameters[0], (string)parameters[1]);
+            var result = client.DownloadDailyDiffFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

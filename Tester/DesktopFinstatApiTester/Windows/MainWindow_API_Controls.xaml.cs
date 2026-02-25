@@ -301,7 +301,7 @@ namespace DesktopFinstatApiTester.Windows
             urlParameters.Add("StationName", "curl-test");
 
             StringBuilder str = new StringBuilder();
-            str.AppendLine($"curl '{url}/{endPoint}{urlSuffix}?{string.Join("&", urlParameters.Select(x=> $"{x.Key}={x.Value}"))}' -v");
+            str.AppendLine($"curl '{url}/{endPoint}{urlSuffix}?{string.Join("&", urlParameters.Select(x => $"{x.Key}={x.Value}"))}' -v");
             str.AppendLine();
             str.AppendLine($"curl -X POST '{url}/{endPoint}{urlSuffix}' -d '{string.Join("&", urlParameters.Select(x => $"{x.Key}={x.Value}"))}' -v ");
             str.AppendLine();
@@ -660,7 +660,7 @@ namespace DesktopFinstatApiTester.Windows
             if (treeViewObjectGraph.SelectedItem != null)
             {
                 var item = (ViewModel.ObjectViewModel)treeViewObjectGraph.SelectedItem;
-                OutputWindow window = new OutputWindow(JsonConvert.SerializeObject(item.Object, Formatting.Indented))
+                OutputWindow window = new OutputWindow(JsonSerializer.Serialize(item.Object, new JsonSerializerOptions { WriteIndented = true }))
                 {
                     Owner = this,
                     Title = "Selected Result Node"

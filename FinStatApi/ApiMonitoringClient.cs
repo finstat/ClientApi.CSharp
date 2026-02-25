@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -32,19 +27,24 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public bool Add(string ico, string category = null, bool json = false)
+        public async Task<bool> Add(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<bool>("/AddToMonitoring", list, json);
+        }
+
+        public async Task<bool> Add(string ico, string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
             if (!string.IsNullOrEmpty(category))
-            {
-                reqparm.Add("category", category);
-            }
-            return DoApiCall<bool>("/AddToMonitoring", reqparm, json);
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<bool>("/AddToMonitoring", list, json);
         }
 
         /// <summary>
@@ -59,19 +59,24 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public bool Remove(string ico, string category = null, bool json = false)
+        public async Task<bool> Remove(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json);
+        }
+
+        public async Task<bool> Remove(string ico, string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
             if (!string.IsNullOrEmpty(category))
-            {
-                reqparm.Add("category", category);
-            }
-            return DoApiCall<bool>("/RemoveFromMonitoring", reqparm, json);
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json);
         }
 
         /// <summary>
@@ -81,21 +86,25 @@ namespace FinstatApi
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!
-        /// or Unknown exception while communication with Finstat api!
+        /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public string[] GetMonitorings(string category = null, bool json = false)
+        public async Task<string[]> GetMonitorings(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "list") },
-            };
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "list")),
+            });
+            return await DoApiCall<string[]>("/MonitoringList", list, json);
+        }
+
+        public async Task<string[]> GetMonitorings(string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "list")),
+            });
             if (!string.IsNullOrEmpty(category))
-            {
-                reqparm.Add("category", category);
-            }
-            return DoApiCall<string[]>("/MonitoringList", reqparm, json);
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<string[]>("/MonitoringList", list, json);
         }
 
         /// <summary>
@@ -108,18 +117,22 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public Monitoring[] GetReport(string category = null, bool json = false)
+        public async Task<Monitoring[]> GetReport(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "report") },
-            };
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "report")),
+            });
+            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json);
+        }
+
+        public async Task<Monitoring[]> GetReport(string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "report")),
+            });
             if (!string.IsNullOrEmpty(category))
-            {
-                reqparm.Add("category", category);
-            }
-            return DoApiCall<Monitoring[]>("/MonitoringReport", reqparm, json);
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json);
         }
 
         /// <summary>
@@ -129,17 +142,15 @@ namespace FinstatApi
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public ProceedingResult[] GetProceedings(bool json = false)
+        public async Task<ProceedingResult[]> GetProceedings(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "proceedings") },
-            };
-            return DoApiCall<ProceedingResult[]>("/MonitoringProceedings", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "proceedings")),
+            });
+            return await DoApiCall<ProceedingResult[]>("/MonitoringProceedings", list, json);
         }
 
         /// <summary>
@@ -154,15 +165,13 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public bool AddDate(string date, bool json = false)
+        public async Task<bool> AddDate(string date, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "date", date },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, date) },
-            };
-            return DoApiCall<bool>("/AddDateToMonitoring", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("date", date),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
+            });
+            return await DoApiCall<bool>("/AddDateToMonitoring", list, json);
         }
 
         /// <summary>
@@ -174,18 +183,15 @@ namespace FinstatApi
         /// Not valid API key!
         /// or Invalid Date format
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public bool RemoveDate(string date, bool json = false)
+        public async Task<bool> RemoveDate(string date, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "date", date },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, date) },
-            };
-            return DoApiCall<bool>("/RemoveDateFromMonitoring", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("date", date),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
+            });
+            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json);
         }
 
         /// <summary>
@@ -198,34 +204,29 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public string[] GetDateMonitorings(bool json = false)
+        public async Task<string[]> GetDateMonitorings(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "datelist") },
-            };
-            return DoApiCall<string[]>("/MonitoringDateList", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datelist")),
+            });
+            return await DoApiCall<string[]>("/MonitoringDateList", list, json);
         }
 
-        /// <summary>
+        // <summary>
         /// Retrieves report of date events in current monitorings.
         /// </summary>
         /// <returns>List of monitoring events.</returns>
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public MonitoringDate[] GetDateReport(bool json = false)
+        public async Task<MonitoringDate[]> GetDateReport(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "datereport") },
-            };
-            return DoApiCall<MonitoringDate[]>("/MonitoringDateReport", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datereport")),
+            });
+            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json);
         }
 
         /// <summary>
@@ -235,17 +236,15 @@ namespace FinstatApi
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public ProceedingResult[] GetDateProceedings(bool json = false)
+        public async Task<ProceedingResult[]> GetDateProceedings(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "dateproceedings") },
-            };
-            return DoApiCall<ProceedingResult[]>("/MonitoringDateProceedings", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "dateproceedings")),
+            });
+            return await DoApiCall<ProceedingResult[]>("/MonitoringDateProceedings", list, json);
         }
 
         /// <summary>
@@ -261,12 +260,10 @@ namespace FinstatApi
         ///
         public object GetCategories(bool json)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, "monitoringcategories") },
-            };
-            return DoApiCall<MonitoringCategory[]>("/MonitoringCategories", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "monitoringcategories")),
+            });
+            return DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json);
         }
     }
 }

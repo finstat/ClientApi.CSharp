@@ -16,7 +16,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKMonitoringDateAdd(object[] parameters)
         {
             var client = CreateSKApiMonitoringClient();
-            var result = client.AddDate((string)parameters[0], IsJSON());
+            var result = client.AddDate((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -31,7 +31,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKMonitoringDateRemove(object[] parameters)
         {
             var client = CreateSKApiMonitoringClient();
-            var result = client.RemoveDate((string)parameters[0], IsJSON());
+            var result = client.RemoveDate((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -44,7 +44,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKMonitoringDateList(object[] parameters)
         {
             var client = CreateSKApiMonitoringClient();
-            var result = client.GetDateMonitorings(IsJSON());
+            var result = client.GetDateMonitorings(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -57,7 +57,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKMonitoringDateReport(object[] parameters)
         {
             var client = CreateSKApiMonitoringClient();
-            var result = client.GetDateReport(IsJSON());
+            var result = client.GetDateReport(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -70,7 +70,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKMonitoringDateProceedings(object[] parameters)
         {
             var client = CreateSKApiMonitoringClient();
-            var result = client.GetDateProceedings(IsJSON());
+            var result = client.GetDateProceedings(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

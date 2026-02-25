@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>FinstatApiCz</AssemblyName>
     <RootNamespace>FinstatApi</RootNamespace>
-    <AssemblyName>FinstatApi</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
 
-  <Import Project="..\Shared\FinStatApi.Client\FinStatApi.Client.projitems" Label="Shared" />
+  <Import Project="..\Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems" Label="Shared" />
 
-<Import Project="..\Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems" Label="Shared" />
+<Import Project="..\Shared\FinStatApi.Client\FinStatApi.Client.projitems" Label="Shared" />
 
 </Project>

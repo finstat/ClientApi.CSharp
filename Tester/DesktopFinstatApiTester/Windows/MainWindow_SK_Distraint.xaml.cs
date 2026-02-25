@@ -27,7 +27,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDistraintSearch(object[] parameters)
         {
             var client = CreateSKApiDistraintClient();
-            var result = client.RequestDistraintSearch((string)parameters[0], (string)parameters[1], (string)parameters[2], (string)parameters[3], (string)parameters[4], (string)parameters[5]);
+            var result = client.RequestDistraintSearch((string)parameters[0], (string)parameters[1], (string)parameters[2], (string)parameters[3], (string)parameters[4], (string)parameters[5]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -46,7 +46,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDistraintDetail(object[] parameters)
         {
             var client = CreateSKApiDistraintClient();
-            var result = client.RequestDistraintDetail((string)parameters[0], ((string)parameters[1]).Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(x => Int32.Parse(x.Trim())).ToArray());
+            var result = client.RequestDistraintDetail((string)parameters[0], ((string)parameters[1]).Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(x => Int32.Parse(x.Trim())).ToArray()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -66,7 +66,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDistraintResults(object[] parameters)
         {
             var client = CreateSKApiDistraintClient();
-            var result = client.RequestDistraintResults((string)parameters[0], (string)parameters[1], (string)parameters[2], (string)parameters[3], (string)parameters[4], (string)parameters[5]);
+            var result = client.RequestDistraintResults((string)parameters[0], (string)parameters[1], (string)parameters[2], (string)parameters[3], (string)parameters[4], (string)parameters[5]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -81,7 +81,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDistraintResultsByToken(object[] parameters)
         {
             var client = CreateSKApiDistraintClient();
-            var result = client.RequestDistraintResultsByToken((string)parameters[0]);
+            var result = client.RequestDistraintResultsByToken((string)parameters[0]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -96,7 +96,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDistraintStoredDetail(object[] parameters)
         {
             var client = CreateSKApiDistraintClient();
-            var result = client.RequestDistraintStoredDetail((string)parameters[0]);
+            var result = client.RequestDistraintStoredDetail((string)parameters[0]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

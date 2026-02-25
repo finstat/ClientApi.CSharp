@@ -20,7 +20,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyStatement2014DiffList(object[] parameters)
         {
             var client = CreateSKApiDailyStatement2014DiffClient();
-            var result = client.RequestListOfDailyStatement2014Diffs(IsJSON());
+            var result = client.RequestListOfDailyStatement2014Diffs(IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -36,7 +36,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyStatement2014DiffFile(object[] parameters)
         {
             var client = CreateSKApiDailyStatement2014DiffClient();
-            var result = client.DownloadDailyStatement2014DiffFile((string)parameters[0], (string)parameters[1]);
+            var result = client.DownloadDailyStatement2014DiffFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -65,7 +65,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKDailyStatementDiff2014Legend(object[] parameters)
         {
             var client = CreateSKApiDailyStatement2014DiffClient();
-            var result = client.RequestStatement2014Legend();
+            var result = client.RequestStatement2014Legend().GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

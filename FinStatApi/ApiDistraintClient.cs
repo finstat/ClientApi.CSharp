@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -36,16 +32,14 @@ namespace FinstatApi
         /// or Url {0} not found!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DistraintResult RequestDistraintSearch(string ico, string surname, string dateOfBirth, string city, string companyName, string fileReference, bool json = false)
+        public async Task<DistraintResult> RequestDistraintSearch(string ico, string surname, string dateOfBirth, string city, string companyName, string fileReference, bool json = false)
         {
             var search = string.Format("{0}|{1}|{2}|{3}|{4}|{5}", ico, surname, dateOfBirth, city, companyName, fileReference);
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "search", search },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, search) },
-            };
-            return DoApiCall<DistraintResult>("/distraintSearch", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("search", search ),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, search)),
+            });
+            return await DoApiCall<DistraintResult>("/distraintSearch", list, json);
         }
 
         /// <summary>
@@ -60,7 +54,7 @@ namespace FinstatApi
         /// or Url {0} not found!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DistraintDetailResults RequestDistraintDetail(string token, int[] ids, bool json = false)
+        public async Task<DistraintDetailResults> RequestDistraintDetail(string token, int[] ids, bool json = false)
         {
             var idsString = String.Empty;
             var idsParam = String.Empty;
@@ -72,15 +66,12 @@ namespace FinstatApi
                     idsParam += (!string.IsNullOrEmpty(idsParam) ? "," : null) + id;
                 }
             }
-
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "token", token },
-                { "ids", idsParam },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, token + idsString) },
-            };
-            return DoApiCall<DistraintDetailResults>("/distraintDetail", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("token", token ),
+                new KeyValuePair<string, string>("ids", idsParam ),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, token + idsString)),
+            });
+            return await DoApiCall<DistraintDetailResults>("/distraintDetail", list, json);
         }
 
         /// <summary>
@@ -99,16 +90,14 @@ namespace FinstatApi
         /// or Url {0} not found!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DistraintResult RequestDistraintResults(string ico, string surname, string dateOfBirth, string city, string companyName, string fileReference, bool json = false)
+        public async Task<DistraintResult> RequestDistraintResults(string ico, string surname, string dateOfBirth, string city, string companyName, string fileReference, bool json = false)
         {
             var search = string.Format("{0}|{1}|{2}|{3}|{4}|{5}", ico, surname, dateOfBirth, city, companyName, fileReference);
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "search", search },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, search) },
-            };
-            return DoApiCall<DistraintResult>("/distraintResults", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("search", search ),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, search)),
+            });
+            return await DoApiCall<DistraintResult>("/distraintResults", list, json);
         }
 
         /// <summary>
@@ -123,15 +112,13 @@ namespace FinstatApi
         /// or Url {0} not found!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DistraintResult RequestDistraintResultsByToken(string token, bool json = false)
+        public async Task<DistraintResult> RequestDistraintResultsByToken(string token, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "token", token },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, token) },
-            };
-            return DoApiCall<DistraintResult>("/distraintResultsByToken", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("token", token ),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, token)),
+            });
+            return await DoApiCall<DistraintResult>("/distraintResultsByToken", list, json);
         }
 
         /// <summary>
@@ -146,15 +133,13 @@ namespace FinstatApi
         /// or Url {0} not found!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DistraintDetailResults RequestDistraintStoredDetail(string id, bool json = false)
+        public async Task<DistraintDetailResults> RequestDistraintStoredDetail(string id, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "id", id },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, id) },
-            };
-            return DoApiCall<DistraintDetailResults>("/distraintStoredDetail", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("id", id ),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, id)),
+            });
+            return await DoApiCall<DistraintDetailResults>("/distraintStoredDetail", list, json);
         }
     }
 }

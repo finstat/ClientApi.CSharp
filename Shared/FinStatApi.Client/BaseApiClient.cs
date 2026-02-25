@@ -1,11 +1,5 @@
-﻿using FinstatApi;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -31,16 +25,15 @@ namespace FinstatApi
         /// or Specified query {0} too short!
         /// or Url {0} not found!
         /// or Unknown exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public ApiAutocomplete RequestAutocomplete(string query, bool json = false)
+        public async Task<ApiAutocomplete> RequestAutocomplete(string query, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-                new System.Collections.Specialized.NameValueCollection
-                {
-                    { "query", query },
-                    { "Hash", ComputeVerificationHash(_apiKey, _privateKey, query) },
-                };
-            return DoApiCall<ApiAutocomplete>("/autocomplete", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("query", query ),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, query)),
+            });
+            return await DoApiCall<ApiAutocomplete>("/autocomplete", list, json);
         }
 
 
@@ -57,19 +50,17 @@ namespace FinstatApi
         /// or Not valid user license email!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public string RequestAutoLogin(string url, string email = null, bool json = false)
+        public async Task<string> RequestAutoLogin(string url, string email = null, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-                new System.Collections.Specialized.NameValueCollection
-                {
-                    { "url", url },
-                    { "Hash", ComputeVerificationHash(_apiKey, _privateKey, "autologin") },
-                };
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("url", url),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "autologin")),
+            });
             if (!string.IsNullOrEmpty(email))
             {
-                reqparm.Add("email", email);
+                list.Add(new KeyValuePair<string, string>("email", email));
             }
-            return DoApiCall<string>("/autologin", reqparm, json);
+            return await DoApiCall<string>("/autologin", list, json);
         }
     }
 }

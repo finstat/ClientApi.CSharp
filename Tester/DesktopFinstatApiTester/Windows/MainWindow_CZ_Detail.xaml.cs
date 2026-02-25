@@ -1,9 +1,4 @@
 ﻿extern alias CZ;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace DesktopFinstatApiTester.Windows
@@ -20,7 +15,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZBasic(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestBasic((string)parameters[0], IsJSON());
+            var result = client.RequestBasic((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -35,7 +30,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZDetail(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestDetail((string)parameters[0], IsJSON());
+            var result = client.RequestDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -50,7 +45,7 @@ namespace DesktopFinstatApiTester.Windows
         private object CZPremium(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestPremium((string)parameters[0], IsJSON());
+            var result = client.RequestPremium((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

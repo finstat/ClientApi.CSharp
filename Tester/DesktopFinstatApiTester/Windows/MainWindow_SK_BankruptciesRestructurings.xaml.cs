@@ -21,7 +21,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKPersonBankruptcyProceedings(object[] parameters)
         {
             var client = CreateSKApiBankruptcyRestructuringClient();
-            var result = client.RequestPersonBankruptcyProceedings((string)parameters[0], (string)parameters[1], (DateTime)parameters[2], IsJSON());
+            var result = client.RequestPersonBankruptcyProceedings((string)parameters[0], (string)parameters[1], (DateTime)parameters[2], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -39,7 +39,7 @@ namespace DesktopFinstatApiTester.Windows
         private object SKCompanyBankruptcyRestructuring(object[] parameters)
         {
             var client = CreateSKApiBankruptcyRestructuringClient();
-            var result = client.RequestCompanyBankruptcyRestructuring((string)parameters[0], (string)parameters[1], IsJSON());
+            var result = client.RequestCompanyBankruptcyRestructuring((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

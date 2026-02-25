@@ -1,11 +1,8 @@
 ﻿using FinstatApi.ViewModel;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -31,14 +28,12 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DailyDiffList RequestListOfDailyStatementDiffs(bool json = false)
+        public async Task<DailyDiffList> RequestListOfDailyStatementDiffs(bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, null) },
-            };
-            return DoApiCall<DailyDiffList>("/GetListOfStatementDiffs", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, null)),
+            });
+            return await DoApiCall<DailyDiffList>("/GetListOfStatementDiffs", list, json);
         }
 
         /// <summary>
@@ -51,17 +46,15 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public string DownloadDailyStatementDiffFile(string fileName, string exportPath)
+        public async Task<string> DownloadDailyStatementDiffFile(string fileName, string exportPath)
         {
             try
             {
-                System.Collections.Specialized.NameValueCollection reqparm =
-                new System.Collections.Specialized.NameValueCollection
-                {
-                    { "fileName", fileName },
-                    { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, fileName) },
-                };
-                byte[] responsebytes = DoApiCall("/GetStatementFile", reqparm);
+                var list = new List<KeyValuePair<string, string>>(new[] {
+                     new KeyValuePair<string, string>("fileName", fileName),
+                     new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, fileName)),
+                });
+                var responsebytes = await DoApiCall("/GetStatementFile", list);
                 if (responsebytes != null)
                 {
                     string fullExportPath = Path.Combine(exportPath, fileName);
@@ -77,6 +70,10 @@ namespace FinstatApi
             catch (FinstatApiException e)
             {
                 throw e;
+            }
+            catch (TaskCanceledException e)
+            {
+                throw new FinstatApiException(FinstatApiException.FailTypeEnum.Timeout, "Timeout exception while processing Finstat api request!", e);
             }
             catch (Exception e)
             {
@@ -94,15 +91,13 @@ namespace FinstatApi
         /// or Timeout exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public KeyValue[] RequestStatementLegend(string lang = "sk", bool json = false)
+        public async Task<KeyValue[]> RequestStatementLegend(string lang = "sk", bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "lang", lang },
-                { "Hash", ApiClient.ComputeVerificationHash(_apiKey, _privateKey, lang) },
-            };
-            return DoApiCall<KeyValue[]>("/GetStatementLegend", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("lang", lang),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, lang)),
+            });
+            return await DoApiCall<KeyValue[]>("/GetStatementLegend", list, json);
         }
     }
 }

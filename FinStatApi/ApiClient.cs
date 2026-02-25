@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FinstatApi
 {
@@ -20,7 +15,7 @@ namespace FinstatApi
         {
         }
         /// <summary>
-        /// Requests the detail for specified ico.
+        /// Requests the beaic for specified ico.
         /// </summary>
         /// <param name="ico">The ico.</param>
         /// <returns>Details</returns>
@@ -28,18 +23,16 @@ namespace FinstatApi
         /// Not valid API key!
         /// or Specified ico {0} not found in database!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public DetailResult RequestDetail(string ico, bool json = false)
+        public async Task<BasicResult> RequestBasic(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
-            return DoApiCall<DetailResult>("/detail", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<BasicResult>("/basic", list, json);
         }
 
         /// <summary>
@@ -51,18 +44,16 @@ namespace FinstatApi
         /// Not valid API key!
         /// or Specified ico {0} not found in database!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public BasicResult RequestBasic(string ico, bool json = false)
+        public async Task<DetailResult> RequestDetail(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
-            return DoApiCall<BasicResult>("/basic", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<DetailResult>("/detail", list, json);
         }
         /// <summary>
         /// Requests the extended detail for specified ico.
@@ -73,18 +64,16 @@ namespace FinstatApi
         /// Not valid API key!
         /// or Specified ico {0} not found in database!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public ExtendedResult RequestExtendedDetail(string ico, bool json = false)
+        public async Task<ExtendedResult> RequestExtendedDetail(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
-            return DoApiCall<ExtendedResult>("/extended", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<ExtendedResult>("/extended", list, json);
         }
 
         /// <summary>
@@ -96,18 +85,16 @@ namespace FinstatApi
         /// Not valid API key!
         /// or Specified ico {0} not found in database!
         /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public UltimateResult RequestUltimateDetail(string ico, bool json = false)
+        public async Task<UltimateResult> RequestUltimateDetail(string ico, bool json = false)
         {
-            System.Collections.Specialized.NameValueCollection reqparm =
-            new System.Collections.Specialized.NameValueCollection
-            {
-                { "ico", ico },
-                { "Hash", ComputeVerificationHash(_apiKey, _privateKey, ico) },
-            };
-            return DoApiCall<UltimateResult>("/ultimate", reqparm, json);
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<UltimateResult>("/ultimate", list, json);
         }
     }
 }
