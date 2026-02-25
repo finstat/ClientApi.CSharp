@@ -89,6 +89,7 @@ namespace DesktopFinstatApiTester.ViewModel
             return type != null && (
                 type.IsPrimitive ||
                 type.IsAssignableFrom(typeof(string)) ||
+                type.IsAssignableFrom(typeof(decimal)) ||
                 type.IsAssignableFrom(typeof(DateTime)) ||
                 type.IsAssignableFrom(typeof(DateTime?)) ||
                 type.IsEnum);

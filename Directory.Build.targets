@@ -1,0 +1,4 @@
+<Project>
+  <!-- Override the ResolveNuGetPackageAssets target for packages.config projects -->
+  <Target Name="ResolveNuGetPackageAssets" Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'" />
+</Project>

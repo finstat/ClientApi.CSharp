@@ -100,13 +100,13 @@ namespace FinstatApi
 
         }
 
-        internal static  HttpClient CreateClient(int? timeoutMiliSeconds)
+        internal static  HttpClient CreateClient(int? timeoutMiliSeconds, bool isZdrojak)
         {
             X509Certificate2 cert = null;
             HttpClientHandler handler = null;
             HttpClient client = null;
 #if DEBUG
-                if (_url.Contains("zdrojak.eu"))
+                if (isZdrojak)
                 {
                     X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
                     store.Open(OpenFlags.ReadOnly);
@@ -161,7 +161,7 @@ namespace FinstatApi
                 {
                     list.AddRange(methodParams);
                 }
-                using (HttpClient client = CreateClient(_timeout))
+                using (HttpClient client = CreateClient(_timeout, _url.Contains("zdrojak.eu")))
                 {
                     var requestHeaders = new Dictionary<string, string[]>();
                     if (list != null)

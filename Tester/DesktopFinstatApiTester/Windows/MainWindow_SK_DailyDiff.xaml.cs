@@ -1,6 +1,7 @@
-﻿using Ionic.Zip;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -43,13 +44,12 @@ namespace DesktopFinstatApiTester.Windows
         {
             DoApiRequest("Open DailyDiffFile", "SK", (parameters) =>
             {
-                using (ZipFile zip = new ZipFile((string)parameters[0]))
+                using (var stream = File.OpenRead((string)parameters[0]))
+                using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: false))
                 {
-                    var enumerator = zip.Entries.GetEnumerator();
-                    enumerator.MoveNext();
-                    ZipEntry firstItem = enumerator.Current;
+                    var firstItem = archive.Entries.First();
                     XmlSerializer serializer = new XmlSerializer(typeof(FinstatApi.ViewModel.Diff.ExtendedResult[]));
-                    return (FinstatApi.ViewModel.Diff.ExtendedResult[])serializer.Deserialize(firstItem.OpenReader());
+                    return (FinstatApi.ViewModel.Diff.ExtendedResult[])serializer.Deserialize(firstItem.Open());
                 }
             }, new[] {
                 new ApiCallParameter(ParameterTypeEnum.File, "Open Zip File")

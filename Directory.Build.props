@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <!-- Disable SDK NuGet restore for packages.config projects to fix VS 2025 compatibility -->
+    <RestorePackagesWithLockFile Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'">false</RestorePackagesWithLockFile>
+    <!-- Skip NuGet SDK targets for packages.config projects -->
+    <ImportNuGetBuildTasksPackTargetsFromSdk Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'">false</ImportNuGetBuildTasksPackTargetsFromSdk>
+    <!-- Disable the problematic NuGet assets resolution for packages.config projects -->
+    <ResolveNuGetPackages Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'">false</ResolveNuGetPackages>
+  </PropertyGroup>
+</Project>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29920.165
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11520.95 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tester", "Tester", "{AAEB862A-A701-4348-BB6A-228955EA4EA3}"
 EndProject
@@ -60,25 +60,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopFinstatApiTester", "Tester\DesktopFinstatApiTester\DesktopFinstatApiTester.csproj", "{88EC8F97-0B1B-49F9-B8AC-70D38090C6C8}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{01a52a45-b92b-42ec-bbd5-5a28ffac7f9c}*SharedItemsImports = 13
-		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{22bc4041-5f65-4504-85bb-8fa844e2ad60}*SharedItemsImports = 13
-		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{3100699c-4da1-409f-bb3e-15227efa070f}*SharedItemsImports = 13
-		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{69c28ee8-7b16-450f-8c34-933fdabee38d}*SharedItemsImports = 13
-		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
-		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
-		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 4
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 4
-		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 4
-		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{bf93a508-99f4-45c2-bfe1-55dddc696aa0}*SharedItemsImports = 13
-		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
-		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
-		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 4
-		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 4
-		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
@@ -252,5 +233,24 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C2330823-576C-4E34-BBF3-AF66DC863DDB}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{01a52a45-b92b-42ec-bbd5-5a28ffac7f9c}*SharedItemsImports = 13
+		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{22bc4041-5f65-4504-85bb-8fa844e2ad60}*SharedItemsImports = 13
+		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{3100699c-4da1-409f-bb3e-15227efa070f}*SharedItemsImports = 13
+		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{69c28ee8-7b16-450f-8c34-933fdabee38d}*SharedItemsImports = 13
+		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
+		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
+		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{a01b7fd0-8a0b-4b92-9dba-36b29a9d0d63}*SharedItemsImports = 5
+		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 5
+		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 5
+		Shared\FinStatApiCZ.ViewModel\FinStatApiCZ.ViewModel.projitems*{bc9d1c9f-669a-41a8-8fe1-1b4de68a792c}*SharedItemsImports = 5
+		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{bf93a508-99f4-45c2-bfe1-55dddc696aa0}*SharedItemsImports = 13
+		Shared\FinStatApi.Client.Core\FinStatApi.Client.Core.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
+		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
+		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{c3bdde1c-98bd-4fd2-9712-749bf54cd1e2}*SharedItemsImports = 5
+		Shared\FinStatApi.Client.Framework\FinStatApi.Client.Framework.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 5
+		Shared\FinStatApi.Client\FinStatApi.Client.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 5
+		Shared\FinstatApi.ViewModel\FinstatApi.ViewModel.projitems*{f0b05a37-f223-45c0-a692-37c4a7906d63}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
