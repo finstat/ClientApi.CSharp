@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="ControlzEx" Version="7.0.3" />
     <PackageReference Include="Fluent.Ribbon" Version="11.0.2" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.141" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\FinStatApiCZ\FinStatApiCZ.csproj">

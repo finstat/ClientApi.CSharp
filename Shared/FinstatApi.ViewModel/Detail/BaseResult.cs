@@ -9,7 +9,6 @@ namespace FinstatApi
         public string RegisterNumberText { get; set; }
         public string Dic { get; set; }
         public string IcDPH { get; set; }
-        public bool SuspendedAsPerson { get; set; }
 
         public bool PaymentOrderWarning { get; set; }
         public string PaymentOrderUrl { get; set; }
@@ -45,7 +44,11 @@ namespace FinstatApi
         {
             StringBuilder dataString = new StringBuilder();
             dataString.AppendLine(string.Format("ICO: {0}", Ico));
-            dataString.AppendLine(string.Format("Name: {0}{1} in {2}", Name, SuspendedAsPerson ? "[pozastavená]" + ((SuspendedAsPersonUntil != null) ? SuspendedAsPersonUntil.Value.ToString("dd.MM.yyyy") : null) : null, Activity));
+            dataString.AppendLine(string.Format("Name: {0} in {1}", Name, Activity));
+            if (SuspendedAsPersonUntil != null)
+            {
+                dataString.AppendLine(string.Format("SuspendedAsPersonUntil: {0}", SuspendedAsPersonUntil.Value.ToString("dd.MM.yyyy")));
+            }
             dataString.AppendLine(string.Format("LegalForm: {0} {1}", LegalFormCode, LegalFormText));
             dataString.AppendLine(string.Format("Register Number: {0}", RegisterNumberText));
             dataString.AppendLine(string.Format("DIC: {0}", Dic));
@@ -58,9 +61,6 @@ namespace FinstatApi
             dataString.AppendLine(base.ToString());
             dataString.AppendLine(string.Format("ProfitActual: {0}", ProfitActual));
             dataString.AppendLine(string.Format("RevenueActual: {0}", RevenueActual));
-            dataString.AppendLine(string.Format("Created: {0}", Created));
-            dataString.AppendLine(string.Format("Canceled: {0}", Cancelled));
-            dataString.AppendLine(string.Format("URL: {0}", Url));
             dataString.AppendLine(string.Format("Warning: {0}", Warning + " " + WarningUrl));
             dataString.AppendLine(string.Format("HasKaR: {0}", HasKaR + " " + KaRUrl));
             dataString.AppendLine(string.Format("HasDebt: {0}", HasDebt + " " + DebtUrl));

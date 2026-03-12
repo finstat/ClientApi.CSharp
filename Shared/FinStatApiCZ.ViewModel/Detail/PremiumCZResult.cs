@@ -5,7 +5,6 @@ namespace FinstatApi
         public string VatNumber { get; set; }
         public string TaxPayer { get; set; }
         public BankAccount[] BankAccounts { get; set; }
-        public bool SuspendedAsPerson { get; set; }
         public string LegalFormCode { get; set; }
         public string OwnershipCode { get; set; }
         public bool? UnReliability { get; set; }
