@@ -28,6 +28,7 @@ namespace DesktopFinstatApiTester.Windows
                 {
                     var graph = new ViewModel.ObjectViewModelHierarchy((item.DataCount > 0) ? item.Data[0] : null);
                     treeViewObjectGraph.ItemsSource = graph.FirstGeneration;
+                    graph.FirstGeneration[0].LoadChildren(true);
                     graph.FirstGeneration[0].IsSelected = true;
                     graph.FirstGeneration[0].IsExpanded = true;
 
@@ -37,6 +38,7 @@ namespace DesktopFinstatApiTester.Windows
                         ResponseHeaders = item.ResponseHeaders,
                     });
                     treeViewHeadersGraph.ItemsSource = graph2.FirstGeneration;
+                    graph2.FirstGeneration[0].LoadChildren(true);
                     graph2.FirstGeneration[0].IsSelected = true;
                     graph2.FirstGeneration[0].IsExpanded = true;
                 }

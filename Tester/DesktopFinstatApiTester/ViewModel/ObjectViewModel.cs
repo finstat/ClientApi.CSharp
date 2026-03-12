@@ -41,9 +41,9 @@ namespace DesktopFinstatApiTester.ViewModel
             _parent = parent;
         }
 
-        public void LoadChildren()
+        public void LoadChildren(bool triggerPropertyChanged)
         {
-            if (_object != null)
+            if (_object != null && (_children == null || _children.Count == 0 || (_children.Count == 1 && _children[0]._object == null)))
             {
                 // exclude value types and strings from listing child members
                 if (!IsPrintableType(_type))
@@ -74,9 +74,16 @@ namespace DesktopFinstatApiTester.ViewModel
                     }
 
                     _children = new ReadOnlyCollection<ObjectViewModel>(children);
-                    this.OnPropertyChanged("Children");
-                    this.OnPropertyChanged("PropertyInfo");
-                    this.OnPropertyChanged("PropertyDetail");
+                    foreach (var child in _children)
+                    {
+                        child.LoadChildren(false);
+                    }
+                    if (triggerPropertyChanged)
+                    {
+                        this.OnPropertyChanged("Children");
+                        this.OnPropertyChanged("PropertyInfo");
+                        this.OnPropertyChanged("PropertyDetail");
+                    }
                 }
             }
         }
@@ -119,19 +126,19 @@ namespace DesktopFinstatApiTester.ViewModel
         {
             get
             {
-                var type = string.Empty;
+                System.Type type = null;
                 if (_object != null)
                 {
-                    type = string.Format("({0})", _type.Name);
+                    type = _type;
                 }
                 else
                 {
                     if (_info != null)
                     {
-                        type = string.Format("({0})", _info.PropertyType.Name);
+                        type = _info.PropertyType;
                     }
                 }
-                return type;
+                return string.Format("({0})", type?.Name?.Replace("[]", $"[{_children?.Count}]"));
             }
         }
 
@@ -201,7 +208,7 @@ namespace DesktopFinstatApiTester.ViewModel
                     _isExpanded = value;
                     if (_isExpanded)
                     {
-                        LoadChildren();
+                        LoadChildren(true);
                     }
                     this.OnPropertyChanged("IsExpanded");
                 }
