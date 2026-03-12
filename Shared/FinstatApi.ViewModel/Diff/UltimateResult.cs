@@ -47,6 +47,149 @@ namespace FinstatApi.ViewModel.Diff
         public DateTime? ORLiquidationDate { get; set; }
         public ReceivableDebt[] StateReceivables { get; set; }
 
+        public override string ToString()
+        {
+            StringBuilder result = new StringBuilder();
+            result.AppendLine(base.ToString());
+            result.AppendLine(string.Format("Country: {0}", Country));
+            if (ORCancelled.HasValue)
+            {
+                result.AppendLine(string.Format("ORCancelled: {0}", ORCancelled));
+            }
+            if (ORRemoved.HasValue)
+            {
+                result.AppendLine(string.Format("ORRemoved: {0}", ORRemoved));
+            }
+            result.AppendLine(string.Format("SelfEmployed: {0}", SelfEmployed));
+            if (StructuredName != null)
+            {
+                result.AppendLine(string.Format("StructuredName: Prefix={0} Name={1} Suffix={2} After={3}",
+                    StructuredName.Prefix != null ? string.Join(" ", StructuredName.Prefix) : null,
+                    StructuredName.Name != null ? string.Join(" ", StructuredName.Name) : null,
+                    StructuredName.Suffix != null ? string.Join(" ", StructuredName.Suffix) : null,
+                    StructuredName.After != null ? string.Join(" ", StructuredName.After) : null));
+            }
+            if (!string.IsNullOrEmpty(ORSection))
+            {
+                result.AppendLine(string.Format("ORSection: {0} ORInsertNo: {1}", ORSection, ORInsertNo));
+            }
+            if (RegistrationCourt != null)
+            {
+                result.AppendLine(string.Format("RegistrationCourt: {0}", RegistrationCourt.Name));
+            }
+            if (!string.IsNullOrEmpty(ProcurationAction))
+            {
+                result.AppendLine(string.Format("ProcurationAction: {0}", ProcurationAction));
+            }
+            if (!string.IsNullOrEmpty(StatutoryAction))
+            {
+                result.AppendLine(string.Format("StatutoryAction: {0}", StatutoryAction));
+            }
+            if (Offices != null && Offices.Length > 0)
+            {
+                result.AppendLine(string.Format("Offices (count): {0}", Offices.Length));
+            }
+            if (ContactSources != null && ContactSources.Length > 0)
+            {
+                result.AppendLine(string.Format("ContactSources (count): {0}", ContactSources.Length));
+            }
+            if (WebPages != null && WebPages.Length > 0)
+            {
+                result.AppendLine(string.Format("WebPages: {0}", string.Join(", ", WebPages)));
+            }
+            if (EmployeesNumber.HasValue)
+            {
+                result.AppendLine(string.Format("EmployeesNumber: {0}", EmployeesNumber.Value));
+            }
+            if (Subjects != null && Subjects.Length > 0)
+            {
+                result.AppendLine(string.Format("Subjects (count): {0}", Subjects.Length));
+            }
+            if (AddressHistory != null && AddressHistory.Length > 0)
+            {
+                result.AppendLine(string.Format("AddressHistory (count): {0}", AddressHistory.Length));
+            }
+            if (Persons != null && Persons.Length > 0)
+            {
+                result.AppendLine(string.Format("Persons (count): {0}", Persons.Length));
+            }
+            if (!string.IsNullOrEmpty(RpvsInsert))
+            {
+                result.AppendLine(string.Format("RpvsInsert: {0} RpvsUrl: {1}", RpvsInsert, RpvsUrl));
+            }
+            if (RpvsPersons != null && RpvsPersons.Length > 0)
+            {
+                result.AppendLine(string.Format("RpvsPersons (count): {0}", RpvsPersons.Length));
+            }
+            result.AppendLine(string.Format("HasDebt: {0} DebtUrl: {1}", HasDebt, DebtUrl));
+            result.AppendLine(string.Format("HasDisposal: {0} DisposalUrl: {1}", HasDisposal, DisposalUrl));
+            if (LiqDeadline.HasValue)
+            {
+                result.AppendLine(string.Format("LiqDeadline: {0}", LiqDeadline));
+            }
+            if (!string.IsNullOrEmpty(KarUrl))
+            {
+                result.AppendLine(string.Format("KarUrl: {0}", KarUrl));
+            }
+            if (Bankrupt != null)
+            {
+                result.AppendLine(string.Format("Bankrupt: {0}", Bankrupt));
+            }
+            if (Restructuring != null)
+            {
+                result.AppendLine(string.Format("Restructuring: {0}", Restructuring));
+            }
+            if (Liquidation != null)
+            {
+                result.AppendLine(string.Format("Liquidation: {0}", Liquidation));
+            }
+            if (OtherProceeding != null)
+            {
+                result.AppendLine(string.Format("OtherProceeding: {0}", OtherProceeding));
+            }
+            if (JudgementIndicators != null && JudgementIndicators.Length > 0)
+            {
+                result.AppendLine(string.Format("JudgementIndicators (count): {0}", JudgementIndicators.Length));
+            }
+            if (!string.IsNullOrEmpty(JudgementFinstatLink))
+            {
+                result.AppendLine(string.Format("JudgementFinstatLink: {0}", JudgementFinstatLink));
+            }
+            if (JudgementCounts != null && JudgementCounts.Length > 0)
+            {
+                result.AppendLine(string.Format("JudgementCounts (count): {0}", JudgementCounts.Length));
+            }
+            if (JudgementLastPublishedDate.HasValue)
+            {
+                result.AppendLine(string.Format("JudgementLastPublishedDate: {0}", JudgementLastPublishedDate));
+            }
+            if (BasicCapital.HasValue)
+            {
+                result.AppendLine(string.Format("BasicCapital: {0}", BasicCapital));
+            }
+            if (PaybackRange.HasValue)
+            {
+                result.AppendLine(string.Format("PaybackRange: {0}", PaybackRange));
+            }
+            if (!string.IsNullOrEmpty(SalesCategory))
+            {
+                result.AppendLine(string.Format("SalesCategory: {0}", SalesCategory));
+            }
+            if (!string.IsNullOrEmpty(EmployeeYear))
+            {
+                result.AppendLine(string.Format("EmployeeYear: {0}", EmployeeYear));
+            }
+            if (ORLiquidationDate.HasValue)
+            {
+                result.AppendLine(string.Format("ORLiquidationDate: {0}", ORLiquidationDate));
+            }
+            if (StateReceivables != null && StateReceivables.Length > 0)
+            {
+                result.AppendLine(string.Format("StateReceivables (count): {0}", StateReceivables.Length));
+            }
+            return result.ToString();
+        }
+
         public class Address
         {
             public string Street { get; set; }

@@ -36,8 +36,12 @@ namespace FinstatApi
             }
             if (!string.IsNullOrEmpty(ORSection))
             {
-                //sekicam vlozka
+                //sekcia a vlozka
                 result.AppendLine(string.Format("ORSection: {0} ORInsertNo: {1}", ORSection, ORInsertNo));
+            }
+            if (PaybackRange.HasValue)
+            {
+                result.AppendLine(string.Format("PaybackRange: {0}", PaybackRange.Value));
             }
             if (ORCancelled != null && ORCancelled.HasValue)
             {
@@ -46,7 +50,7 @@ namespace FinstatApi
             }
             if (RegistrationCourt != null)
             {
-                //nZapisany na
+                //Zapisany na
                 result.AppendLine(string.Format("RegistrationCourt: {0}", RegistrationCourt.Name));
             }
             if (Persons != null && Persons.Length > 0)
@@ -93,9 +97,21 @@ namespace FinstatApi
             {
                 result.AppendLine(string.Format("Liquidation: {0}", Liquidation));
             }
+            if (OtherProceeding != null)
+            {
+                result.AppendLine(string.Format("OtherProceeding: {0}", OtherProceeding));
+            }
             if (PreventiveRestructuring != null)
             {
                 result.AppendLine(string.Format("PreventiveRestructuring: {0}", PreventiveRestructuring));
+            }
+            if (RPOPersons != null && RPOPersons.Length > 0)
+            {
+                result.AppendLine("\nRPO Person:");
+                foreach (var person in RPOPersons)
+                {
+                    result.AppendLine(person.ToString());
+                }
             }
             if (DistraintsAuthorizations != null && DistraintsAuthorizations.Length > 0)
             {
@@ -134,7 +150,7 @@ namespace FinstatApi
                         i++;
                     }
                 }
-                dataString.AppendLine(string.Format("Functions (0): {1}", i, f));
+                dataString.AppendLine(string.Format("Functions ({0}): {1}", i, f));
                 return dataString.ToString();
             }
         }
@@ -176,7 +192,7 @@ namespace FinstatApi
             {
                 StringBuilder dataString = new StringBuilder();
                 dataString.AppendLine(base.ToString());
-                dataString.AppendLine(string.Format("Source {0}", Source));
+                dataString.AppendLine(string.Format("Source: {0}", Source));
                 return dataString.ToString();
             }
         }
@@ -228,7 +244,7 @@ namespace FinstatApi
                         i++;
                     }
                 }
-                dataString.AppendLine(string.Format("Functions (0): {1}", i, f));
+                dataString.AppendLine(string.Format("Functions ({0}): {1}", i, f));
                 dataString.AppendLine(string.Format("BirthDate: {0}", BirthDate));
                 dataString.AppendLine(string.Format("Citizenship: {0}", Citizenship));
                 return dataString.ToString();
@@ -243,8 +259,8 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(string.Format("Type: {0}", Type));
-                dataString.Append(string.Format("Description: {0}", Description));
+                dataString.Append(string.Format("Type: {0}, ", Type));
+                dataString.Append(string.Format("Description: {0}, ", Description));
                 dataString.Append(string.Format("From: {0}", From));
                 return dataString.ToString();
             }
@@ -271,7 +287,7 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(base.ToString());
+                dataString.AppendLine(base.ToString());
                 dataString.AppendLine(string.Format("ValidFrom: {0}", ValidFrom));
                 dataString.AppendLine(string.Format("ValidTo: {0}", ValidTo));
                 return dataString.ToString();
@@ -306,10 +322,10 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(string.Format("EnterDate: {0}", EnterDate));
-                dataString.Append(string.Format("EnterReason: {0}", EnterReason));
-                dataString.Append(string.Format("ExitDate: {0}", ExitDate));
-                dataString.Append(string.Format("Officers: {0}", Officers?.Length));
+                dataString.AppendLine(string.Format("EnterDate: {0}", EnterDate));
+                dataString.AppendLine(string.Format("EnterReason: {0}", EnterReason));
+                dataString.AppendLine(string.Format("ExitDate: {0}", ExitDate));
+                dataString.AppendLine(string.Format("Officers (count): {0}", Officers?.Length));
                 dataString.AppendLine(string.Format("Source: {0}", Source));
                 var f = new StringBuilder();
                 int i = 0;
@@ -325,7 +341,7 @@ namespace FinstatApi
                         i++;
                     }
                 }
-                dataString.AppendLine(string.Format("Deadlines (0): {1}", i, f));
+                dataString.AppendLine(string.Format("Deadlines ({0}): {1}", i, f));
                 return dataString.ToString();
             }
         }
@@ -341,11 +357,12 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(base.ToString());
-                dataString.Append(string.Format("FileReference: {0}", FileReference));
-                dataString.Append(string.Format("CourtCode: {0}", CourtCode));
-                dataString.Append(string.Format("ExitReason: {0}", ExitReason));
-                dataString.Append(string.Format("Status: {0}", Status));
+                dataString.AppendLine(base.ToString());
+                dataString.AppendLine(string.Format("StartDate: {0}", StartDate));
+                dataString.AppendLine(string.Format("FileReference: {0}", FileReference));
+                dataString.AppendLine(string.Format("CourtCode: {0}", CourtCode));
+                dataString.AppendLine(string.Format("ExitReason: {0}", ExitReason));
+                dataString.AppendLine(string.Format("Status: {0}", Status));
                 return dataString.ToString();
             }
         }
@@ -369,11 +386,11 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(base.ToString());
-                dataString.Append(string.Format("FileReference: {0}", FileReference));
-                dataString.Append(string.Format("CourtCode: {0}", CourtCode));
-                dataString.Append(string.Format("FirstDate: {0}", FirstDate));
-                dataString.Append(string.Format("LastDate: {0}", LastDate));
+                dataString.AppendLine(string.Format("FileReference: {0}", FileReference));
+                dataString.AppendLine(string.Format("CourtCode: {0}", CourtCode));
+                dataString.AppendLine(string.Format("Source: {0}", Source));
+                dataString.AppendLine(string.Format("FirstDate: {0}", FirstDate));
+                dataString.AppendLine(string.Format("LastDate: {0}", LastDate));
                 return dataString.ToString();
             }
         }
@@ -392,15 +409,14 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(base.ToString());
-                dataString.Append(string.Format("ReferenceNumber: {0}", ReferenceNumber));
-                dataString.Append(string.Format("TypeOfClaim: {0}", TypeOfClaim));
-                dataString.Append(string.Format("Authorized: {0}", (Authorized != null && Authorized.Length > 0) ? Authorized.Length : 0));
-                dataString.Append(string.Format("Plaintiff: {0}", Plaintiff));
-                dataString.Append(string.Format("PublishDate: {0}", PublishDate));
-                dataString.Append(string.Format("Url: {0}", Url));
-                dataString.Append(string.Format("Court: {0}", Court));
-                dataString.Append(string.Format("IdentifierNumber: {0}", IdentifierNumber));
+                dataString.AppendLine(string.Format("ReferenceNumber: {0}", ReferenceNumber));
+                dataString.AppendLine(string.Format("TypeOfClaim: {0}", TypeOfClaim));
+                dataString.AppendLine(string.Format("Authorized (count): {0}", (Authorized != null && Authorized.Length > 0) ? Authorized.Length : 0));
+                dataString.AppendLine(string.Format("Plaintiff: {0}", Plaintiff));
+                dataString.AppendLine(string.Format("PublishDate: {0}", PublishDate));
+                dataString.AppendLine(string.Format("Url: {0}", Url));
+                dataString.AppendLine(string.Format("Court: {0}", Court));
+                dataString.AppendLine(string.Format("IdentifierNumber: {0}", IdentifierNumber));
                 return dataString.ToString();
             }
         }

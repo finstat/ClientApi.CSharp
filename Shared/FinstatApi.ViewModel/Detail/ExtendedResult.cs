@@ -59,12 +59,13 @@ namespace FinstatApi
         public override string ToString()
         {
             StringBuilder dataString = new StringBuilder();
-            dataString.Append(base.ToString());
+            dataString.AppendLine(base.ToString());
             dataString.AppendLine(string.Format("Ownership: {0} {1}", OwnershipTypeText, OwnershipTypeCode));
             dataString.AppendLine(string.Format("Phones: {0}", string.Join(", ", Phones)));
             dataString.AppendLine(string.Format("Emails: {0}", string.Join(", ", Emails)));
             dataString.AppendLine(string.Format("Employee: {0} {1}", EmployeeText, EmployeeCode));
             dataString.AppendLine(string.Format("ActualYear: {0}", ActualYear));
+            dataString.AppendLine(string.Format("BasicCapital: {0}", BasicCapital));
             dataString.AppendLine(string.Format("ProfitPrev: {0}", ProfitPrev));
             dataString.AppendLine(string.Format("RevenuePrev: {0}", RevenuePrev));
             dataString.AppendLine(string.Format("ForeignResources: {0}", ForeignResources));
@@ -82,7 +83,7 @@ namespace FinstatApi
 
             if (Offices != null)
             {
-                dataString.AppendLine(" Offices:");
+                dataString.AppendLine("Offices:");
                 foreach (Office o in Offices)
                 {
                     dataString.AppendLine(string.Format(" - {0}", o));
@@ -91,20 +92,20 @@ namespace FinstatApi
 
             if (Subjects != null)
             {
-                dataString.AppendLine("  Subjects:");
+                dataString.AppendLine("Subjects:");
                 foreach (Subject s in Subjects)
                 {
-                    dataString.AppendLine(string.Format("- {0}", s));
+                    dataString.AppendLine(string.Format(" - {0}", s));
                 }
             }
             if (SelfEmployed && (StructuredName != null))
             {
-                dataString.AppendLine(String.Format("Name structured: \n {0}", StructuredName));
+                dataString.AppendLine(string.Format("StructuredName: {0}", StructuredName));
             }
 
             if (ContactSources != null)
             {
-                dataString.AppendLine(string.Format("Contact Sources: {0}", ContactSources.Length));
+                dataString.AppendLine(string.Format("ContactSources (count): {0}", ContactSources.Length));
             }
 
             dataString.AppendLine(string.Format("WarningKaR: {0}", WarningKaR));
@@ -247,8 +248,8 @@ namespace FinstatApi
             public override string ToString()
             {
                 StringBuilder dataString = new StringBuilder();
-                dataString.Append(base.ToString());
-                dataString.AppendLine(string.Format("Type {0}", Type));
+                dataString.AppendLine(base.ToString());
+                dataString.AppendLine(string.Format("Type: {0}", Type));
                 dataString.AppendLine(string.Format("Subjects: {0}", (Subjects != null) ? string.Join(", ", Subjects) : ""));
                 return dataString.ToString();
             }
@@ -289,7 +290,7 @@ namespace FinstatApi
                 dataString.AppendLine(string.Format("Prefix: {0}, ", Prefix != null ? string.Join(" ", Prefix) : null));
                 dataString.AppendLine(string.Format("Name: {0}, ", Name != null ? string.Join(" ", Name) : null));
                 dataString.AppendLine(string.Format("Suffix: {0}, ", Suffix != null ? string.Join(" ", Suffix) : null));
-                dataString.AppendLine(string.Format(" After: {0}, ", After != null ? string.Join(" ", After) : null));
+                dataString.AppendLine(string.Format("After: {0}, ", After != null ? string.Join(" ", After) : null));
                 return dataString.ToString();
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,6 +18,8 @@ namespace FinstatApi
         internal readonly string _stationId;
         internal readonly string _stationName;
         internal readonly int _timeout;
+
+        public Func<HttpClientHandler> HttpClientHandlerFactory { get; set; }
 
         public ViewModel.Limits Limits { get; protected set; }
         public event HeadersDelegate OnRequest;

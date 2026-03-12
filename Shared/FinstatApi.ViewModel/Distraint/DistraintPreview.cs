@@ -37,7 +37,7 @@ namespace FinstatApi
                     result.AppendLine(oblig.ToString());
                 }
             }
-            result.AppendLine(string.Format("TypeOfAuthorisation: {0} Created: {1} DetailId {2} DetailToken {3} StoredDetailId {4}",
+            result.AppendLine(string.Format("TypeOfAuthorisation: {0} Created: {1} DetailId: {2} DetailToken: {3} StoredDetailId: {4}",
                 TypeOfAuthorisation, Created, DetailId, DetailToken, StoredDetailId));
             return result.ToString();
         }

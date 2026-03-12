@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -98,41 +97,15 @@ namespace FinstatApi
 
         }
 
-        internal static HttpClient CreateClient(int? timeoutMiliSeconds, bool bypassSslValidation)
+        internal HttpClient CreateClient(int? timeoutMiliSeconds)
         {
-            X509Certificate2 cert = null;
-            HttpClientHandler handler = null;
-            HttpClient client = null;
-#if DEBUG
-            if (bypassSslValidation)
+            HttpClient client;
+            var handlerFactory = HttpClientHandlerFactory;
+            if (handlerFactory != null)
             {
-                X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-                store.Open(OpenFlags.ReadOnly);
-                X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
-                if (certs.Count > 0)
-                {
-                    cert = certs[0];
-                }
-                else
-                {
-                    X509Store storeMachine = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-                    storeMachine.Open(OpenFlags.ReadOnly);
-                    X509Certificate2Collection certsMachine = storeMachine.Certificates.Find(X509FindType.FindByIssuerName, "root_ca_dev_zdrojak.eu", false);
-                    if (certsMachine.Count > 0)
-                    {
-                        cert = certsMachine[0];
-                    }
-                }
-                handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback = (message, serverCert, chain, errors) => true;
-                if (cert != null)
-                {
-                    handler.ClientCertificates.Add(cert);
-                }
-                client = new HttpClient(handler);
+                client = new HttpClient(handlerFactory());
             }
-#endif
-            if (client == null)
+            else
             {
                 client = new HttpClient();
             }
@@ -160,7 +133,7 @@ namespace FinstatApi
                 {
                     list.AddRange(methodParams);
                 }
-                using (HttpClient client = CreateClient(_timeout, _url.Contains("zdrojak.eu") || _url.Contains("localhost")))
+                using (HttpClient client = CreateClient(_timeout))
                 {
                     var requestHeaders = new Dictionary<string, string[]>();
                     if (list != null)
