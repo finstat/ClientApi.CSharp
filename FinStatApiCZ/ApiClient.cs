@@ -77,26 +77,5 @@ namespace FinstatApi
             });
             return await DoApiCall<PremiumCZResult>("/premiumcz", list, json);
         }
-
-        /// <summary>
-        /// Requests the elite for specified ico.
-        /// </summary>
-        /// <param name="ico">The ico.</param>
-        /// <returns>PRemoumResult</returns>
-        /// <exception cref="FinstatApi.FinstatApiException">
-        /// Not valid API key!
-        /// or Specified ico {0} not found in database!
-        /// or Url {0} not found!
-        /// or TimeOut exception while communication with Finstat api!
-        /// or Unknown exception while communication with Finstat api!
-        /// </exception>
-        public async Task<EliteCZResult> RequestElite(string ico, bool json = false)
-        {
-            var list = new List<KeyValuePair<string, string>>(new[] {
-                new KeyValuePair<string, string>("ico", ico),
-                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
-            });
-            return await DoApiCall<EliteCZResult>("/elitecz", list, json);
-        }
     }
 }
