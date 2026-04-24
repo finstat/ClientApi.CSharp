@@ -154,5 +154,97 @@ namespace FinstatApi
             });
             return await DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json);
         }
+
+        /// <summary>
+        /// Adds specified date of birth to monitoring.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <returns>True if succeed otherwise false.</returns>
+        public async Task<bool> AddDate(string date, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("date", date),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
+            });
+            return await DoApiCall<bool>("/AddDateToMonitoring", list, json);
+        }
+
+        public async Task<bool> AddDate(string date, string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("date", date),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<bool>("/AddDateToMonitoring", list, json);
+        }
+
+        /// <summary>
+        /// Removes specified date of birth from monitoring.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <returns>True if succeed otherwise false.</returns>
+        public async Task<bool> RemoveDate(string date, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("date", date),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
+            });
+            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json);
+        }
+
+        public async Task<bool> RemoveDate(string date, string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("date", date),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json);
+        }
+
+        /// <summary>
+        /// Retrieves list of currently monitored dates of birth.
+        /// </summary>
+        public async Task<string[]> GetDateMonitorings(bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datelist")),
+            });
+            return await DoApiCall<string[]>("/MonitoringDateList", list, json);
+        }
+
+        public async Task<string[]> GetDateMonitorings(string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datelist")),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<string[]>("/MonitoringDateList", list, json);
+        }
+
+        /// <summary>
+        /// Retrieves report of date-of-birth events in current monitoring.
+        /// </summary>
+        public async Task<MonitoringDate[]> GetDateReport(bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datereport")),
+            });
+            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json);
+        }
+
+        public async Task<MonitoringDate[]> GetDateReport(string category, bool json = false)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datereport")),
+            });
+            if (!string.IsNullOrEmpty(category))
+                list.Add(new KeyValuePair<string, string>("category", category));
+            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json);
+        }
     }
 }
