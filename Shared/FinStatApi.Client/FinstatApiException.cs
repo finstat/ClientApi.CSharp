@@ -22,7 +22,9 @@ namespace FinstatApi
             InsufficientAccess,
             AccessDisabled,
             InvalidHash,
-            BadRequest
+            BadRequest,
+            Unauthorized,
+            GdprRestriction
         }
 
         public FailTypeEnum FailType { get; set; }

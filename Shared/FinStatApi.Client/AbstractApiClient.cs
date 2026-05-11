@@ -38,49 +38,57 @@ namespace FinstatApi
 
         }
 
-        internal Exception ParseErrorResponse(HttpRequestException e, HttpStatusCode? code, string parameter = null)
+        internal Exception ParseErrorResponse(HttpRequestException e, HttpStatusCode? code, byte[] responseContent, string parameter = null)
         {
+            var body = (responseContent != null && responseContent.Length > 0)
+                ? Encoding.UTF8.GetString(responseContent)
+                : string.Empty;
+            var detail = !string.IsNullOrEmpty(body) ? body : e.Message;
             if (code.HasValue)
             {
                 switch (code.Value)
                 {
                     case HttpStatusCode.Forbidden:
-                        if (e.Message.Contains("Insufficient access"))
+                        if (body.Contains("Insufficient access"))
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.InsufficientAccess, e.Message, e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.InsufficientAccess, detail, e);
                         }
-                        else if (e.Message.Contains("Your API access and Finstat license expired"))
+                        else if (body.Contains("Your API access and FinStat license expired"))
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.LicenseExpired, e.Message, e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.LicenseExpired, detail, e);
                         }
-                        else if (e.Message.Contains("Your API access is disabled"))
+                        else if (body.Contains("Your API access is disabled"))
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.AccessDisabled, e.Message, e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.AccessDisabled, detail, e);
                         }
-                        else if (e.Message.Contains("Invalid verification hash"))
+                        else if (body.Contains("Invalid verification hash"))
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.InvalidHash, e.Message, e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.InvalidHash, detail, e);
                         }
                         else
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.NotValidCustomerKey, e.Message, e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.NotValidCustomerKey, detail, e);
                         }
                     case HttpStatusCode.BadRequest:
-                        return new FinstatApiException(FinstatApiException.FailTypeEnum.BadRequest, e.Message, e);
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.BadRequest, detail, e);
+                    case HttpStatusCode.Unauthorized:
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.Unauthorized, detail, e);
                     case HttpStatusCode.PaymentRequired:
-                        return new FinstatApiException(FinstatApiException.FailTypeEnum.LimitExceed, e.Message, e);
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.LimitExceed, detail, e);
                     case HttpStatusCode.NotFound:
                         if (!string.IsNullOrEmpty(parameter))
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.NotFound, string.Format("Specified ico '{0}' not found in database. Server response: {1}", parameter, e.Message), e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.NotFound, string.Format("Specified ico '{0}' not found in database. Server response: {1}", parameter, detail), e);
                         }
                         else
                         {
-                            return new FinstatApiException(FinstatApiException.FailTypeEnum.TooShort, string.Format("Specified query is too short. Server response: {0}", e.Message), e);
+                            return new FinstatApiException(FinstatApiException.FailTypeEnum.TooShort, string.Format("Specified query is too short. Server response: {0}", detail), e);
                         }
                     case HttpStatusCode.RequestTimeout:
                         return new FinstatApiException(FinstatApiException.FailTypeEnum.Timeout,
                                string.Format("Request to url {0} timeouts in {1} miliseconds!", _url, _timeout), e);
+                    case (HttpStatusCode)451:
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.GdprRestriction, detail, e);
                     default:
                         return new FinstatApiException(FinstatApiException.FailTypeEnum.Unknown, "Unspecified exception!", e);
                 }
@@ -170,7 +178,7 @@ namespace FinstatApi
             catch (HttpRequestException e)
             {
                 RaiseOnErrorResponseContent(resultContent);
-                throw ParseErrorResponse(e, (result != null) ? result.StatusCode : (HttpStatusCode?)null);
+                throw ParseErrorResponse(e, (result != null) ? result.StatusCode : (HttpStatusCode?)null, resultContent);
             }
             catch (TaskCanceledException e)
             {
