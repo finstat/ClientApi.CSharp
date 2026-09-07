@@ -89,8 +89,18 @@ namespace FinstatApi
                                string.Format("Request to url {0} timeouts in {1} miliseconds!", _url, _timeout), e);
                     case (HttpStatusCode)451:
                         return new FinstatApiException(FinstatApiException.FailTypeEnum.GdprRestriction, detail, e);
+                    case (HttpStatusCode)429:
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.RateLimitExceeded, detail, e);
+                    case HttpStatusCode.BadGateway:
+                        // An upstream register (currently CRE, behind the live distraint
+                        // endpoints) was unreachable. No credit is charged for this, so the
+                        // caller may safely retry once the register is back.
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.RegisterUnavailable, detail, e);
                     default:
-                        return new FinstatApiException(FinstatApiException.FailTypeEnum.Unknown, "Unspecified exception!", e);
+                        // Keep the server body: it is the only thing that tells the caller
+                        // what actually went wrong on an unmapped status code.
+                        return new FinstatApiException(FinstatApiException.FailTypeEnum.Unknown,
+                               string.Format("Unspecified exception (HTTP {0})! Server response: {1}", (int)code.Value, detail), e);
                 }
             }
             else

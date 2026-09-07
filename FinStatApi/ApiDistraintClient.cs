@@ -48,7 +48,11 @@ namespace FinstatApi
         /// <param name="token"></param>
         /// <param name="ids"></param>
         /// <param name="json"></param>
-        /// <returns>DistraintDetailResult</returns>
+        /// <returns>DistraintDetailResults, wrapping a DistraintDetails list of DistraintDetailResult</returns>
+        /// <remarks>
+        /// Charged per identifier, not per call: the price is the number of unique ids in
+        /// <paramref name="ids"/>. At most 200 ids (after duplicates are removed), all numeric.
+        /// </remarks>
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!
@@ -127,7 +131,7 @@ namespace FinstatApi
         /// <param name="token"></param>
         /// <param name="ids"></param>
         /// <param name="json"></param>
-        /// <returns>DistraintDetailResult</returns>
+        /// <returns>DistraintDetailResults, wrapping a DistraintDetails list of DistraintDetailResult</returns>
         /// <exception cref="FinstatApi.FinstatApiException">
         /// Not valid API key!
         /// or Url {0} not found!

@@ -19,10 +19,12 @@ namespace FinstatApi
             StringBuilder result = new StringBuilder();
             result.AppendLine(base.ToString());
 
-            base.ToString();
             result.AppendLine(string.Format("Court: {0} DateOfAuthorisation: {1} CourtCode: {2} SumOutstanding: {3} Currency: {4}",
                 Court, DateOfAuthorisation, CourtCode, SumOutstanding, Currency));
-            result.AppendLine(Bailiff.ToString());
+            if (Bailiff != null)
+            {
+                result.AppendLine(Bailiff.ToString());
+            }
             result.AppendLine(string.Format("ClaimDescription: {0}",
                 EnforcementDetails));
             return result.ToString();
