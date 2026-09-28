@@ -13,6 +13,11 @@ nupkg/
 *.userosscache
 *.sln.docstates
 
+# Local secrets for CLI testers (api_key / private_key)
+Tester/SK/**/appsettings.json
+Tester/CZ/**/appsettings.json
+Tester/DesktopFinstatApiTester/**/application.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

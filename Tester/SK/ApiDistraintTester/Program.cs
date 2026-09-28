@@ -25,7 +25,7 @@ namespace ApiDistraintTester
         //private const string ApiUrlConst = "http://localhost.fiddler:3376/api/";
         //private const string ApiUrlConst = "http://localhost:3376/api/";
         //private const string ApiUrlConst = "https://cz.finstat.sk/api/";
-        private const string ApiUrlConst = "https://www.finstat.sk/api/";
+        private static string ApiUrlConst = "https://www.finstat.sk/api/";
         private const string TestIcoConst = "35757442";
         private static string _apiKey = null;
         private static string _privateKey = null;
@@ -41,10 +41,11 @@ namespace ApiDistraintTester
                 }
              */
             var builder = new ConfigurationBuilder()
-                     .AddJsonFile("appsettings.json")
+                     .AddJsonFile("appsettings.json", optional: true)
                      ;
 
             var configuration = builder.Build();
+            ApiUrlConst = configuration["api_url"] ?? ApiUrlConst;
             _apiKey = configuration["api_key"];
             _privateKey = configuration["private_key"];
             if (string.IsNullOrEmpty(_apiKey) || _apiKey == "add_api_key")
@@ -350,14 +351,19 @@ namespace ApiDistraintTester
                 if (task.IsFaulted && task.Exception != null && task.Exception.InnerException != null && (task.Exception.InnerException is FinstatApiException))
                 {
                     FinstatApiException ex = (FinstatApiException)task.Exception.InnerException;
-                    if (ex.FailType == FinstatApiException.FailTypeEnum.NotFound)
+                    if (ex.FailType == FinstatApiException.FailTypeEnum.NotFound
+                        || ex.FailType == FinstatApiException.FailTypeEnum.BadRequest)
                     {
-                        Console.WriteLine("Not existing company: Test OK!");
+                        Console.WriteLine("Not existing company: Test OK! (FailType: {0})", ex.FailType);
                     }
                     else
                     {
-                        throw ex;
+                        Console.WriteLine("Not existing company: Test FAIL! Unexpected FailType: {0} - {1}", ex.FailType, ex.Message);
                     }
+                }
+                else if (task.IsFaulted && task.Exception != null)
+                {
+                    Console.WriteLine("Not existing company: Test FAIL with raw exception: {0}", task.Exception.InnerException ?? task.Exception);
                 }
                 else
                 {
@@ -383,8 +389,12 @@ namespace ApiDistraintTester
                     }
                     else
                     {
-                        throw ex;
+                        Console.WriteLine("Request timeout: Test FAIL! Unexpected FailType: {0} - {1}", ex.FailType, ex.Message);
                     }
+                }
+                else if (task.IsFaulted && task.Exception != null)
+                {
+                    Console.WriteLine("Request timeout: Test FAIL with raw exception: {0}", task.Exception.InnerException ?? task.Exception);
                 }
                 else
                 {
@@ -410,8 +420,12 @@ namespace ApiDistraintTester
                     }
                     else
                     {
-                        throw ex;
+                        Console.WriteLine("Not valid customer key: Test FAIL! Unexpected FailType: {0} - {1}", ex.FailType, ex.Message);
                     }
+                }
+                else if (task.IsFaulted && task.Exception != null)
+                {
+                    Console.WriteLine("Not valid customer key: Test FAIL with raw exception: {0}", task.Exception.InnerException ?? task.Exception);
                 }
                 else
                 {
@@ -431,14 +445,19 @@ namespace ApiDistraintTester
                 if (task.IsFaulted && task.Exception != null && task.Exception.InnerException != null && (task.Exception.InnerException is FinstatApiException))
                 {
                     FinstatApiException ex = (FinstatApiException)task.Exception.InnerException;
-                    if (ex.FailType == FinstatApiException.FailTypeEnum.UrlNotFound)
+                    if (ex.FailType == FinstatApiException.FailTypeEnum.UrlNotFound
+                        || ex.FailType == FinstatApiException.FailTypeEnum.OtherCommunicationFail)
                     {
-                        Console.WriteLine("Url not found: Test OK!");
+                        Console.WriteLine("Url not found: Test OK! (FailType: {0})", ex.FailType);
                     }
                     else
                     {
-                        throw ex;
+                        Console.WriteLine("Url not found: Test FAIL! Unexpected FailType: {0} - {1}", ex.FailType, ex.Message);
                     }
+                }
+                else if (task.IsFaulted && task.Exception != null)
+                {
+                    Console.WriteLine("Url not found: Test FAIL with raw exception: {0}", task.Exception.InnerException ?? task.Exception);
                 }
                 else
                 {

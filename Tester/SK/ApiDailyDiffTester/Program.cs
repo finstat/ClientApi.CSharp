@@ -16,7 +16,7 @@ namespace ApiDailyDiffTester
     {
         //private const string ApiUrlConst = "http://ipv4.fiddler:3376/api/";
         //private const string ApiUrlConst = "http://localhost:3376/api/";
-        private const string ApiUrlConst = "https://www.finstat.sk/api/";
+        private static string ApiUrlConst = "https://www.finstat.sk/api/";
         private static string _apiKey = null;
         private static string _privateKey = null;
         public static void Main(string[] args)
@@ -29,10 +29,11 @@ namespace ApiDailyDiffTester
                 }
              */
             var builder = new ConfigurationBuilder()
-                     .AddJsonFile("appsettings.json")
+                     .AddJsonFile("appsettings.json", optional: true)
                      ;
 
             var configuration = builder.Build();
+            ApiUrlConst = configuration["api_url"] ?? ApiUrlConst;
             _apiKey = configuration["api_key"];
             _privateKey = configuration["private_key"];
             if (string.IsNullOrEmpty(_apiKey) || _apiKey == "add_api_key")
