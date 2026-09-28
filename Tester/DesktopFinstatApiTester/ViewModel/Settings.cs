@@ -44,6 +44,23 @@ namespace DesktopFinstatApiTester.ViewModel
             }
         }
 
+        /// <summary>
+        /// Flat pass-throughs to <see cref="ApiKeys"/>. Birko's schema-driven <c>Form</c> binds each
+        /// <c>FormField.Name</c> as a path on the model, so exposing the two keys at the top level
+        /// keeps the settings schema a flat list of field names.
+        /// </summary>
+        public string PublicKey
+        {
+            get { return ApiKeys?.PublicKey; }
+            set { if (ApiKeys != null) { ApiKeys.PublicKey = value; RaisePropertyChanged(nameof(PublicKey)); } }
+        }
+
+        public string PrivateKey
+        {
+            get { return ApiKeys?.PrivateKey; }
+            set { if (ApiKeys != null) { ApiKeys.PrivateKey = value; RaisePropertyChanged(nameof(PrivateKey)); } }
+        }
+
         private int _timeOut;
         public int TimeOut
         {
@@ -144,11 +161,48 @@ namespace DesktopFinstatApiTester.ViewModel
             }
         }
 
+        /// <summary>
+        /// Per-field errors, keyed by field name; empty when the form is valid. Replaces the WPF
+        /// <c>IAppControl.GetErrors()</c> walk over <c>Validation.GetErrors(textBox)</c> — no
+        /// <c>ValidationRule</c>s were ever declared, so the checks were these emptiness tests.
+        /// </summary>
+        public IDictionary<string, string[]> Validate()
+        {
+            var errors = new Dictionary<string, string[]>();
+
+            void Require(string field, string value)
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    errors.Add(field, new[] { "Value is empty" });
+                }
+            }
+
+            Require(nameof(PublicKey), PublicKey);
+            Require(StationNameProperty, StationName);
+            Require(StationIDProperty, StationID);
+            Require(FinStatApiUrlProperty, FinStatApiUrl);
+            Require(FinStatApiUrlPropertyCZ, FinStatApiUrlCZ);
+            if (TimeOut <= 0)
+            {
+                errors.Add(TimeOutProperty, new[] { "Value must be greater than zero" });
+            }
+
+            return errors;
+        }
+
+        public bool IsValid()
+        {
+            return Validate().Count == 0;
+        }
+
         public void FromModel(Model.Settings model)
         {
             if (model != null)
             {
                 ApiKeys.FromModel(model.ApiKeys);
+                RaisePropertyChanged(nameof(PublicKey));
+                RaisePropertyChanged(nameof(PrivateKey));
                 ResponseType = model.ResponseType;
                 TimeOut = model.TimeOut;
                 StationName = model.StationName;

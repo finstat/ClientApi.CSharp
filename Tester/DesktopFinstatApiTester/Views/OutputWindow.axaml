@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DesktopFinstatApiTester.Views.OutputWindow"
+        Title="Output" Width="720" Height="520"
+        WindowStartupLocation="CenterOwner"
+        Icon="/favicon.ico"
+        FontFamily="{DynamicResource BFont}"
+        Background="{DynamicResource BBgSecondaryBrush}"
+        Foreground="{DynamicResource BTextBrush}">
+
+  <DockPanel Margin="{DynamicResource MarginSm}">
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,0">
+      <Button Grid.Column="0" Content="Reload" Click="ButtonRefresh_Click" />
+      <Button Grid.Column="2" Content="Copy to Clipboard" Click="ButtonCopy_Click" />
+    </Grid>
+
+    <TextBox x:Name="textBoxOutput"
+             AcceptsReturn="True" IsReadOnly="True" TextWrapping="NoWrap"
+             FontFamily="{DynamicResource BFontMono}"
+             FontSize="{DynamicResource BTextSm}"
+             VerticalAlignment="Stretch"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+  </DockPanel>
+</Window>

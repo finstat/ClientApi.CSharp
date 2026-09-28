@@ -1,0 +1,32 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DesktopFinstatApiTester.App">
+
+  <Application.Styles>
+    <FluentTheme />
+    <!-- DataGrid ships its theme as Styles, so Birko's restyle is a StyleInclude that must come
+         after FluentTheme (see Birko.Xaml.Avalonia/CLAUDE.md). -->
+    <StyleInclude Source="avares://Birko.Xaml.Avalonia/Controls/DataGridStyles.axaml" />
+  </Application.Styles>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Finstat is the only theme this app offers, but the core (light + dark) sheet is still
+             mandatory: ThemeVariant.Dark has no InheritVariant, so without it nothing resolves under
+             OS dark mode, and Finstat itself inherits Light. Core + one extra is ~43% lighter than
+             the all-four BirkoTheme.axaml bundle. Add more Tokens.<Theme>.axaml lines to offer more. -->
+        <ResourceInclude Source="avares://Birko.Xaml.Avalonia/BirkoTheme.Core.axaml" />
+        <ResourceInclude Source="avares://Birko.Xaml.Avalonia/Themes/Tokens.Finstat.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <!-- Spacing tokens are emitted as x:Double and a double cannot bind to Thickness, so the
+           handful of paddings this app needs are declared here (same reason the token generator
+           emits radii as CornerRadius rather than double). -->
+      <Thickness x:Key="MarginSm">5</Thickness>
+      <Thickness x:Key="MarginCell">4,0</Thickness>
+      <Thickness x:Key="MarginField">0,0,0,8</Thickness>
+    </ResourceDictionary>
+  </Application.Resources>
+
+</Application>

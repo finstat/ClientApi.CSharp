@@ -1,23 +1,52 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Cross-platform Avalonia desktop tester (was WPF + Fluent.Ribbon). The chrome, tokens and
+       dialogs come from Birko.Xaml; only this app's API-calling logic lives here.
+
+       TFM is net8.0 to match Birko.Xaml.* (Avalonia 11.3 targets net6.0/net8.0). The FinStatApi
+       clients are netstandard2.0, so they reference cleanly from here. -->
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>DesktopFinstatApiTester</RootNamespace>
     <AssemblyName>DesktopFinstatApiTester</AssemblyName>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- The response grid / object tree bind to reflection-walked graphs and to the hand-rolled
+         INotifyPropertyChanged view-models, neither of which has an x:DataType. -->
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="ControlzEx" Version="7.0.3" />
-    <PackageReference Include="Fluent.Ribbon" Version="11.0.2" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.141" />
+    <!-- Also the windows' Icon="/favicon.ico"; the default AvaloniaResource globs don't cover it. -->
+    <AvaloniaResource Include="favicon.ico" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
+    <!-- The response list is a DataGrid; Birko restyles it via Controls/DataGridStyles.axaml.
+         Pinned to 11.3.13, the last 11.x DataGrid: a floating version resolves to 12.x, which
+         drags Avalonia 12 in and fails restore with NU1605 against the 11.3 pins above. -->
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\FinStatApiCZ\FinStatApiCZ.csproj">
       <Aliases>CZ</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\..\FinStatApi\FinStatApi.csproj" />
   </ItemGroup>
+
+  <!-- Birko XAML framework. Real assemblies (not .projitems) by EPIC-015 convention, so these are
+       ProjectReferences. $(BirkoSrc) comes from Directory.Build.props — defaults to the sibling
+       Birko\Framework checkout and is overridable via /p:BirkoSrc=... or the BIRKO_SRC env var. -->
+  <ItemGroup>
+    <ProjectReference Include="$(BirkoSrc)\Birko.Xaml.Core\Birko.Xaml.Core.csproj" />
+    <ProjectReference Include="$(BirkoSrc)\Birko.Xaml.Avalonia\Birko.Xaml.Avalonia.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,157 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Birko.Xaml.Avalonia.Controls;assembly=Birko.Xaml.Avalonia"
+        x:Class="DesktopFinstatApiTester.Views.MainWindow"
+        Title="FinStat API Tester"
+        Width="1280" Height="800"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Icon="/favicon.ico"
+        FontFamily="{DynamicResource BFont}"
+        Background="{DynamicResource BBgSecondaryBrush}"
+        Foreground="{DynamicResource BTextBrush}">
+
+  <!-- Root panel: the workspace plus the overlay layers (dialogs, settings modal, command
+       palette). DialogService hosts its overlays in this panel. -->
+  <Panel x:Name="rootPanel">
+
+    <DockPanel>
+
+      <!-- ── Header: brand, theme switcher, settings, palette hint ───────────── -->
+      <Border DockPanel.Dock="Top" Height="{DynamicResource BHeaderHeight}"
+              Background="{DynamicResource BBgBrush}"
+              BorderBrush="{DynamicResource BBorderBrush}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="12,0">
+          <TextBlock Text="FinStat API Tester" VerticalAlignment="Center"
+                     FontFamily="{DynamicResource BFontHeading}"
+                     FontSize="{DynamicResource BTextLg}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource BTextBrush}" />
+
+          <ComboBox Grid.Column="2" x:Name="comboBoxTheme" MinWidth="130"
+                    VerticalAlignment="Center" Margin="{DynamicResource MarginSm}"
+                    ToolTip.Tip="Switch the Birko theme"
+                    SelectionChanged="comboBoxTheme_SelectionChanged" />
+
+          <Button Grid.Column="3" x:Name="buttonCommands" Content="Commands  Ctrl+K"
+                  VerticalAlignment="Center" Margin="{DynamicResource MarginSm}"
+                  Click="buttonCommands_Click" />
+
+          <Button Grid.Column="4" x:Name="buttonSettings" Content="Settings"
+                  VerticalAlignment="Center" Margin="{DynamicResource MarginSm}"
+                  Click="buttonSettings_Click" />
+        </Grid>
+      </Border>
+
+      <!-- ── Ribbon: replaces Fluent:Ribbon. Model-driven; tabs built in MainWindow_Ribbon.cs ── -->
+      <c:Ribbon DockPanel.Dock="Top" x:Name="ribbon" />
+
+      <!-- ── Status bar: free-text slot on the left, API limits on the right ─── -->
+      <Border DockPanel.Dock="Bottom" Height="{DynamicResource BStatusBarHeight}"
+              Background="{DynamicResource BBgBrush}"
+              BorderBrush="{DynamicResource BBorderBrush}" BorderThickness="0,1,0,0">
+        <Grid ColumnDefinitions="*,Auto" Margin="12,0">
+          <TextBlock x:Name="textBlockStatusBarLeft" VerticalAlignment="Center"
+                     Foreground="{DynamicResource BTextMutedBrush}" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                      DataContext="{Binding Limits}">
+            <TextBlock Text="Limits: " Foreground="{DynamicResource BTextMutedBrush}" />
+            <TextBlock Text="Daily " Foreground="{DynamicResource BTextMutedBrush}" />
+            <TextBlock Text="{Binding Daily.Current}" Foreground="{DynamicResource BTextBrush}" />
+            <TextBlock Text="/" Foreground="{DynamicResource BTextMutedBrush}" />
+            <TextBlock Text="{Binding Daily.Max}" Foreground="{DynamicResource BTextBrush}" />
+            <TextBlock Text="  |  Monthly " Foreground="{DynamicResource BTextMutedBrush}" />
+            <TextBlock Text="{Binding Monthly.Current}" Foreground="{DynamicResource BTextBrush}" />
+            <TextBlock Text="/" Foreground="{DynamicResource BTextMutedBrush}" />
+            <TextBlock Text="{Binding Monthly.Max}" Foreground="{DynamicResource BTextBrush}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ── Workspace: request history (left) + response inspector (right) ──── -->
+      <Grid ColumnDefinitions="45*,55*">
+
+        <DataGrid x:Name="datagridResponse" Grid.Column="0"
+                  Margin="{DynamicResource MarginSm}"
+                  ItemsSource="{Binding ResponseItems}"
+                  SelectionMode="Single" IsReadOnly="True"
+                  AutoGenerateColumns="False"
+                  CanUserResizeColumns="True"
+                  SelectionChanged="datagridResponse_SelectionChanged">
+          <DataGrid.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="CURL Command" Click="dataGridCurlCommand_Click" />
+              <MenuItem Header="Repeat Request" Click="dataGridRepeatRequest_Click" />
+              <Separator />
+              <MenuItem Header="Show Error Response" Click="dataGridShowResponseOutputWindow_Click" />
+            </ContextMenu>
+          </DataGrid.ContextMenu>
+          <DataGrid.Columns>
+            <!-- Six columns in a ~575dip pane: the fixed-shape columns size to their content and
+                 only the two free-text ones stretch. MinWidth keeps every header legible instead of
+                 clipping it away, falling back to a horizontal scrollbar on a narrow window. -->
+            <DataGridTextColumn Header="Source" Width="Auto" MinWidth="70" Binding="{Binding ApiSource}" />
+            <DataGridTextColumn Header="Request" Width="2*" MinWidth="95" Binding="{Binding Request}" />
+            <DataGridTextColumn Header="Parameters" Width="3*" MinWidth="115" Binding="{Binding Parameter}" />
+            <DataGridTextColumn Header="Send" Width="Auto" MinWidth="95"
+                                Binding="{Binding Send, StringFormat='{}{0:dd.MM.yy HH:mm:ss}'}" />
+            <DataGridTextColumn Header="Received" Width="Auto" MinWidth="110"
+                                Binding="{Binding Received, StringFormat='{}{0:dd.MM.yy HH:mm:ss}'}" />
+            <DataGridTextColumn Header="Count" Width="Auto" MinWidth="75" Binding="{Binding DataCount}" />
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Birko's ObjectTree walks the response graph itself (POCOs, dictionaries, collections,
+             JsonNode) with type-colored monospaced values, and reports the selected node's value +
+             path so the context menu can act on it. -->
+        <TabControl x:Name="tabControlResponse" Grid.Column="1">
+          <TabItem Header="Data">
+            <ScrollViewer>
+              <c:ObjectTree x:Name="objectTreeData" Margin="{DynamicResource MarginSm}">
+                <c:ObjectTree.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Copy Value To Clipboard" Click="treeCopyValueToClipboard_Click" />
+                    <MenuItem Header="Copy JSON To Clipboard" Click="treeCopyToClipboard_Click" />
+                    <Separator />
+                    <MenuItem Header="Show JSON In Output Window" Click="treeShowJSONInOutputWindow_Click" />
+                    <MenuItem Header="Show XML In Output Window" Click="treeShowXMLInOutputWindow_Click" />
+                  </ContextMenu>
+                </c:ObjectTree.ContextMenu>
+              </c:ObjectTree>
+            </ScrollViewer>
+          </TabItem>
+          <TabItem Header="Headers">
+            <ScrollViewer>
+              <c:ObjectTree x:Name="objectTreeHeaders" Margin="{DynamicResource MarginSm}" />
+            </ScrollViewer>
+          </TabItem>
+        </TabControl>
+      </Grid>
+    </DockPanel>
+
+    <!-- ── Settings (the Fluent Backstage's replacement): Birko Modal + schema-driven Form ── -->
+    <c:Modal x:Name="settingsModal" Title="FinStat API Tester — Access">
+      <StackPanel Spacing="16">
+        <!-- Eight fields overflow a short window; the buttons stay pinned below the scroll area. -->
+        <ScrollViewer MaxHeight="460" HorizontalScrollBarVisibility="Disabled">
+          <c:Form x:Name="settingsForm" />
+        </ScrollViewer>
+        <TextBlock x:Name="textBlockSettingsErrors"
+                   IsVisible="False" TextWrapping="Wrap"
+                   Foreground="{DynamicResource BColorDangerTextBrush}" />
+        <Grid ColumnDefinitions="*,*,*">
+          <Button Grid.Column="0" Content="Use" HorizontalAlignment="Stretch"
+                  Margin="0,0,4,0" Click="buttonSave_Click" />
+          <Button Grid.Column="1" Content="Use and Save" HorizontalAlignment="Stretch"
+                  Margin="4,0" Click="buttonSaveAndStore_Click" />
+          <Button Grid.Column="2" Content="Cancel" HorizontalAlignment="Stretch"
+                  Margin="4,0,0,0" Click="buttonCancel_Click" />
+        </Grid>
+      </StackPanel>
+    </c:Modal>
+
+    <!-- ── Ctrl+K palette over every ribbon command ─────────────────────────── -->
+    <c:CommandPalette x:Name="commandPalette" />
+
+  </Panel>
+</Window>
