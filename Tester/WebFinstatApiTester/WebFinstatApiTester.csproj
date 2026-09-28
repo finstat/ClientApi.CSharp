@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WebFinstatApiTester</RootNamespace>
+    <AssemblyName>WebFinstatApiTester</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FinStatApi\FinStatApi.csproj" />
+    <ProjectReference Include="..\..\FinStatApiCZ\FinStatApiCZ.csproj">
+      <Aliases>CZ</Aliases>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Birko.Security.Vault loads the dev client-cert fingerprint from a running HashiCorp
+       Vault at startup. Dependency chain (after Vault's PasswordSettings moved to
+       Birko.Configuration): Contracts (Data.Models interfaces) → Configuration →
+       Serialization (ISerializer + SystemJsonSerializer) → Security → Security.Vault.
+       $(BirkoSrc) comes from Directory.Build.props — defaults to ..\Birko\Framework next to the repo and
+       can be overridden via /p:BirkoSrc=... or the BIRKO_SRC env var. -->
+  <Import Project="$(BirkoSrc)\Birko.Contracts\Birko.Contracts.projitems" Label="Shared" />
+  <Import Project="$(BirkoSrc)\Birko.Configuration\Birko.Configuration.projitems" Label="Shared" />
+  <Import Project="$(BirkoSrc)\Birko.Serialization\Birko.Serialization.projitems" Label="Shared" />
+  <Import Project="$(BirkoSrc)\Birko.Security\Birko.Security.projitems" Label="Shared" />
+  <Import Project="$(BirkoSrc)\Birko.Security.Vault\Birko.Security.Vault.projitems" Label="Shared" />
+  <Import Project="$(BirkoSrc)\Birko.Security.Vault.Configuration\Birko.Security.Vault.Configuration.projitems" Label="Shared" />
+
+  <!-- Birko.Health — pure, no Birko.* deps, so the projitems can be imported alone.
+       Powers the /health endpoint (disk/memory + FinStat outbound reachability). -->
+  <Import Project="$(BirkoSrc)\Birko.Health\Birko.Health.projitems" Label="Shared" />
+
+  <!-- Birko.Validation — cherry-pick Core/Rules/Fluent only. The projitems also compiles
+       Integration/*.cs which pulls Birko.Data.Stores/Birko.Rules; those aren't needed here. -->
+  <ItemGroup>
+    <Compile Include="$(BirkoSrc)\Birko.Validation\Core\*.cs"   LinkBase="Birko.Validation\Core" />
+    <Compile Include="$(BirkoSrc)\Birko.Validation\Rules\*.cs"  LinkBase="Birko.Validation\Rules" />
+    <Compile Include="$(BirkoSrc)\Birko.Validation\Fluent\*.cs" LinkBase="Birko.Validation\Fluent" />
+  </ItemGroup>
+
+
+  <!-- Frontend build. esbuild bundles src/app.ts into wwwroot/app.js.
+       Set /p:NpmBuildSkip=true to skip — e.g. when wwwroot is already bundled
+       by an upstream stage (Docker frontend stage). -->
+  <Target Name="NpmInstall" BeforeTargets="NpmBuild"
+          Condition="'$(NpmBuildSkip)' != 'true' And Exists('package.json') And !Exists('node_modules')">
+    <Exec Command="npm install" />
+  </Target>
+  <Target Name="NpmBuild" BeforeTargets="BeforeBuild"
+          Condition="'$(NpmBuildSkip)' != 'true' And Exists('package.json')">
+    <Exec Command="npm run build:dev" Condition="'$(Configuration)' != 'Release'" />
+    <Exec Command="npm run build"     Condition="'$(Configuration)' == 'Release'" />
+  </Target>
+
+  <ItemGroup>
+    <Content Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
+    <Compile Remove="node_modules\**" />
+    <None Include="TODO.md" />
+  </ItemGroup>
+
+</Project>

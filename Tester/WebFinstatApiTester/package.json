@@ -1,0 +1,17 @@
+{
+  "name": "web-finstat-api-tester",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:dev": "node build.js",
+    "build":     "node build.js --minify",
+    "watch":     "node build.js --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

@@ -1,0 +1,72 @@
+# BuildKit convention: when `-f <path>/Dockerfile` is used, a `<path>/Dockerfile.dockerignore`
+# takes precedence over a `.dockerignore` at the context root. This keeps the ignore rules
+# scoped to this image build without affecting anything else in C:/Source/.
+
+# Deny every top-level entry by default; allowlist what this build needs.
+/*
+!/ClientApi.CSharp
+# Birko.* shared projects now live under the Birko\Framework bucket. Un-ignore the
+# bucket path step by step, then allowlist only the projects this image needs (so
+# Birko\Framework.Tests, Birko\Consumers, and unrelated Birko.* stay out of context).
+!/Birko
+/Birko/*
+!/Birko/Framework
+/Birko/Framework/*
+!/Birko/Framework/Birko.Contracts
+!/Birko/Framework/Birko.Configuration
+!/Birko/Framework/Birko.Serialization
+!/Birko/Framework/Birko.Security
+!/Birko/Framework/Birko.Security.Vault
+!/Birko/Framework/Birko.Security.Vault.Configuration
+!/Birko/Framework/Birko.Health
+!/Birko/Framework/Birko.Validation
+# Frontend TypeScript sources — now in the Birko\Web bucket — for the esbuild stage.
+!/Birko/Web
+/Birko/Web/*
+!/Birko/Web/Birko.Web.Core
+!/Birko/Web/Birko.Web.Components
+!/Birko/Web/Birko.Web.Shell
+
+# Artefacts inside allowed dirs
+**/bin
+**/obj
+**/node_modules
+
+# Developer-local secrets — never baked into the image.
+**/appsettings.Development.json
+**/appsettings.*.Development.json
+**/appsettings.Local.json
+
+# Frontend prebuilt output from the host — the Docker frontend stage rebuilds it.
+# Left out to keep the context small; the Dockerfile recreates wwwroot/app.js anyway.
+ClientApi.CSharp/Tester/WebFinstatApiTester/wwwroot/app.js
+ClientApi.CSharp/Tester/WebFinstatApiTester/wwwroot/app.js.map
+
+# IDE / editor state
+**/.vs
+**/.idea
+**/*.user
+**/*.suo
+**/.vscode
+
+# VCS
+**/.git
+**/.gitignore
+**/.gitattributes
+**/.github
+
+# Agent state
+**/.claude
+
+# Other testers — not needed for the web image
+ClientApi.CSharp/Tester/DesktopFinstatApiTester
+ClientApi.CSharp/Tester/SK
+ClientApi.CSharp/Tester/CZ
+
+# Prebuilt image tarballs that happen to sit in the repo
+ClientApi.CSharp/*.tar
+
+# Docker itself
+ClientApi.CSharp/Dockerfile
+ClientApi.CSharp/Dockerfile.dockerignore
+ClientApi.CSharp/docker-compose.yml

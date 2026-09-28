@@ -1,0 +1,53 @@
+/**
+ * Tester-local token overrides — loaded AFTER tokens.css so these win the cascade.
+ *
+ * Retints the primary accent to teal (variant C mitigated) per the design system's
+ * recommendation: bluer than the FinStat green so it doesn't visually collide with
+ * the success state (#16a34a). Success / warning / danger / info stay untouched.
+ *
+ * Kept here (not in Birko.Web.Components/css/tokens.css) because the retint is
+ * tester-specific — other consumers of the Birko tokens keep the blue default.
+ */
+
+:root {
+  --b-color-primary: #0d9488;       /* teal-600 */
+  --b-color-primary-hover: #0f766e; /* teal-700 */
+  --b-color-primary-light: #ccfbf1; /* teal-100 */
+  --b-focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.18);
+}
+
+[data-theme="dark"] {
+  /* Dark companion — teal hues that read on slate-900. Hover is lighter than
+     base (opposite direction from light theme) to register on dark surfaces. */
+  --b-color-primary: #2dd4bf;       /* teal-400 */
+  --b-color-primary-hover: #5eead4; /* teal-300 */
+  --b-color-primary-light: #134e4a; /* teal-900 */
+  --b-focus-ring: 0 0 0 3px rgba(45, 212, 191, 0.3);
+}
+
+/* ─── Ribbon — tighter spacing for smaller monitors ─────────────────────────
+   The shared b-ribbon component reads these two custom properties (with fallbacks
+   to --b-space-xl / --b-space-xs). Overriding them cascades through the shadow
+   DOM without touching the shared lib. Default: 1.5rem group gap / 0.25rem item
+   gap — fine on 1920-wide, too airy on 13" laptops. */
+:root {
+  --b-ribbon-group-gap: var(--b-space-lg, 1rem);   /* was 1.5rem */
+  --b-ribbon-item-gap:  var(--b-space-2xs, 0.125rem);
+  /* Ribbon is text-only — no need for the default 8rem panel height. */
+  --b-ribbon-panel-height: 4.5rem;
+}
+
+@media (max-width: 1440px) {
+  :root {
+    --b-ribbon-group-gap: var(--b-space-md, 0.75rem);
+    --b-ribbon-tab-height: 2.375rem;               /* was 2.75rem */
+    --b-ribbon-panel-height: 4rem;                 /* was 4.5rem from index.html */
+  }
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --b-ribbon-group-gap: var(--b-space-sm, 0.5rem);
+    --b-ribbon-panel-height: 3.75rem;
+  }
+}

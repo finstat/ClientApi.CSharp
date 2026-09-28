@@ -1,0 +1,14 @@
+{
+  "_comment": "Copy to appsettings.Development.json (gitignored) and fill in local secrets. Takes precedence over LocalVault.",
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Information"
+    }
+  },
+  "Security": {
+    "DevCertificate": {
+      "Fingerprint": ""
+    }
+  }
+}

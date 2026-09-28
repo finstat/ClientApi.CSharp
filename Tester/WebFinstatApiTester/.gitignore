@@ -1,0 +1,15 @@
+# Node
+node_modules/
+package-lock.json
+
+# esbuild output (generated; index.html is source)
+wwwroot/app.js
+wwwroot/app.js.map
+wwwroot/css/tokens.css
+wwwroot/css/reset.css
+# Per-theme sheets, copied from Birko.Web.Components by build.js
+wwwroot/css/themes/
+
+# Local dev secrets — fingerprint overrides, etc.
+# Start from appsettings.Development.json.example.
+appsettings.Development.json
