@@ -6,5 +6,15 @@
     <ImportNuGetBuildTasksPackTargetsFromSdk Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'">false</ImportNuGetBuildTasksPackTargetsFromSdk>
     <!-- Disable the problematic NuGet assets resolution for packages.config projects -->
     <ResolveNuGetPackages Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'">false</ResolveNuGetPackages>
+
+    <!-- Root of the Birko\Framework bucket of shared-project checkouts. Consumed by csproj
+         files that Import $(BirkoSrc)\Birko.X\*.projitems (e.g. Tester\WebFinstatApiTester).
+         Framework bucket only: the TypeScript build (Tester\WebFinstatApiTester\build.js)
+         resolves the Birko\Web bucket separately via BIRKO_WEB_SRC. Resolution order:
+           1. /p:BirkoSrc=... passed on the CLI
+           2. BIRKO_SRC environment variable
+           3. Default: ..\Birko\Framework next to this repo -->
+    <BirkoSrc Condition="'$(BirkoSrc)' == '' and '$(BIRKO_SRC)' != ''">$(BIRKO_SRC)</BirkoSrc>
+    <BirkoSrc Condition="'$(BirkoSrc)' == ''">$(MSBuildThisFileDirectory)..\Birko\Framework</BirkoSrc>
   </PropertyGroup>
 </Project>
