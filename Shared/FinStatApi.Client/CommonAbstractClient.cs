@@ -64,17 +64,17 @@ namespace FinstatApi
             {
                 Daily = new ViewModel.Limit
                 {
-                    Current = (header != null && header.ContainsKey("Finstat-Daily-Limit-Current") && header["Finstat-Daily-Limit-Current"] != null && header["Finstat-Daily-Limit-Current"].Length > 0)
-                    ? long.Parse(header["Finstat-Daily-Limit-Current"][0]) : 0,
-                    Max = (header != null && header.ContainsKey("Finstat-Daily-Limit-Max") && header["Finstat-Daily-Limit-Max"] != null && header["Finstat-Daily-Limit-Max"].Length > 0)
-                    ? long.Parse(header["Finstat-Daily-Limit-Max"][0]) : 0
+                    Current = (header != null && header.ContainsKey("finstat-daily-limit-current") && header["finstat-daily-limit-current"] != null && header["finstat-daily-limit-current"].Length > 0)
+                    ? long.Parse(header["finstat-daily-limit-current"][0]) : 0,
+                    Max = (header != null && header.ContainsKey("finstat-daily-limit-max") && header["finstat-daily-limit-max"] != null && header["finstat-daily-limit-max"].Length > 0)
+                    ? long.Parse(header["finstat-daily-limit-max"][0]) : 0
                 },
                 Monthly = new ViewModel.Limit
                 {
-                    Current = (header != null && header.ContainsKey("Finstat-Monthly-Limit-Current") && header["Finstat-Monthly-Limit-Current"] != null && header["Finstat-Monthly-Limit-Current"].Length > 0)
-                    ? long.Parse(header["Finstat-Monthly-Limit-Current"][0]) : 0,
-                    Max = (header != null && header.ContainsKey("Finstat-Monthly-Limit-Max") && header["Finstat-Monthly-Limit-Max"] != null && header["Finstat-Monthly-Limit-Max"].Length > 0)
-                    ? long.Parse(header["Finstat-Monthly-Limit-Max"][0]) : 0
+                    Current = (header != null && header.ContainsKey("finstat-monthly-limit-current") && header["finstat-monthly-limit-current"] != null && header["finstat-monthly-limit-current"].Length > 0)
+                    ? long.Parse(header["finstat-monthly-limit-current"][0]) : 0,
+                    Max = (header != null && header.ContainsKey("finstat-monthly-limit-max") && header["finstat-monthly-limit-max"] != null && header["finstat-monthly-limit-max"].Length > 0)
+                    ? long.Parse(header["finstat-monthly-limit-max"][0]) : 0
                 }
             };
         }

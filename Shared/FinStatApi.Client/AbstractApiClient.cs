@@ -149,7 +149,10 @@ namespace FinstatApi
                     resultContent = await result.Content.ReadAsByteArrayAsync();
                     if (result.Headers != null)
                     {
-                        var responseHeaders = new Dictionary<string, string[]>();
+                        // HTTP/2 mandates lowercase header names on the wire, while HTTP/1.1
+                        // servers are free to send them capitalised. Key case-insensitively so
+                        // the limit headers resolve the same way under either protocol version.
+                        var responseHeaders = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
                         foreach (var header in result.Headers)
                         {
                             responseHeaders.Add(header.Key, result.Headers.GetValues(header.Key).ToArray());
