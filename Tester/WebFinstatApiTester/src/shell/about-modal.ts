@@ -9,10 +9,10 @@ export const OPEN_ABOUT_EVENT = 'finstat:open-about';
 export const DOCS_URL             = 'https://finstat.github.io/api-documentation/';
 export const BIRKO_AUTHOR         = 'https://github.com/birko';
 export const BIRKO_AUTHOR_AVATAR  = 'https://github.com/birko.png?size=48';
-export const BIRKO_REPO           = 'https://github.com/birko/Birko.Framework';
-export const BIRKO_WEB_CORE       = 'https://github.com/birko/Birko.Web.Core';
-export const BIRKO_WEB_COMPONENTS = 'https://github.com/birko/Birko.Web.Components';
-export const BIRKO_WEB_SHELL      = 'https://github.com/birko/Birko.Web.Shell';
+export const BIRKO_REPO           = 'https://github.com/Birko-Framework/Birko.Framework';
+export const BIRKO_WEB_CORE       = 'https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Core';
+export const BIRKO_WEB_COMPONENTS = 'https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Components';
+export const BIRKO_WEB_SHELL      = 'https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Shell';
 
 const VERSION = '1.0.0';
 

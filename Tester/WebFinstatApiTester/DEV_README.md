@@ -25,16 +25,16 @@ Referencia: https://finstat.github.io/api-documentation/
 
 ### 2. Sibling .NET projekty
 
-Importované cez `$(BirkoSrc)\Birko.X\*.projitems` (shared projects, nie NuGet!). Všetky repá sú na [github.com/birko](https://github.com/birko):
+Importované cez `$(BirkoSrc)\Birko.X\*.projitems` (shared projects, nie NuGet!). Všetky sú v monorepe [Birko-Framework/Birko.Framework](https://github.com/Birko-Framework/Birko.Framework):
 
-- [Birko.Contracts](https://github.com/birko/Birko.Contracts)
-- [Birko.Configuration](https://github.com/birko/Birko.Configuration)
-- [Birko.Serialization](https://github.com/birko/Birko.Serialization)
-- [Birko.Security](https://github.com/birko/Birko.Security)
-- [Birko.Security.Vault](https://github.com/birko/Birko.Security.Vault)
-- [Birko.Security.Vault.Configuration](https://github.com/birko/Birko.Security.Vault.Configuration)
-- [Birko.Health](https://github.com/birko/Birko.Health) (pre `/health`)
-- [Birko.Validation](https://github.com/birko/Birko.Validation) (cherry-pick: `Core/*.cs`, `Rules/*.cs`, `Fluent/*.cs`)
+- [Birko.Contracts](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Contracts)
+- [Birko.Configuration](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Configuration)
+- [Birko.Serialization](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Serialization)
+- [Birko.Security](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Security)
+- [Birko.Security.Vault](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Security.Vault)
+- [Birko.Security.Vault.Configuration](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Security.Vault.Configuration)
+- [Birko.Health](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Health) (pre `/health`)
+- [Birko.Validation](https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Validation) (cherry-pick: `Core/*.cs`, `Rules/*.cs`, `Fluent/*.cs`)
 
 Cestu určuje MSBuild property `$(BirkoSrc)` z `Directory.Build.props`. Poradie rezolúcie:
 
@@ -46,9 +46,9 @@ Cestu určuje MSBuild property `$(BirkoSrc)` z `Directory.Build.props`. Poradie 
 
 Rezolvujú sa cez `BIRKO_WEB_SRC` env var v `build.js`; bez env var `build.js` vylezie po stromčeku hore a nájde checkout `Birko\Web` (žiadna absolútna cesta sa necommituje):
 
-- [Birko.Web.Core](https://github.com/birko/Birko.Web.Core) (`birko-web-core/*`)
-- [Birko.Web.Components](https://github.com/birko/Birko.Web.Components) (`birko-web-components/*`, + CSS `tokens.css`, `reset.css`)
-- [Birko.Web.Shell](https://github.com/birko/Birko.Web.Shell) (`birko-web-shell/*`)
+- [Birko.Web.Core](https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Core) (`birko-web-core/*`)
+- [Birko.Web.Components](https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Components) (`birko-web-components/*`, + CSS `tokens.css`, `reset.css`)
+- [Birko.Web.Shell](https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Shell) (`birko-web-shell/*`)
 
 > .NET a TS build používajú **dve rôzne** env vars, lebo ukazujú na rôzne buckety: `BIRKO_SRC` → `Birko\Framework` (.NET), `BIRKO_WEB_SRC` → `Birko\Web` (esbuild). Pri štandardnom layoute `C:\Source\Birko\{Framework,Web}` netreba nastavovať ani jednu.
 
@@ -243,25 +243,13 @@ Ak `ENABLED≠true` alebo `TOKEN` je prázdny, Vault sa nekontaktuje.
 
 ```bash
 # Birko.* shared projekty idú do bucketu Birko/Framework
-mkdir -p C:/Source/Birko/Framework
-cd C:/Source/Birko/Framework     # alebo kdekoľvek, len nastav BIRKO_SRC
-
-git clone https://github.com/birko/Birko.Contracts.git
-git clone https://github.com/birko/Birko.Configuration.git
-git clone https://github.com/birko/Birko.Serialization.git
-git clone https://github.com/birko/Birko.Security.git
-git clone https://github.com/birko/Birko.Security.Vault.git
-git clone https://github.com/birko/Birko.Security.Vault.Configuration.git
-git clone https://github.com/birko/Birko.Health.git
-git clone https://github.com/birko/Birko.Validation.git
+mkdir -p C:/Source/Birko
+cd C:/Source/Birko
+git clone https://github.com/Birko-Framework/Birko.Framework.git Framework   # alebo kdekoľvek, len nastav BIRKO_SRC
 
 # Birko.Web.* TypeScript projekty idú do bucketu Birko/Web
-mkdir -p C:/Source/Birko/Web
-cd C:/Source/Birko/Web           # alebo kdekoľvek, len nastav BIRKO_WEB_SRC
-
-git clone https://github.com/birko/Birko.Web.Core.git
-git clone https://github.com/birko/Birko.Web.Components.git
-git clone https://github.com/birko/Birko.Web.Shell.git
+cd C:/Source/Birko
+git clone https://github.com/Birko-Framework/Birko.Web.git Web               # alebo kdekoľvek, len nastav BIRKO_WEB_SRC
 
 # a samotný ClientApi.CSharp do rootu C:/Source (ak ho ešte nemáš)
 cd C:/Source
