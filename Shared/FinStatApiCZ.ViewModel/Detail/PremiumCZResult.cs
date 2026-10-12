@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 
 namespace FinstatApi
@@ -17,6 +18,8 @@ namespace FinstatApi
         public double? ProfitActual { get; set; }
         public SalesTypeEnum Sales { get; set; }
         public ProfitTypeEnum Profit { get; set; }
+        public TurnoverCategory TurnoverCategory { get; set; }
+        public DateTime? SuspendedAsPersonUntil { get; set; }
 
         public override string ToString()
         {
@@ -34,11 +37,25 @@ namespace FinstatApi
             dataString.AppendLine(string.Format("ProfitActual: {0}", ProfitActual));
             dataString.AppendLine(string.Format("Sales: {0}", Sales));
             dataString.AppendLine(string.Format("Profit: {0}", Profit));
+            dataString.AppendLine(string.Format("TurnoverCategory: {0}", TurnoverCategory));
+            dataString.AppendLine(string.Format("SuspendedAsPersonUntil: {0}", SuspendedAsPersonUntil));
             if (BankAccounts != null && BankAccounts.Length > 0)
             {
                 dataString.AppendLine(string.Format("BankAccounts (count): {0}", BankAccounts.Length));
             }
             return dataString.ToString();
+        }
+    }
+
+    public class TurnoverCategory
+    {
+        public int Year { get; set; }
+        public string Code { get; set; }
+        public string Text { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0} {1} ({2})", Code, Text, Year);
         }
     }
 }

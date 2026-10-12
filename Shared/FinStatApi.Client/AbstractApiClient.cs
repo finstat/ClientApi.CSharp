@@ -136,7 +136,11 @@ namespace FinstatApi
             return client;
         }
 
-        internal async Task<byte[]> DoApiCall(string methodUrl, List<KeyValuePair<string, string>> methodParams, bool json = false, string method = "POST")
+        /// <param name="lang">
+        /// Language of response texts (sk|cs), sent as the Lang parameter. Honoured on finstat.cz only; finstat.sk
+        /// always answers in Slovak. Null leaves the choice to the server (domain default, or Accept-Language).
+        /// </param>
+        internal async Task<byte[]> DoApiCall(string methodUrl, List<KeyValuePair<string, string>> methodParams, bool json = false, string method = "POST", string lang = null)
         {
             HttpResponseMessage result = null;
             byte[] resultContent = null;
@@ -150,6 +154,11 @@ namespace FinstatApi
                 if (methodParams != null && methodParams.Count > 0)
                 {
                     list.AddRange(methodParams);
+                }
+                // statement legend calls already carry lang as a hashed method parameter, which takes precedence
+                if (!string.IsNullOrWhiteSpace(lang) && !list.Any(x => string.Equals(x.Key, "lang", StringComparison.OrdinalIgnoreCase)))
+                {
+                    list.Add(new KeyValuePair<string, string>("Lang", lang));
                 }
                 using (HttpClient client = CreateClient(_timeout))
                 {
@@ -200,11 +209,11 @@ namespace FinstatApi
             }
         }
 
-        internal async Task<T> DoApiCall<T>(string methodUrl, List<KeyValuePair<string, string>> methodParams, bool json = false, string method = "POST")
+        internal async Task<T> DoApiCall<T>(string methodUrl, List<KeyValuePair<string, string>> methodParams, bool json = false, string method = "POST", string lang = null)
         {
             try
             {
-                var bytes = await DoApiCall(methodUrl, methodParams, json, method);
+                var bytes = await DoApiCall(methodUrl, methodParams, json, method, lang);
                 if (bytes != null)
                 {
                     var response = Encoding.UTF8.GetString(bytes);

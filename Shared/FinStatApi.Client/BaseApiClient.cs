@@ -27,13 +27,13 @@ namespace FinstatApi
         /// or Unknown exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<ApiAutocomplete> RequestAutocomplete(string query, bool json = false)
+        public async Task<ApiAutocomplete> RequestAutocomplete(string query, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("query", query ),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, query)),
             });
-            return await DoApiCall<ApiAutocomplete>("/autocomplete", list, json);
+            return await DoApiCall<ApiAutocomplete>("/autocomplete", list, json, lang: lang);
         }
 
 
@@ -50,7 +50,7 @@ namespace FinstatApi
         /// or Not valid user license email!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<string> RequestAutoLogin(string url, string email = null, bool json = false)
+        public async Task<string> RequestAutoLogin(string url, string email = null, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("url", url),
@@ -60,7 +60,7 @@ namespace FinstatApi
             {
                 list.Add(new KeyValuePair<string, string>("email", email));
             }
-            return await DoApiCall<string>("/autologin", list, json);
+            return await DoApiCall<string>("/autologin", list, json, lang: lang);
         }
     }
 }

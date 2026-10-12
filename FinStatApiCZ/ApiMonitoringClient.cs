@@ -28,16 +28,16 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<bool> Add(string ico, bool json = false)
+        public async Task<bool> Add(string ico, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
             });
-            return await DoApiCall<bool>("/AddToMonitoring", list, json);
+            return await DoApiCall<bool>("/AddToMonitoring", list, json, lang: lang);
         }
 
-        public async Task<bool> Add(string ico, string category, bool json = false)
+        public async Task<bool> Add(string ico, string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
@@ -45,7 +45,7 @@ namespace FinstatApi
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<bool>("/AddToMonitoring", list, json);
+            return await DoApiCall<bool>("/AddToMonitoring", list, json, lang: lang);
         }
 
         /// <summary>
@@ -60,16 +60,16 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<bool> Remove(string ico, bool json = false)
+        public async Task<bool> Remove(string ico, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
             });
-            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json);
+            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json, lang: lang);
         }
 
-        public async Task<bool> Remove(string ico, string category, bool json = false)
+        public async Task<bool> Remove(string ico, string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
@@ -77,7 +77,7 @@ namespace FinstatApi
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json);
+            return await DoApiCall<bool>("/RemoveFromMonitoring", list, json, lang: lang);
         }
 
         /// <summary>
@@ -90,22 +90,22 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<string[]> GetMonitorings(bool json = false)
+        public async Task<string[]> GetMonitorings(bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "list")),
             });
-            return await DoApiCall<string[]>("/MonitoringList", list, json);
+            return await DoApiCall<string[]>("/MonitoringList", list, json, lang: lang);
         }
 
-        public async Task<string[]> GetMonitorings(string category, bool json = false)
+        public async Task<string[]> GetMonitorings(string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "list")),
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<string[]>("/MonitoringList", list, json);
+            return await DoApiCall<string[]>("/MonitoringList", list, json, lang: lang);
         }
 
         /// <summary>
@@ -118,22 +118,22 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<Monitoring[]> GetReport(bool json = false)
+        public async Task<Monitoring[]> GetReport(bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "report")),
             });
-            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json);
+            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json, lang: lang);
         }
 
-        public async Task<Monitoring[]> GetReport(string category, bool json = false)
+        public async Task<Monitoring[]> GetReport(string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "report")),
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json);
+            return await DoApiCall<Monitoring[]>("/MonitoringReport", list, json, lang: lang);
         }
 
         /// <summary>
@@ -147,12 +147,12 @@ namespace FinstatApi
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
         ///
-        public async Task<MonitoringCategory[]> GetCategories(bool json)
+        public async Task<MonitoringCategory[]> GetCategories(bool json, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "monitoringcategories")),
             });
-            return await DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json);
+            return await DoApiCall<MonitoringCategory[]>("/MonitoringCategories", list, json, lang: lang);
         }
 
         /// <summary>
@@ -160,16 +160,16 @@ namespace FinstatApi
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns>True if succeed otherwise false.</returns>
-        public async Task<bool> AddDate(string date, bool json = false)
+        public async Task<bool> AddDate(string date, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("date", date),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
             });
-            return await DoApiCall<bool>("/AddDateToMonitoring", list, json);
+            return await DoApiCall<bool>("/AddDateToMonitoring", list, json, lang: lang);
         }
 
-        public async Task<bool> AddDate(string date, string category, bool json = false)
+        public async Task<bool> AddDate(string date, string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("date", date),
@@ -177,7 +177,7 @@ namespace FinstatApi
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<bool>("/AddDateToMonitoring", list, json);
+            return await DoApiCall<bool>("/AddDateToMonitoring", list, json, lang: lang);
         }
 
         /// <summary>
@@ -185,16 +185,16 @@ namespace FinstatApi
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns>True if succeed otherwise false.</returns>
-        public async Task<bool> RemoveDate(string date, bool json = false)
+        public async Task<bool> RemoveDate(string date, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("date", date),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, date)),
             });
-            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json);
+            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json, lang: lang);
         }
 
-        public async Task<bool> RemoveDate(string date, string category, bool json = false)
+        public async Task<bool> RemoveDate(string date, string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("date", date),
@@ -202,49 +202,49 @@ namespace FinstatApi
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json);
+            return await DoApiCall<bool>("/RemoveDateFromMonitoring", list, json, lang: lang);
         }
 
         /// <summary>
         /// Retrieves list of currently monitored dates of birth.
         /// </summary>
-        public async Task<string[]> GetDateMonitorings(bool json = false)
+        public async Task<string[]> GetDateMonitorings(bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datelist")),
             });
-            return await DoApiCall<string[]>("/MonitoringDateList", list, json);
+            return await DoApiCall<string[]>("/MonitoringDateList", list, json, lang: lang);
         }
 
-        public async Task<string[]> GetDateMonitorings(string category, bool json = false)
+        public async Task<string[]> GetDateMonitorings(string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datelist")),
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<string[]>("/MonitoringDateList", list, json);
+            return await DoApiCall<string[]>("/MonitoringDateList", list, json, lang: lang);
         }
 
         /// <summary>
         /// Retrieves report of date-of-birth events in current monitoring.
         /// </summary>
-        public async Task<MonitoringDate[]> GetDateReport(bool json = false)
+        public async Task<MonitoringDate[]> GetDateReport(bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datereport")),
             });
-            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json);
+            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json, lang: lang);
         }
 
-        public async Task<MonitoringDate[]> GetDateReport(string category, bool json = false)
+        public async Task<MonitoringDate[]> GetDateReport(string category, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, "datereport")),
             });
             if (!string.IsNullOrEmpty(category))
                 list.Add(new KeyValuePair<string, string>("category", category));
-            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json);
+            return await DoApiCall<MonitoringDate[]>("/MonitoringDateReport", list, json, lang: lang);
         }
     }
 }

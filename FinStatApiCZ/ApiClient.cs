@@ -27,13 +27,13 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<BasicResult> RequestBasic(string ico, bool json = false)
+        public async Task<BasicResult> RequestBasic(string ico, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
             });
-            return await DoApiCall<BasicResult>("/basic", list, json);
+            return await DoApiCall<BasicResult>("/basic", list, json, lang: lang);
         }
 
         /// <summary>
@@ -48,13 +48,13 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<DetailResult> RequestDetail(string ico, bool json = false)
+        public async Task<DetailResult> RequestDetail(string ico, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
             });
-            return await DoApiCall<DetailResult>("/detail", list, json);
+            return await DoApiCall<DetailResult>("/detail", list, json, lang: lang);
         }
 
         /// <summary>
@@ -69,13 +69,13 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<PremiumCZResult> RequestPremium(string ico, bool json = false)
+        public async Task<PremiumCZResult> RequestPremium(string ico, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
             });
-            return await DoApiCall<PremiumCZResult>("/premiumcz", list, json);
+            return await DoApiCall<PremiumCZResult>("/premiumcz", list, json, lang: lang);
         }
 
         /// <summary>
@@ -90,13 +90,34 @@ namespace FinstatApi
         /// or TimeOut exception while communication with Finstat api!
         /// or Unknown exception while communication with Finstat api!
         /// </exception>
-        public async Task<EliteCZResult> RequestElite(string ico, bool json = false)
+        public async Task<EliteCZResult> RequestElite(string ico, bool json = false, string lang = null)
         {
             var list = new List<KeyValuePair<string, string>>(new[] {
                 new KeyValuePair<string, string>("ico", ico),
                 new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
             });
-            return await DoApiCall<EliteCZResult>("/elitecz", list, json);
+            return await DoApiCall<EliteCZResult>("/elitecz", list, json, lang: lang);
+        }
+
+        /// <summary>
+        /// Requests the ultimate for specified ico.
+        /// </summary>
+        /// <param name="ico">The ico.</param>
+        /// <returns>UltimateCZResult</returns>
+        /// <exception cref="FinstatApi.FinstatApiException">
+        /// Not valid API key!
+        /// or Specified ico {0} not found in database!
+        /// or Url {0} not found!
+        /// or TimeOut exception while communication with Finstat api!
+        /// or Unknown exception while communication with Finstat api!
+        /// </exception>
+        public async Task<UltimateCZResult> RequestUltimate(string ico, bool json = false, string lang = null)
+        {
+            var list = new List<KeyValuePair<string, string>>(new[] {
+                new KeyValuePair<string, string>("ico", ico),
+                new KeyValuePair<string, string>("Hash", ComputeVerificationHash(_apiKey, _privateKey, ico)),
+            });
+            return await DoApiCall<UltimateCZResult>("/ultimatecz", list, json, lang: lang);
         }
     }
 }
