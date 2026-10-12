@@ -1,0 +1,114 @@
+name: Web tester image
+
+# Builds the WebFinstatApiTester Docker image and pushes it to
+# ghcr.io/finstat/finstat-web-tester.
+#
+#   push to master  -> :latest + :sha-<short>   (only when the web tester or its inputs change)
+#   release         -> :<version> + :latest
+#   manual run      -> :latest from master (:<branch> from any other branch),
+#                      optionally against a specific Birko ref
+#
+# The Dockerfile expects the C:/Source layout as its build context, so the
+# Birko-Framework repos are checked out next to this one:
+#   ClientApi.CSharp/  Birko/Framework/  Birko/Web/
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'Tester/WebFinstatApiTester/**'
+      - 'FinStatApi/**'
+      - 'FinStatApiCZ/**'
+      - 'Shared/**'
+      - 'Dockerfile'
+      - 'Dockerfile.dockerignore'
+      - 'global.json'
+      - '.github/workflows/web-tester-image.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      birko_ref:
+        description: 'Birko.Framework / Birko.Web branch, tag or commit'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: web-tester-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/finstat/finstat-web-tester
+  BIRKO_REF: ${{ inputs.birko_ref || 'main' }}
+
+jobs:
+  image:
+    name: Build and push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ClientApi.CSharp
+        uses: actions/checkout@v4
+        with:
+          path: ClientApi.CSharp
+
+      - name: Checkout Birko.Framework
+        uses: actions/checkout@v4
+        with:
+          repository: Birko-Framework/Birko.Framework
+          ref: ${{ env.BIRKO_REF }}
+          path: Birko/Framework
+
+      - name: Checkout Birko.Web
+        uses: actions/checkout@v4
+        with:
+          repository: Birko-Framework/Birko.Web
+          ref: ${{ env.BIRKO_REF }}
+          path: Birko/Web
+
+      - name: Record Birko commits
+        id: birko
+        run: |
+          echo "framework=$(git -C Birko/Framework rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "web=$(git -C Birko/Web rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
+            type=sha,prefix=sha-,format=short,enable=${{ github.event_name == 'push' }}
+            type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
+            type=ref,event=branch,enable=${{ github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/master' }}
+          labels: |
+            org.opencontainers.image.title=FinStat API web tester
+            org.opencontainers.image.description=Web UI for trying the FinStat SK and CZ APIs
+            sk.finstat.birko.framework.revision=${{ steps.birko.outputs.framework }}
+            sk.finstat.birko.web.revision=${{ steps.birko.outputs.web }}
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ClientApi.CSharp/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
