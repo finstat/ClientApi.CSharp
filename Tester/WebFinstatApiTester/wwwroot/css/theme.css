@@ -33,21 +33,20 @@
 :root {
   --b-ribbon-group-gap: var(--b-space-lg, 1rem);   /* was 1.5rem */
   --b-ribbon-item-gap:  var(--b-space-2xs, 0.125rem);
-  /* Ribbon is text-only — no need for the default 8rem panel height. */
-  --b-ribbon-panel-height: 4.5rem;
+  /* No --b-ribbon-panel-height override: b-ribbon sizes its panel to the content and only uses the token
+     as a ceiling. The old 4.5rem / 4rem / 3.75rem caps date from a text-only, one-row ribbon; with three
+     items per column they clipped rows 2-3 and left one or two buttons per group visible. */
 }
 
 @media (max-width: 1440px) {
   :root {
     --b-ribbon-group-gap: var(--b-space-md, 0.75rem);
     --b-ribbon-tab-height: 2.375rem;               /* was 2.75rem */
-    --b-ribbon-panel-height: 4rem;                 /* was 4.5rem from index.html */
   }
 }
 
 @media (max-width: 1200px) {
   :root {
     --b-ribbon-group-gap: var(--b-space-sm, 0.5rem);
-    --b-ribbon-panel-height: 3.75rem;
   }
 }

@@ -11,6 +11,8 @@ export interface Settings {
   finStatApiUrl: string;
   finStatApiUrlCZ: string;
   responseType: 'xml' | 'json';
+  /** FinStat response text language; '' = server default. Honoured on finstat.cz only. */
+  lang: '' | 'sk' | 'cs';
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -22,6 +24,7 @@ export const DEFAULT_SETTINGS: Settings = {
   finStatApiUrl: 'https://www.finstat.sk/api',
   finStatApiUrlCZ: 'https://cz.finstat.sk/api',
   responseType: 'xml',
+  lang: '',
 };
 
 const STORAGE_KEY = 'finstat_tester_settings';
@@ -74,5 +77,6 @@ export function settingsHeaders(): Record<string, string> {
     'X-Finstat-Url':          s.finStatApiUrl,
     'X-Finstat-UrlCZ':        s.finStatApiUrlCZ,
     'X-Finstat-ResponseType': s.responseType,
+    'X-Finstat-Lang':         s.lang,
   };
 }

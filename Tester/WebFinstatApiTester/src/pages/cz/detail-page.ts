@@ -7,9 +7,9 @@ import { applyPendingPrefill, emphasizeAction, parseRouteSegments, runApiCall } 
 import { PAGE_STYLES } from '../page-styles.js';
 import { t, onLocaleChange } from '../../i18n/index.js';
 
-type Kind = 'basic' | 'detail' | 'premium' | 'elite';
+type Kind = 'basic' | 'detail' | 'premium' | 'elite' | 'ultimate';
 
-const BUTTON_KINDS: ReadonlyArray<Kind> = ['basic', 'detail', 'premium', 'elite'];
+const BUTTON_KINDS: ReadonlyArray<Kind> = ['basic', 'detail', 'premium', 'elite', 'ultimate'];
 
 export class CzDetailPage extends BaseComponent {
   private _busy = false;

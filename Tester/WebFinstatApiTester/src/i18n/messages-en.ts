@@ -200,6 +200,9 @@ export const en = {
       responseType: 'Response type',
       responseTypeHint:
         'Wire format between our backend and FinStat. The browser always receives JSON; the "Raw" viewer tabs show the body re-serialised in the format picked here.',
+      lang: 'Response language',
+      langHint: 'Sent as the Lang parameter. Only finstat.cz honours it; finstat.sk always answers in Slovak.',
+      langDefault: 'Server default',
       finStatApiUrl: 'FinStat SK URL',
       finStatApiUrlCZ: 'FinStat CZ URL',
     },
@@ -218,11 +221,17 @@ export const en = {
 
   about: {
     title: 'About',
-    tagline: 'v{version} — browser port of DesktopFinstatApiTester.',
+    tagline: 'Browser port of DesktopFinstatApiTester.',
     author: 'Author',
     poweredBy: 'Powered by',
     finstatApi: 'FinStat API',
     documentation: 'Documentation',
+    clientLibrary: 'C# client library',
+    versions: 'Versions',
+    versionTester: 'Tester',
+    versionClientSk: 'FinStat client SK',
+    versionClientCz: 'FinStat client CZ',
+    versionRuntime: 'Runtime',
   },
 
   history: {
@@ -357,7 +366,7 @@ export const en = {
       },
     },
     cz: {
-      detail: { basic: 'CZ basic', detail: 'CZ detail', premium: 'CZ premium', elite: 'CZ elite' },
+      detail: { basic: 'CZ basic', detail: 'CZ detail', premium: 'CZ premium', elite: 'CZ elite', ultimate: 'CZ ultimate' },
       autoComplete: 'CZ AutoComplete',
       autoLogin: 'CZ AutoLogin',
       monitoring: {
@@ -400,7 +409,7 @@ export const en = {
         skDistraint:        'SK Distraint',
         skDistraintDesc:    'Search exekučné konania, fetch result details, replay stored tokens.',
         czDetail:           'CZ Detail',
-        czDetailDesc:       'Basic, Detail, Premium and Elite tiers for a Czech IČO.',
+        czDetailDesc:       'Basic, Detail, Premium, Elite and Ultimate tiers for a Czech IČO.',
       },
     },
     sk: {

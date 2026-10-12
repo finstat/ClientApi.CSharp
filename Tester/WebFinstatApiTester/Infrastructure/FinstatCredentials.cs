@@ -24,6 +24,9 @@ public sealed class FinstatCredentials
     /// <summary>True when the browser requested JSON responses (else XML).</summary>
     public bool Json { get; init; }
 
+    /// <summary>Response text language (sk|cs) passed to the CZ client calls as their lang argument; null = server default.</summary>
+    public string? Lang { get; init; }
+
     private static readonly FinstatCredentialsValidator Validator = new();
 
     public void EnsureValid()
@@ -46,9 +49,13 @@ public sealed class FinstatCredentials
             UrlCz       = FirstNonEmpty(h["X-Finstat-UrlCZ"].FirstOrDefault(), DefaultUrlCz),
             Json        = string.Equals(h["X-Finstat-ResponseType"].FirstOrDefault(), "json",
                                         StringComparison.OrdinalIgnoreCase),
+            Lang        = NullIfEmpty(h["X-Finstat-Lang"].FirstOrDefault()),
         };
         return ValueTask.FromResult<FinstatCredentials?>(creds);
     }
+
+    private static string? NullIfEmpty(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private static string FirstNonEmpty(string? value, string fallback) =>
         string.IsNullOrWhiteSpace(value) ? fallback : value;

@@ -14,6 +14,7 @@ const SERVER_FIELD_MAP: Record<string, string> = {
   TimeOut:     'station.timeOut',
   UrlSk:       'urls.finStatApiUrl',
   UrlCz:       'urls.finStatApiUrlCZ',
+  Lang:        'station.lang',
 };
 
 function candidateHeaders(flat: Record<string, unknown>): Record<string, string> {
@@ -26,6 +27,7 @@ function candidateHeaders(flat: Record<string, unknown>): Record<string, string>
     'X-Finstat-Url':          String(flat.finStatApiUrl ?? ''),
     'X-Finstat-UrlCZ':        String(flat.finStatApiUrlCZ ?? ''),
     'X-Finstat-ResponseType': String(flat.responseType ?? ''),
+    'X-Finstat-Lang':         String(flat.lang ?? ''),
   };
 }
 
@@ -91,6 +93,15 @@ function buildSchema(): FormSchema {
             hint: t('settings.field.responseTypeHint'),
             options: [{ value: 'xml', label: 'XML' }, { value: 'json', label: 'JSON' }],
           },
+          {
+            name: 'lang', type: 'select', label: t('settings.field.lang'),
+            hint: t('settings.field.langHint'),
+            options: [
+              { value: '',   label: t('settings.field.langDefault') },
+              { value: 'cs', label: 'CS' },
+              { value: 'sk', label: 'SK' },
+            ],
+          },
         ],
       },
       {
@@ -114,6 +125,7 @@ function toFormValues() {
       stationName: s.stationName,
       timeOut: s.timeOut,
       responseType: s.responseType,
+      lang: s.lang,
     },
     urls: {
       finStatApiUrl: s.finStatApiUrl,
@@ -134,6 +146,7 @@ function fromFormData(data: Record<string, unknown>): Record<string, unknown> {
     stationName:     String(st.stationName ?? DEFAULT_SETTINGS.stationName),
     timeOut:         Number(st.timeOut ?? DEFAULT_SETTINGS.timeOut),
     responseType:    (st.responseType === 'json' ? 'json' : 'xml') as 'xml' | 'json',
+    lang:            (st.lang === 'sk' || st.lang === 'cs' ? st.lang : '') as '' | 'sk' | 'cs',
     finStatApiUrl:   String(u.finStatApiUrl   ?? DEFAULT_SETTINGS.finStatApiUrl),
     finStatApiUrlCZ: String(u.finStatApiUrlCZ ?? DEFAULT_SETTINGS.finStatApiUrlCZ),
   };

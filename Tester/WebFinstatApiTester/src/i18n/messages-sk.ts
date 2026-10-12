@@ -198,6 +198,9 @@ export const sk = {
       stationName: 'Názov stanice',
       timeOut: 'Timeout (ms)',
       responseType: 'Typ odpovede',
+      lang: 'Jazyk odpovede',
+      langHint: 'Posiela sa ako parameter Lang. Zohľadňuje ho len finstat.cz; finstat.sk odpovedá vždy po slovensky.',
+      langDefault: 'Predvolený serverom',
       responseTypeHint:
         'Formát prenosu medzi naším backendom a FinStatom. Prehliadač vždy dostane JSON; karty „Raw“ zobrazujú telo znovu serializované vo zvolenom formáte.',
       finStatApiUrl: 'FinStat SK URL',
@@ -218,11 +221,17 @@ export const sk = {
 
   about: {
     title: 'O aplikácii',
-    tagline: 'v{version} — prehliadačová verzia DesktopFinstatApiTester.',
+    tagline: 'Prehliadačová verzia DesktopFinstatApiTester.',
     author: 'Autor',
     poweredBy: 'Technológie',
     finstatApi: 'FinStat API',
     documentation: 'Dokumentácia',
+    clientLibrary: 'C# klientska knižnica',
+    versions: 'Verzie',
+    versionTester: 'Tester',
+    versionClientSk: 'FinStat klient SK',
+    versionClientCz: 'FinStat klient CZ',
+    versionRuntime: 'Runtime',
   },
 
   history: {
@@ -357,7 +366,7 @@ export const sk = {
       },
     },
     cz: {
-      detail: { basic: 'CZ basic', detail: 'CZ detail', premium: 'CZ premium', elite: 'CZ elite' },
+      detail: { basic: 'CZ basic', detail: 'CZ detail', premium: 'CZ premium', elite: 'CZ elite', ultimate: 'CZ ultimate' },
       autoComplete: 'CZ AutoComplete',
       autoLogin: 'CZ AutoLogin',
       monitoring: {
@@ -400,7 +409,7 @@ export const sk = {
         skDistraint:        'SK Exekúcie',
         skDistraintDesc:    'Vyhľadať exekučné konania, detaily, obnoviť uložené tokeny.',
         czDetail:           'CZ Detail',
-        czDetailDesc:       'Základná, detail, premium a elite úroveň pre české IČO.',
+        czDetailDesc:       'Základná, detail, premium, elite a ultimate úroveň pre české IČO.',
       },
     },
     sk: {

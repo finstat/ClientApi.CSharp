@@ -138,6 +138,7 @@ app.MapCzDetailEndpoints();
 app.MapCzAutoEndpoints();
 app.MapCzMonitoringEndpoints();
 app.MapCurlEndpoints();
+app.MapAboutEndpoints();
 
 app.MapFallbackToFile("index.html");
 

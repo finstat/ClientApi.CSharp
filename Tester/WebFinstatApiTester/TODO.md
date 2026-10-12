@@ -84,7 +84,7 @@ Tester/WebFinstatApiTester/
 
 ### V3 — CZ endpoints
 
-- [ ] **#16** CZ Detail (Basic/Detail/Premium/Elite), CZ AutoComplete/AutoLogin (inherited), CZ Monitoring (Add/Remove/GetMonitorings/GetReport/GetCategories — CZ has no proceedings or date variants).
+- [ ] **#16** CZ Detail (Basic/Detail/Premium/Elite/Ultimate), CZ AutoComplete/AutoLogin (inherited), CZ Monitoring (Add/Remove/GetMonitorings/GetReport/GetCategories — CZ has no proceedings or date variants).
 
 ---
 

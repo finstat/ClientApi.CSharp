@@ -87,6 +87,7 @@ const ROUTES: Route[] = [
   { path: '/cz/detail/detail',               component: () => wrap('cz-detail-page') },
   { path: '/cz/detail/premium',              component: () => wrap('cz-detail-page') },
   { path: '/cz/detail/elite',                component: () => wrap('cz-detail-page') },
+  { path: '/cz/detail/ultimate',             component: () => wrap('cz-detail-page') },
   { path: '/cz/autocomplete',                component: () => wrap('cz-autocomplete-page') },
   { path: '/cz/autologin',                   component: () => wrap('cz-autologin-page') },
 

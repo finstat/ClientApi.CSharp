@@ -127,6 +127,7 @@ public static class CurlBuilder
         ["api/cz/detail/detail"]  = new("/detail",   "CZ", (d, p) => d["ico"] = Str(p, "ico"), p => Str(p, "ico")),
         ["api/cz/detail/premium"] = new("/premiumcz","CZ", (d, p) => d["ico"] = Str(p, "ico"), p => Str(p, "ico")),
         ["api/cz/detail/elite"]   = new("/elitecz",  "CZ", (d, p) => d["ico"] = Str(p, "ico"), p => Str(p, "ico")),
+        ["api/cz/detail/ultimate"] = new("/ultimatecz", "CZ", (d, p) => d["ico"] = Str(p, "ico"), p => Str(p, "ico")),
 
         // CZ Auto
         ["api/cz/autocomplete"] = new("/autocomplete", "CZ", (d, p) => d["query"] = Str(p, "query"), p => Str(p, "query")),
@@ -179,6 +180,9 @@ public static class CurlBuilder
         urlParams["Hash"]       = hash;
         urlParams["StationId"]  = "curl-test";
         urlParams["StationName"]= "curl-test";
+        // Lang is only honoured on finstat.cz, so only the CZ clients send it (mirrors the C# client)
+        if (m.Country == "CZ" && creds.Lang is not null && !urlParams.Keys.Any(k => string.Equals(k, "lang", StringComparison.OrdinalIgnoreCase)))
+            urlParams["Lang"] = creds.Lang;
 
         var qs   = string.Join("&", urlParams.Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value)}"));
         var form = string.Join("&", urlParams.Select(kv => $"{kv.Key}={kv.Value}"));

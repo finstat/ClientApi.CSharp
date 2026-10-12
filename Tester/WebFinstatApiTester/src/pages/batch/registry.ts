@@ -102,6 +102,8 @@ export function batchEndpoints(): BatchEndpoint[] {
       run: (ico) => czDetail.premium(ico) },
     { id: 'cz-elite',   group: czGroup, label: t('ribbon.item.elite'),   inputLabel: ICO_CZ, placeholder: '27074358',
       run: (ico) => czDetail.elite(ico) },
+    { id: 'cz-ultimate', group: czGroup, label: t('ribbon.item.ultimate'), inputLabel: ICO_CZ, placeholder: '27074358',
+      run: (ico) => czDetail.ultimate(ico) },
 
     // ── Monitoring (SK + CZ) — ICO with optional shared category ───────────
     { id: 'sk-mon-add',    group: skMon, label: t('ribbon.item.add'),    inputLabel: ICO, placeholder: '35757442',

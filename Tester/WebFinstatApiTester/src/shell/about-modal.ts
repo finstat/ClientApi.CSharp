@@ -7,6 +7,7 @@ import { t, onLocaleChange } from '../i18n/index.js';
 export const OPEN_ABOUT_EVENT = 'finstat:open-about';
 
 export const DOCS_URL             = 'https://finstat.github.io/api-documentation/';
+export const CLIENT_REPO          = 'https://github.com/finstat/ClientApi.CSharp';
 export const BIRKO_AUTHOR         = 'https://github.com/birko';
 export const BIRKO_AUTHOR_AVATAR  = 'https://github.com/birko.png?size=48';
 export const BIRKO_REPO           = 'https://github.com/Birko-Framework/Birko.Framework';
@@ -14,7 +15,8 @@ export const BIRKO_WEB_CORE       = 'https://github.com/Birko-Framework/Birko.We
 export const BIRKO_WEB_COMPONENTS = 'https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Components';
 export const BIRKO_WEB_SHELL      = 'https://github.com/Birko-Framework/Birko.Web/tree/main/Birko.Web.Shell';
 
-const VERSION = '1.0.0';
+/** Shape of GET api/about — versions read from the loaded assemblies, see AboutEndpoints.cs. */
+interface AboutInfo { tester: string; clientSk: string; clientCz: string; runtime: string; }
 
 /** GitHub mark (Octicons, MIT) inlined so the About modal works offline. */
 const GH_ICON = `<svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -35,6 +37,15 @@ export class AboutModal extends BaseComponent {
       .muted { color: var(--b-text-muted); font-size: var(--b-text-sm, 0.8125rem); }
       a { color: var(--b-color-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; }
       a:hover { text-decoration: underline; }
+      /* b-modal focuses the first link on open; without this the browser draws its own black box. */
+      a:focus-visible {
+        outline: 2px solid var(--b-color-primary);
+        outline-offset: 2px;
+        border-radius: var(--b-radius-sm, 0.25rem);
+      }
+      dl { display: grid; grid-template-columns: auto 1fr; gap: 0.15rem var(--b-space-md, 1rem); margin: 0; }
+      dt { color: var(--b-text-secondary); }
+      dd { margin: 0; font-family: var(--b-font-mono, monospace); font-size: var(--b-text-sm, 0.8125rem); }
       .author { display: flex; align-items: center; gap: var(--b-space-sm, 0.5rem); }
       .author img { width: 2.5rem; height: 2.5rem; border-radius: var(--b-radius-full, 9999px); border: 1px solid var(--b-border); }
       .author .who { display: flex; flex-direction: column; }
@@ -48,8 +59,19 @@ export class AboutModal extends BaseComponent {
         <div class="stack">
           <div>
             <div class="brand">${t('shell.brand')}</div>
-            <div class="muted">${t('about.tagline', { version: VERSION })}</div>
+            <div class="muted">${t('about.tagline')}</div>
           </div>
+
+          ${this._info ? `
+          <div>
+            <h3>${t('about.versions')}</h3>
+            <dl>
+              <dt>${t('about.versionTester')}</dt>   <dd>${this._info.tester}</dd>
+              <dt>${t('about.versionClientSk')}</dt> <dd>${this._info.clientSk}</dd>
+              <dt>${t('about.versionClientCz')}</dt> <dd>${this._info.clientCz}</dd>
+              <dt>${t('about.versionRuntime')}</dt>  <dd>${this._info.runtime}</dd>
+            </dl>
+          </div>` : ''}
 
           <div>
             <h3>${t('about.author')}</h3>
@@ -76,6 +98,7 @@ export class AboutModal extends BaseComponent {
             <h3>${t('about.finstatApi')}</h3>
             <ul>
               <li><a href="${DOCS_URL}" target="_blank" rel="noopener">${t('about.documentation')}</a></li>
+              <li><a href="${CLIENT_REPO}" target="_blank" rel="noopener">${GH_ICON} ${t('about.clientLibrary')}</a></li>
             </ul>
           </div>
         </div>
@@ -87,6 +110,7 @@ export class AboutModal extends BaseComponent {
   }
 
   private _unsubLocale?: () => void;
+  private _info: AboutInfo | null = null;
 
   protected onMount() {
     this.$('#btn-close')?.addEventListener('click', () => this.close());
@@ -101,7 +125,17 @@ export class AboutModal extends BaseComponent {
     this._unsubLocale?.();
   }
 
-  open()  { this.$<BModal>('#modal')?.open(); }
+  async open() {
+    // Versions are fetched once; a failed call just leaves the section out rather than blocking the modal.
+    if (!this._info) {
+      try {
+        const resp = await fetch('api/about');
+        if (resp.ok) { this._info = await resp.json() as AboutInfo; this.update(); }
+      } catch { /* offline or older backend — show the modal without versions */ }
+    }
+    this.$<BModal>('#modal')?.open();
+  }
+
   close() { this.$<BModal>('#modal')?.close(); }
 }
 

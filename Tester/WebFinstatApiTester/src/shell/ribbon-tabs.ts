@@ -58,6 +58,7 @@ export function TABS(): RibbonTab[] {
             { id: 'cz-detail-detail',  label: t('ribbon.item.detail'),  icon: ICON.tier, href: '#/cz/detail/detail' },
             { id: 'cz-detail-premium', label: t('ribbon.item.premium'), icon: ICON.tier, href: '#/cz/detail/premium' },
             { id: 'cz-detail-elite',   label: t('ribbon.item.elite'),   icon: ICON.tier, href: '#/cz/detail/elite' },
+            { id: 'cz-detail-ultimate', label: t('ribbon.item.ultimate'), icon: ICON.tier, href: '#/cz/detail/ultimate' },
           ],
         },
         {
@@ -212,7 +213,7 @@ export function TABS(): RibbonTab[] {
 const TAB_HREFS: Record<string, readonly string[]> = {
   detail:     ['#/sk/detail/basic', '#/sk/detail/detail', '#/sk/detail/extended', '#/sk/detail/ultimate',
                '#/sk/autocomplete', '#/sk/autologin',
-               '#/cz/detail/basic', '#/cz/detail/detail', '#/cz/detail/premium', '#/cz/detail/elite',
+               '#/cz/detail/basic', '#/cz/detail/detail', '#/cz/detail/premium', '#/cz/detail/elite', '#/cz/detail/ultimate',
                '#/cz/autocomplete', '#/cz/autologin'],
   monitoring: ['#/sk/monitoring/categories', '#/sk/monitoring/list', '#/sk/monitoring/add',
                '#/sk/monitoring/remove', '#/sk/monitoring/report', '#/sk/monitoring/proceedings',

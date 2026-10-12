@@ -6,7 +6,7 @@ Webová (browser-based) verzia desktop testera pre FinStat API. Jeden ASP.NET Co
 
 - **Backend**: hostuje C# klientov `FinStatApi` (SK) a `FinStatApiCZ` (CZ) za minimal-API endpointmi (`/api/sk/*`, `/api/cz/*`, `/api/whoami`, `/api/settings/validate`, `/health`).
 - **Frontend**: Birko.Web ribbon shell (TypeScript) v `wwwroot/`, bundlovaný cez esbuild do jedného `app.js`.
-- **Credentials flow**: browser drží nastavenia v `localStorage` a posiela ich ako `X-Finstat-*` hlavičky (`ApiKey`, `PrivateKey`, `StationID`, `StationName`, `TimeOut`, `Url`, `UrlCZ`, `ResponseType`) → backend ich bindne do `FinstatCredentials` a `ApiClientFactory` postaví správneho klienta per request.
+- **Credentials flow**: browser drží nastavenia v `localStorage` a posiela ich ako `X-Finstat-*` hlavičky (`ApiKey`, `PrivateKey`, `StationID`, `StationName`, `TimeOut`, `Url`, `UrlCZ`, `ResponseType`, `Lang`) → backend ich bindne do `FinstatCredentials` a `ApiClientFactory` postaví správneho klienta per request.
 - **Nasadenie**: jeden artefakt (`dotnet publish`) alebo Docker image `finstat-web-tester:latest`.
 
 Referencia: https://finstat.github.io/api-documentation/

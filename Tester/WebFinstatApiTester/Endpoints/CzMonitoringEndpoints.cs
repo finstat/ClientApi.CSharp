@@ -16,7 +16,7 @@ public static class CzMonitoringEndpoints
         root.MapGet("/categories", async (FinstatCredentials creds) =>
         {
             var c = ApiClientFactory.CzMonitoring(creds);
-            var r = await c.GetCategories(creds.Json);
+            var r = await c.GetCategories(creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(r, creds.Json));
         });
 
@@ -24,8 +24,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(category)
-                ? await c.GetMonitorings(creds.Json)
-                : await c.GetMonitorings(category, creds.Json);
+                ? await c.GetMonitorings(creds.Json, creds.Lang)
+                : await c.GetMonitorings(category, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkMonitoringEndpoints.StringsResult(r), creds.Json));
         });
 
@@ -33,8 +33,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(req.Category)
-                ? await c.Add(req.Ico, creds.Json)
-                : await c.Add(req.Ico, req.Category!, creds.Json);
+                ? await c.Add(req.Ico, creds.Json, creds.Lang)
+                : await c.Add(req.Ico, req.Category!, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkMonitoringEndpoints.OkResult(r), creds.Json));
         });
 
@@ -42,8 +42,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(req.Category)
-                ? await c.Remove(req.Ico, creds.Json)
-                : await c.Remove(req.Ico, req.Category!, creds.Json);
+                ? await c.Remove(req.Ico, creds.Json, creds.Lang)
+                : await c.Remove(req.Ico, req.Category!, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkMonitoringEndpoints.OkResult(r), creds.Json));
         });
 
@@ -51,8 +51,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(category)
-                ? await c.GetReport(creds.Json)
-                : await c.GetReport(category, creds.Json);
+                ? await c.GetReport(creds.Json, creds.Lang)
+                : await c.GetReport(category, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(r, creds.Json));
         });
 
@@ -63,8 +63,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(category)
-                ? await c.GetDateMonitorings(creds.Json)
-                : await c.GetDateMonitorings(category, creds.Json);
+                ? await c.GetDateMonitorings(creds.Json, creds.Lang)
+                : await c.GetDateMonitorings(category, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkMonitoringEndpoints.StringsResult(r), creds.Json));
         });
 
@@ -72,8 +72,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(req.Category)
-                ? await c.AddDate(req.Date, creds.Json)
-                : await c.AddDate(req.Date, req.Category!, creds.Json);
+                ? await c.AddDate(req.Date, creds.Json, creds.Lang)
+                : await c.AddDate(req.Date, req.Category!, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkMonitoringEndpoints.OkResult(r), creds.Json));
         });
 
@@ -81,8 +81,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(req.Category)
-                ? await c.RemoveDate(req.Date, creds.Json)
-                : await c.RemoveDate(req.Date, req.Category!, creds.Json);
+                ? await c.RemoveDate(req.Date, creds.Json, creds.Lang)
+                : await c.RemoveDate(req.Date, req.Category!, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkMonitoringEndpoints.OkResult(r), creds.Json));
         });
 
@@ -90,8 +90,8 @@ public static class CzMonitoringEndpoints
         {
             var c = ApiClientFactory.CzMonitoring(creds);
             var r = string.IsNullOrWhiteSpace(category)
-                ? await c.GetDateReport(creds.Json)
-                : await c.GetDateReport(category, creds.Json);
+                ? await c.GetDateReport(creds.Json, creds.Lang)
+                : await c.GetDateReport(category, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(r, creds.Json));
         });
 

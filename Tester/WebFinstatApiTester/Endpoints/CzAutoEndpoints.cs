@@ -14,14 +14,14 @@ public static class CzAutoEndpoints
         routes.MapPost("/api/cz/autocomplete", async (AutocompleteRequest req, FinstatCredentials creds) =>
         {
             var client = ApiClientFactory.Cz(creds);
-            var result = await client.RequestAutocomplete(req.Query, creds.Json);
+            var result = await client.RequestAutocomplete(req.Query, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(result, creds.Json));
         });
 
         routes.MapPost("/api/cz/autologin", async (AutoLoginRequest req, FinstatCredentials creds) =>
         {
             var client = ApiClientFactory.Cz(creds);
-            var result = await client.RequestAutoLogin(req.Url, req.Email, creds.Json);
+            var result = await client.RequestAutoLogin(req.Url, req.Email, creds.Json, creds.Lang);
             return Results.Ok(FinstatEnvelopeBuilder.Build(new SkAutoEndpoints.AutoLoginResult(result), creds.Json));
         });
 
