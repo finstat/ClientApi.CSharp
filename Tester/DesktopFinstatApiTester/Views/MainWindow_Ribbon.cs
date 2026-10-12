@@ -41,11 +41,12 @@ namespace DesktopFinstatApiTester.Views
             public const string Company = "🏢";
             public const string Tier = "🔢";
             public const string Login = "🔑";
+            public const string Date = "📅";
         }
 
         private void BuildRibbon()
         {
-            var tabs = BuildRibbonTabs();
+            var tabs = ApplyGroupDefaults(BuildRibbonTabs());
             ribbon.Tabs = tabs;
 
             // Every ribbon command, flattened into the palette, grouped by "Tab · Group".
@@ -59,6 +60,44 @@ namespace DesktopFinstatApiTester.Views
                 })))
                 .ToList();
         }
+
+        /// <summary>Glyph per tab, as the web tester's tab icons; a collapsed group shows its tab's glyph.</summary>
+        private static readonly Dictionary<string, string> TabGlyphs = new Dictionary<string, string>
+        {
+            ["detail"] = Glyph.Detail,
+            ["monitoring"] = Glyph.Monitoring,
+            ["reporting"] = Glyph.Reporting,
+            ["statement"] = Glyph.Statement,
+            ["diff"] = Glyph.Diff,
+            ["distraint"] = Glyph.Distraint,
+            ["bankruptcy"] = Glyph.Bankruptcy,
+        };
+
+        /// <summary>
+        /// Group settings that follow from the table's layout rather than being repeated per group:
+        /// <list type="bullet">
+        ///   <item>Groups are ordered most important first, so the leftmost gets the highest
+        ///         <see cref="RibbonGroup.ScalingPriority"/> and a narrow window collapses groups from the right,
+        ///         as Office does. At the default 0, ties degrade left to right and the primary Detail group was
+        ///         the first to drop to identical icon-only buttons.</item>
+        ///   <item>A group without its own <see cref="RibbonGroup.Icon"/> takes its tab's glyph, so a group folded
+        ///         into a single button shows something meaningful instead of the generic ▦.</item>
+        /// </list>
+        /// </summary>
+        private static IReadOnlyList<RibbonTab> ApplyGroupDefaults(IReadOnlyList<RibbonTab> tabs) =>
+            tabs.Select(tab => new RibbonTab
+            {
+                Id = tab.Id,
+                Label = tab.Label,
+                Groups = tab.Groups.Select((group, index) => new RibbonGroup
+                {
+                    Label = group.Label,
+                    Items = group.Items,
+                    Icon = group.Icon ?? (TabGlyphs.TryGetValue(tab.Id, out var glyph) ? glyph : null),
+                    MinSize = group.MinSize,
+                    ScalingPriority = tab.Groups.Count - index,
+                }).ToList(),
+            }).ToList();
 
         /// <summary>Wrap an API call as a ribbon item. <see cref="RibbonItem.Run"/> is a plain
         /// <see cref="Action"/>, so the async request is started and its failure surfaced through the
@@ -95,6 +134,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "SK Detail",
+                        Icon = Glyph.Company,
                         Items = new[]
                         {
                             Item("sk-detail-basic",    "Basic",    Glyph.Tier, SKBasicRequest),
@@ -106,6 +146,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "SK Other",
+                        Icon = Glyph.Search,
                         Items = new[]
                         {
                             Item("sk-autocomplete", "Auto Complete", Glyph.Search, SKAutoCompleteRequest),
@@ -115,17 +156,20 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "CZ Detail",
+                        Icon = Glyph.Company,
                         Items = new[]
                         {
                             Item("cz-detail-basic",   "Basic",   Glyph.Tier, CZBasicRequest),
                             Item("cz-detail-detail",  "Detail",  Glyph.Tier, CZDetailRequest),
                             Item("cz-detail-premium", "Premium", Glyph.Tier, CZPremiumRequest),
                             Item("cz-detail-elite",   "Elite",   Glyph.Tier, CZEliteRequest),
+                            Item("cz-detail-ultimate", "Ultimate", Glyph.Tier, CZUltimateRequest),
                         },
                     },
                     new RibbonGroup
                     {
                         Label = "CZ Other",
+                        Icon = Glyph.Search,
                         Items = new[]
                         {
                             Item("cz-autocomplete", "Auto Complete", Glyph.Search, CZAutoCompleteRequest),
@@ -144,6 +188,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "SK Categories",
+                        Icon = Glyph.Categories,
                         Items = new[]
                         {
                             Item("sk-mon-categories", "Categories", Glyph.Categories, SKMonitoringCategoriesRequest),
@@ -152,6 +197,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "SK ICO",
+                        Icon = Glyph.Monitoring,
                         Items = new[]
                         {
                             Item("sk-mon-ico-add",         "Add",         Glyph.Add,         SKMonitoringICOAddRequest),
@@ -164,6 +210,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "SK Date",
+                        Icon = Glyph.Date,
                         Items = new[]
                         {
                             Item("sk-mon-date-add",         "Add",         Glyph.Add,         SKMonitoringDateAddRequest),
@@ -176,6 +223,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "CZ Categories",
+                        Icon = Glyph.Categories,
                         Items = new[]
                         {
                             Item("cz-mon-categories", "Categories", Glyph.Categories, CZMonitoringCategoriesRequest),
@@ -184,6 +232,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "CZ ICO",
+                        Icon = Glyph.Monitoring,
                         Items = new[]
                         {
                             Item("cz-mon-ico-add",    "Add",    Glyph.Add,    CZMonitoringICOAddRequest),
@@ -195,6 +244,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "CZ Date",
+                        Icon = Glyph.Date,
                         Items = new[]
                         {
                             Item("cz-mon-date-add",    "Add",    Glyph.Add,    CZMonitoringDateAddRequest),
@@ -253,6 +303,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "Daily",
+                        Icon = Glyph.Diff,
                         Items = new[]
                         {
                             Item("sk-diff-daily-list", "List", Glyph.List,     SKDailyDiffListRequest),
@@ -263,6 +314,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "Ultimate",
+                        Icon = Glyph.Tier,
                         Items = new[]
                         {
                             Item("sk-diff-ultimate-list", "List", Glyph.List,     SKDailyUltimateDiffListRequest),
@@ -273,6 +325,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "Statement",
+                        Icon = Glyph.Statement,
                         Items = new[]
                         {
                             Item("sk-diff-statement-list",   "List",   Glyph.List,     SKDailyStatementDiffListRequest),
@@ -284,6 +337,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "Statement v2014",
+                        Icon = Glyph.Legend,
                         Items = new[]
                         {
                             Item("sk-diff-statement2014-list",   "List",   Glyph.List,     SKDailyStatement2014DiffListRequest),
@@ -307,6 +361,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "Paid",
+                        Icon = Glyph.Distraint,
                         Items = new[]
                         {
                             Item("sk-distraint-search", "Search", Glyph.Search,    SKDistraintSearchRequest),
@@ -316,6 +371,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "Results",
+                        Icon = Glyph.List,
                         Items = new[]
                         {
                             Item("sk-distraint-results",       "Results",         Glyph.List,      SKDistraintResultsRequest),
@@ -329,12 +385,13 @@ namespace DesktopFinstatApiTester.Views
             new RibbonTab
             {
                 Id = "bankruptcy",
-                Label = "BankruptcyRestructuring",
+                Label = "Bankruptcy / Restructuring",
                 Groups = new[]
                 {
                     new RibbonGroup
                     {
                         Label = "Persons",
+                        Icon = Glyph.Person,
                         Items = new[]
                         {
                             Item("sk-bar-person", "Person", Glyph.Person, SKPersonBankruptcyProceedingsRequest),
@@ -343,6 +400,7 @@ namespace DesktopFinstatApiTester.Views
                     new RibbonGroup
                     {
                         Label = "ICO",
+                        Icon = Glyph.Company,
                         Items = new[]
                         {
                             Item("sk-bar-company", "Company", Glyph.Company, SKCompanyBankruptcyRestructuringRequest),

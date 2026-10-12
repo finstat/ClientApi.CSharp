@@ -13,7 +13,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZBasic(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestBasic((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
+            var result = client.RequestBasic((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -25,7 +25,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZDetail(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
+            var result = client.RequestDetail((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -37,7 +37,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZPremium(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestPremium((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
+            var result = client.RequestPremium((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -49,7 +49,19 @@ namespace DesktopFinstatApiTester.Views
         private object CZElite(object[] parameters)
         {
             var client = CreateCZApiClient();
-            var result = client.RequestElite((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
+            var result = client.RequestElite((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
+            AppInstance.Limits.FromModel(client.Limits);
+            return result;
+        }
+
+        private Task CZUltimateRequest() => DoApiRequestAsync("UltimateCZ", "CZ", CZUltimate, new[] {
+            new ApiCallParameter(ParameterTypeEnum.String, "IČO")
+        });
+
+        private object CZUltimate(object[] parameters)
+        {
+            var client = CreateCZApiClient();
+            var result = client.RequestUltimate((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

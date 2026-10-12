@@ -156,6 +156,11 @@ namespace DesktopFinstatApiTester.Views
                     hashParam = (string)parameters.First();
                     urlParameters.Add("ico", parameters.First());
                     break;
+                case "UltimateCZ":
+                    endPoint = "ultimatecz";
+                    hashParam = (string)parameters.First();
+                    urlParameters.Add("ico", parameters.First());
+                    break;
                 case "Ultimate":
                     endPoint = "ultimate";
                     hashParam = (string)parameters.First();
@@ -309,6 +314,11 @@ namespace DesktopFinstatApiTester.Views
             urlParameters.Add("hash", calculatedHash);
             urlParameters.Add("StationId", "curl-test");
             urlParameters.Add("StationName", "curl-test");
+            var lang = RequestLang();
+            if (item.ApiSource == "CZ" && lang != null && !urlParameters.ContainsKey("lang"))
+            {
+                urlParameters.Add("Lang", lang);
+            }
 
             var str = new StringBuilder();
             str.AppendLine($"curl '{url}/{endPoint}{urlSuffix}?{string.Join("&", urlParameters.Select(x => $"{x.Key}={x.Value}"))}' -v");
@@ -402,6 +412,9 @@ namespace DesktopFinstatApiTester.Views
                     break;
                 case "EliteCZ":
                     if (item.ApiSource == "CZ") apiCall = CZElite;
+                    break;
+                case "UltimateCZ":
+                    if (item.ApiSource == "CZ") apiCall = CZUltimate;
                     break;
                 case "Ultimate":
                     if (item.ApiSource == "SK") apiCall = SKUltimate;

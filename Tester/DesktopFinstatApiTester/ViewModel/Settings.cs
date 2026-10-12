@@ -11,6 +11,7 @@ namespace DesktopFinstatApiTester.ViewModel
     {
         public const string ApiKeysProperty = "ApiKeys";
         public const string ResponseTypeProperty = "ResponseType";
+        public const string LangProperty = "Lang";
         public const string TimeOutProperty = "TimeOut";
         public const string StationIDProperty = "StationID";
         public const string StationNameProperty = "StationName";
@@ -145,6 +146,20 @@ namespace DesktopFinstatApiTester.ViewModel
             }
         }
 
+        private ResponseLang _lang;
+        public ResponseLang Lang
+        {
+            get { return _lang; }
+            set
+            {
+                if (_lang != value)
+                {
+                    _lang = value;
+                    RaisePropertyChanged(LangProperty);
+                }
+            }
+        }
+
         private void _apiKeys_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if(new[] { ApiKeys.ApiKeysObjectProperty }.Contains(e.PropertyName))
@@ -155,7 +170,7 @@ namespace DesktopFinstatApiTester.ViewModel
 
         private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (new[] { TimeOutProperty, StationNameProperty, StationIDProperty, ApiKeysProperty, ResponseTypeProperty, FinStatApiUrlProperty, FinStatApiUrlPropertyCZ }.Contains(e.PropertyName))
+            if (new[] { TimeOutProperty, StationNameProperty, StationIDProperty, ApiKeysProperty, ResponseTypeProperty, LangProperty, FinStatApiUrlProperty, FinStatApiUrlPropertyCZ }.Contains(e.PropertyName))
             {
                 RaisePropertyChanged(SettingsObjectProperty);
             }
@@ -204,6 +219,7 @@ namespace DesktopFinstatApiTester.ViewModel
                 RaisePropertyChanged(nameof(PublicKey));
                 RaisePropertyChanged(nameof(PrivateKey));
                 ResponseType = model.ResponseType;
+                Lang = model.Lang;
                 TimeOut = model.TimeOut;
                 StationName = model.StationName;
                 StationID = model.StationID;
@@ -220,6 +236,7 @@ namespace DesktopFinstatApiTester.ViewModel
             }
             model.ApiKeys = ApiKeys.ToModel(model.ApiKeys);
             model.ResponseType = ResponseType;
+            model.Lang = Lang;
             model.StationName = StationName;
             model.StationID = StationID;
             model.TimeOut = TimeOut;

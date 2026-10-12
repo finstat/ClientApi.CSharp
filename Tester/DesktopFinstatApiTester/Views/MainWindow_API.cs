@@ -12,6 +12,13 @@ namespace DesktopFinstatApiTester.Views
     /// </summary>
     public partial class MainWindow
     {
+        /// <summary>Lang argument for the CZ client calls (only finstat.cz honours it), null for <see cref="Model.ResponseLang.Default"/>.</summary>
+        private string RequestLang()
+        {
+            var lang = AppInstance?.Settings?.Lang ?? Model.ResponseLang.Default;
+            return lang == Model.ResponseLang.Default ? null : lang.ToString().ToLowerInvariant();
+        }
+
         private bool IsJSON()
         {
             return AppInstance?.Settings?.ResponseType == Model.ResponseType.JSON;

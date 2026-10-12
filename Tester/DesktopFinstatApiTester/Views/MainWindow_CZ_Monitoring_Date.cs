@@ -14,7 +14,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZMonitoringDateAdd(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.AddDate((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
+            var result = client.AddDate((string)parameters[0], (string)parameters[1], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -27,7 +27,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZMonitoringDateRemove(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.RemoveDate((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
+            var result = client.RemoveDate((string)parameters[0], (string)parameters[1], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -39,7 +39,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZMonitoringDateList(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.GetDateMonitorings((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
+            var result = client.GetDateMonitorings((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }
@@ -51,7 +51,7 @@ namespace DesktopFinstatApiTester.Views
         private object CZMonitoringDateReport(object[] parameters)
         {
             var client = CreateCZApiMonitoringClient();
-            var result = client.GetDateReport((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
+            var result = client.GetDateReport((string)parameters[0], IsJSON(), RequestLang()).GetAwaiter().GetResult();
             AppInstance.Limits.FromModel(client.Limits);
             return result;
         }

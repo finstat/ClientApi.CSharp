@@ -10,9 +10,18 @@ namespace DesktopFinstatApiTester.Model
         XML,
         JSON
     }
+
+    /// <summary>FinStat response text language (Lang parameter); Default leaves it to the server. Honoured on finstat.cz only.</summary>
+    public enum ResponseLang
+    {
+        Default,
+        CS,
+        SK
+    }
     public class Settings
     {
         public ResponseType ResponseType { get; set; } = ResponseType.XML;
+        public ResponseLang Lang { get; set; } = ResponseLang.Default;
         public ApiKeys ApiKeys { get; set; } = new ApiKeys();
         public string StationName { get; set; } = "Api Tester Desktop";
         public string StationID { get; set; } = "api-tester";

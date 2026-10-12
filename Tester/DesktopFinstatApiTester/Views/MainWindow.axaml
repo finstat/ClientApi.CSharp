@@ -11,40 +11,62 @@
         Background="{DynamicResource BBgSecondaryBrush}"
         Foreground="{DynamicResource BTextBrush}">
 
+  <Window.Styles>
+    <!-- Link look for the About modal: Birko's Button theme is a filled primary button, and its
+         hover/pressed setters target the Button's own Background, so a class style can override them. -->
+    <Style Selector="Button.link">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource BColorPrimaryBrush}" />
+      <Setter Property="Padding" Value="0,2" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+    </Style>
+    <Style Selector="Button.link:pointerover, Button.link:pressed">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource BColorPrimaryHoverBrush}" />
+    </Style>
+    <Style Selector="TextBlock.aboutHeading">
+      <Setter Property="Foreground" Value="{DynamicResource BTextSecondaryBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+  </Window.Styles>
+
   <!-- Root panel: the workspace plus the overlay layers (dialogs, settings modal, command
        palette). DialogService hosts its overlays in this panel. -->
   <Panel x:Name="rootPanel">
 
     <DockPanel>
 
-      <!-- ── Header: brand, theme switcher, settings, palette hint ───────────── -->
-      <Border DockPanel.Dock="Top" Height="{DynamicResource BHeaderHeight}"
-              Background="{DynamicResource BBgBrush}"
-              BorderBrush="{DynamicResource BBorderBrush}" BorderThickness="0,0,0,1">
-        <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="12,0">
-          <TextBlock Text="FinStat API Tester" VerticalAlignment="Center"
+      <!-- ── Ribbon, with the title bar folded into its tab row (Office-style): brand before the tabs,
+           theme / palette / settings / about after them. A separate header row above the ribbon cost a
+           full BHeaderHeight of vertical space for a strip that was mostly empty. Tabs are built in
+           MainWindow_Ribbon.cs. ── -->
+      <c:Ribbon DockPanel.Dock="Top" x:Name="ribbon">
+        <c:Ribbon.LeadingContent>
+          <TextBlock Text="FinStat API Tester" VerticalAlignment="Center" Margin="4,0,16,0"
                      FontFamily="{DynamicResource BFontHeading}"
                      FontSize="{DynamicResource BTextLg}"
                      FontWeight="SemiBold"
                      Foreground="{DynamicResource BTextBrush}" />
-
-          <ComboBox Grid.Column="2" x:Name="comboBoxTheme" MinWidth="130"
-                    VerticalAlignment="Center" Margin="{DynamicResource MarginSm}"
-                    ToolTip.Tip="Switch the Birko theme"
-                    SelectionChanged="comboBoxTheme_SelectionChanged" />
-
-          <Button Grid.Column="3" x:Name="buttonCommands" Content="Commands  Ctrl+K"
-                  VerticalAlignment="Center" Margin="{DynamicResource MarginSm}"
-                  Click="buttonCommands_Click" />
-
-          <Button Grid.Column="4" x:Name="buttonSettings" Content="Settings"
-                  VerticalAlignment="Center" Margin="{DynamicResource MarginSm}"
-                  Click="buttonSettings_Click" />
-        </Grid>
-      </Border>
-
-      <!-- ── Ribbon: replaces Fluent:Ribbon. Model-driven; tabs built in MainWindow_Ribbon.cs ── -->
-      <c:Ribbon DockPanel.Dock="Top" x:Name="ribbon" />
+        </c:Ribbon.LeadingContent>
+        <c:Ribbon.TrailingContent>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="8,0">
+            <ComboBox x:Name="comboBoxTheme" MinWidth="120" VerticalAlignment="Center"
+                      ToolTip.Tip="Switch the Birko theme"
+                      SelectionChanged="comboBoxTheme_SelectionChanged" />
+            <!-- Short label: in the tab row every pixel here is taken from the tabs at narrow widths.
+                 The name lives in the tooltip and the accessible name. -->
+            <Button x:Name="buttonCommands" Content="🔍  Ctrl+K" Padding="12,4"
+                    ToolTip.Tip="Commands (Ctrl+K)" AutomationProperties.Name="Commands"
+                    VerticalAlignment="Center" Click="buttonCommands_Click" />
+            <Button x:Name="buttonSettings" Content="Settings" Padding="12,4"
+                    VerticalAlignment="Center" Click="buttonSettings_Click" />
+            <Button x:Name="buttonAbout" Content="About" Padding="12,4"
+                    VerticalAlignment="Center" Click="buttonAbout_Click" />
+          </StackPanel>
+        </c:Ribbon.TrailingContent>
+      </c:Ribbon>
 
       <!-- ── Status bar: free-text slot on the left, API limits on the right ─── -->
       <Border DockPanel.Dock="Bottom" Height="{DynamicResource BStatusBarHeight}"
@@ -148,6 +170,58 @@
                   Margin="4,0,0,0" Click="buttonCancel_Click" />
         </Grid>
       </StackPanel>
+    </c:Modal>
+
+    <!-- ── About: versions from the loaded assemblies (MainWindow_About.cs) + project links ── -->
+    <c:Modal x:Name="aboutModal" Title="About">
+      <!-- DockPanel, not StackPanel: a StackPanel hands its children unlimited height, so the scroll
+           area never scrolled and a short window clipped the bottom links and Close. Docked, the
+           ScrollViewer gets only what is left of the window and Close stays pinned below it. -->
+      <DockPanel MinWidth="380">
+        <Button DockPanel.Dock="Bottom" Content="Close" HorizontalAlignment="Right"
+                Margin="0,16,0,0" Click="buttonAboutClose_Click" />
+        <ScrollViewer MaxHeight="440" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="14">
+        <StackPanel Spacing="2">
+          <TextBlock Text="FinStat API Tester" FontWeight="SemiBold"
+                     FontSize="{DynamicResource BTextLg}" />
+          <TextBlock Text="Desktop tester for the FinStat SK and CZ APIs."
+                     Foreground="{DynamicResource BTextMutedBrush}" />
+        </StackPanel>
+
+        <StackPanel>
+          <TextBlock Classes="aboutHeading" Text="Versions" />
+          <Grid x:Name="gridAboutVersions" ColumnDefinitions="Auto,*" />
+        </StackPanel>
+
+        <StackPanel>
+          <TextBlock Classes="aboutHeading" Text="Author" />
+          <Button Classes="link" Content="birko · github.com/birko"
+                  Tag="https://github.com/birko" Click="aboutLink_Click" />
+        </StackPanel>
+
+        <StackPanel>
+          <TextBlock Classes="aboutHeading" Text="Powered by" />
+          <Button Classes="link" Content="Birko.Framework"
+                  Tag="https://github.com/Birko-Framework/Birko.Framework" Click="aboutLink_Click" />
+          <Button Classes="link" Content="Birko.Xaml.Core"
+                  Tag="https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Xaml.Core" Click="aboutLink_Click" />
+          <Button Classes="link" Content="Birko.Xaml.Avalonia"
+                  Tag="https://github.com/Birko-Framework/Birko.Framework/tree/main/Birko.Xaml.Avalonia" Click="aboutLink_Click" />
+          <Button Classes="link" Content="Avalonia UI"
+                  Tag="https://avaloniaui.net" Click="aboutLink_Click" />
+        </StackPanel>
+
+        <StackPanel>
+          <TextBlock Classes="aboutHeading" Text="FinStat API" />
+          <Button Classes="link" Content="Documentation"
+                  Tag="https://finstat.github.io/api-documentation/" Click="aboutLink_Click" />
+          <Button Classes="link" Content="C# client library"
+                  Tag="https://github.com/finstat/ClientApi.CSharp" Click="aboutLink_Click" />
+        </StackPanel>
+        </StackPanel>
+        </ScrollViewer>
+      </DockPanel>
     </c:Modal>
 
     <!-- ── Ctrl+K palette over every ribbon command ─────────────────────────── -->

@@ -265,6 +265,8 @@ namespace DesktopFinstatApiTester.Views
             new FormField { Name = nameof(ViewModel.Settings.TimeOut),        Label = "TimeOut (ms)", Type = FieldType.Number, Min = 1 },
             new FormField { Name = nameof(ViewModel.Settings.ResponseType),   Label = "Response",     Type = FieldType.Select,
                             Options = Enum.GetValues(typeof(ResponseType)).Cast<object>().ToList() },
+            new FormField { Name = nameof(ViewModel.Settings.Lang),           Label = "Language",     Type = FieldType.Select,
+                            Options = Enum.GetValues(typeof(ResponseLang)).Cast<object>().ToList() },
             new FormField { Name = nameof(ViewModel.Settings.FinStatApiUrl),   Label = "FinStat API URL",    Required = true },
             new FormField { Name = nameof(ViewModel.Settings.FinStatApiUrlCZ), Label = "FinStat API CZ URL", Required = true },
         };
