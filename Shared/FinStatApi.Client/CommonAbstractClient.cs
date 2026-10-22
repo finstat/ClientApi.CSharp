@@ -24,6 +24,8 @@ namespace FinstatApi
         public event HeadersDelegate OnRequest;
         public event HeadersDelegate OnResponse;
         public event ContentDelegate OnErrorResponseContent;
+        // body of a successful response exactly as the server sent it, before it is deserialized
+        public event ContentDelegate OnResponseContent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiClient" /> class.
@@ -117,6 +119,11 @@ namespace FinstatApi
         protected void RaiseOnErrorResponseContent(byte[] content)
         {
             OnErrorResponseContent?.Invoke(content);
+        }
+
+        protected void RaiseOnResponseContent(byte[] content)
+        {
+            OnResponseContent?.Invoke(content);
         }
     }
 }

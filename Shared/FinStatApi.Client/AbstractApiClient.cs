@@ -189,6 +189,7 @@ namespace FinstatApi
                     result.EnsureSuccessStatusCode();
                     if (result.IsSuccessStatusCode)
                     {
+                        RaiseOnResponseContent(resultContent);
                         return resultContent;
                     }
                     return null;
