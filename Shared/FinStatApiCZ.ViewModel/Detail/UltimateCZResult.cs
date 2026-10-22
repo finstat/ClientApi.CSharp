@@ -1,5 +1,7 @@
 using System;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 namespace FinstatApi
 {
@@ -35,12 +37,12 @@ namespace FinstatApi
     }
 
     /// <summary>
-    /// Claims filed by the company as creditor in active insolvency proceedings (at most 300 latest proceedings).
+    /// Claims filed by the company as creditor in active insolvency proceedings; counts and amount cover all of them, Applications at most 300 from the latest proceedings.
     /// </summary>
     public class FiledInsolvencyClaims
     {
         public int ProceedingsCount { get; set; }
-        // null when no application was scanned, so unknown is not reported as 0
+        // null when no amount is known (no active proceeding or no scanned application), so unknown is not reported as 0
         public decimal? AmountOfClaims { get; set; }
         public FiledClaimApplication[] Applications { get; set; }
 
@@ -124,7 +126,7 @@ namespace FinstatApi
         public DateTime? DetectedFrom { get; set; }
         public DateTime? DetectedTo { get; set; }
         public NameParts StructuredName { get; set; }
-        public FunctionAssigment[] Functions { get; set; }
+        public PersonFunction[] Functions { get; set; }
         public DateTime? BirthDate { get; set; }
         public decimal? DepositAmount { get; set; }
         public decimal? PaybackRange { get; set; }
@@ -150,16 +152,67 @@ namespace FinstatApi
         }
     }
 
-    public class FunctionAssigment
+    [XmlType("Function")]
+    public class PersonFunction
     {
-        public string Type { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public PersonFunctionTypeEnum Type { get; set; }
+        // translated label of Type in the response language
+        public string TypeText { get; set; }
+        // function name as written in the register (jednatel, konateľ)
         public string Description { get; set; }
         public DateTime? From { get; set; }
 
         public override string ToString()
         {
-            return string.Format("Type: {0}, Description: {1}, From: {2}", Type, Description, From);
+            return string.Format("Type: {0} ({1}), Description: {2}, From: {3}", Type, TypeText, Description, From);
         }
+    }
+
+    public enum PersonFunctionTypeEnum
+    {
+        Other,
+        Statutory,
+        Partner,
+        Shareholder,
+        SupervisoryBoard,
+        ControlCommission,
+        Procuration,
+        LegalSuccessor,
+        Merger,
+        Division,
+        Liquidator,
+        BankruptcyAdministrator,
+        RestructuringAdministrator,
+        ForeignPerson,
+        ForeignPersonStatutory,
+        // RPVS
+        AuthorizedPerson,
+        PublicSectorPartnerBeneficialOwner,
+        PublicOfficial,
+        // beneficial owner (evidence skutečných majitelů)
+        BeneficialOwner,
+        BeneficialOwnerTopManagement,
+        BeneficialOwnerAppointmentRight,
+        BeneficialOwnerFundsRecipient,
+        BeneficialOwnerManagingBody,
+        BeneficialOwnerFounder,
+        BeneficialOwnerBenefitRight,
+        BeneficialOwnerVotingRight,
+        BeneficialOwnerShareCapital,
+        BeneficialOwnerSignificantBenefit,
+        BeneficialOwnerJointAction,
+        BeneficialOwnerOtherControl,
+        BeneficialOwnerUnspecified,
+        BeneficialOwnerDirect,
+        BeneficialOwnerIndirect,
+        BeneficialOwnerSubstitute,
+        BeneficialOwnerSection4,
+        BeneficialOwnerSection6,
+        BeneficialOwnerRestricted,
+        // trade register
+        ResponsiblePerson,
+        Entrepreneur,
     }
 
     public class NameParts

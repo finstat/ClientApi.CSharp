@@ -6,16 +6,20 @@ namespace FinstatApi
     public class PremiumCZResult : DetailResult
     {
         public string VatNumber { get; set; }
+        // VatPayer, IdentifiedPerson or PersonIdentifiedForTax; null when not registered for VAT
         public string TaxPayer { get; set; }
         public BankAccount[] BankAccounts { get; set; }
         public string LegalFormCode { get; set; }
         public string OwnershipCode { get; set; }
+        // employee count category code from the latest year that has one
+        public string EmployeeCode { get; set; }
         public bool? UnReliability { get; set; }
         public string RegisterNumberText { get; set; }
         public string TradeLicensingOffice { get; set; }
         public int? ActualYear { get; set; }
         public double? SalesActual { get; set; }
         public double? ProfitActual { get; set; }
+        // EliteCZ/UltimateCZ leave Sales and Profit out without financial data, so they read as Unknown
         public SalesTypeEnum Sales { get; set; }
         public ProfitTypeEnum Profit { get; set; }
         public TurnoverCategory TurnoverCategory { get; set; }
@@ -29,6 +33,7 @@ namespace FinstatApi
             dataString.AppendLine(string.Format("TaxPayer: {0}", TaxPayer));
             dataString.AppendLine(string.Format("LegalFormCode: {0}", LegalFormCode));
             dataString.AppendLine(string.Format("OwnershipCode: {0}", OwnershipCode));
+            dataString.AppendLine(string.Format("EmployeeCode: {0}", EmployeeCode));
             dataString.AppendLine(string.Format("UnReliability: {0}", UnReliability));
             dataString.AppendLine(string.Format("RegisterNumberText: {0}", RegisterNumberText));
             dataString.AppendLine(string.Format("TradeLicensingOffice: {0}", TradeLicensingOffice));

@@ -4,6 +4,7 @@ namespace FinstatApi
 {
     public class BasicResult : AbstractResult
     {
+        // VatPayer, IdentifiedPerson or PersonIdentifiedForTax; null when not registered for VAT
         public string TaxPayer { get; set; }
         public string VatNumber { get; set; }
 

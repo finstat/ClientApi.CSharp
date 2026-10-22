@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 namespace FinstatApi
 {
     public class EliteCZResult : PremiumCZResult
     {
+        // current VAT registration is a group registration (skupina DPH)
+        public bool VatGroupMember { get; set; }
         public ContactItem[] Contacts { get; set; }
         public CzNace[] OtherCzNaces { get; set; }
         public Offices Offices { get; set; }
@@ -19,6 +22,7 @@ namespace FinstatApi
         {
             StringBuilder dataString = new StringBuilder();
             dataString.AppendLine(base.ToString());
+            dataString.AppendLine(string.Format("VatGroupMember: {0}", VatGroupMember));
             AppendItems(dataString, "Contacts", Contacts);
             AppendItems(dataString, "OtherCzNaces", OtherCzNaces);
             if (Offices != null)
@@ -74,12 +78,12 @@ namespace FinstatApi
         }
 
         public string Contact { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ContactTypeEnum Type { get; set; }
-        public string[] Sources { get; set; }
 
         public override string ToString()
         {
-            return string.Format("{0}: {1} (Sources: {2})", Type, Contact, Sources != null ? string.Join(", ", Sources) : null);
+            return string.Format("{0}: {1}", Type, Contact);
         }
     }
 
@@ -112,7 +116,8 @@ namespace FinstatApi
     public class Office : Address
     {
         public string[] Subjects { get; set; }
-        public OfficeType Type { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public OfficeTypeEnum Type { get; set; }
         // UltimateCZ only (RŽP office name)
         public string Name { get; set; }
 
@@ -127,9 +132,9 @@ namespace FinstatApi
         }
     }
 
-    public enum OfficeType
+    public enum OfficeTypeEnum
     {
-        Prevadzka
+        Establishment,
     }
 
     public class VehicleFleet
@@ -189,14 +194,21 @@ namespace FinstatApi
     {
         public string FileReference { get; set; }
         public string Url { get; set; }
+        // ISIR court code (e.g. KSJIMBM), language neutral
         public string Court { get; set; }
+        public string CourtName { get; set; }
         public DateTime FirstEvent { get; set; }
         public DateTime LastEvent { get; set; }
-        public string Status { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public IsirStatusEnum Status { get; set; }
+        // translated label of Status; the raw ISIR code when the code is new (Status = Unknown)
+        public string StatusText { get; set; }
         public IsirParty[] Debtors { get; set; }
 
-        // UltimateCZ only
-        public string Type { get; set; }
+        // UltimateCZ only; Bankruptcy, DebtRelief or Reorganization once declared
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public IsirStatusEnum? Type { get; set; }
+        public string TypeText { get; set; }
         public DateTime? StartDate { get; set; }
         public IsirParty[] Officers { get; set; }
         public int? CreditorsCount { get; set; }
@@ -207,12 +219,12 @@ namespace FinstatApi
         public override string ToString()
         {
             StringBuilder dataString = new StringBuilder();
-            dataString.AppendLine(string.Format("FileReference: {0}, Court: {1}, Status: {2}", FileReference, Court, Status));
+            dataString.AppendLine(string.Format("FileReference: {0}, Court: {1} ({2}), Status: {3} ({4})", FileReference, Court, CourtName, Status, StatusText));
             dataString.AppendLine(string.Format("   FirstEvent: {0}, LastEvent: {1}, Url: {2}", FirstEvent, LastEvent, Url));
             dataString.AppendLine(string.Format("   Debtors: {0}", EliteCZResult.JoinParties(Debtors)));
-            if (Type != null || StartDate != null || Officers != null || CreditorsCount != null || Creditors != null || AmountOfClaims != null || ReceivableApplications != null)
+            if (Type != null || TypeText != null || StartDate != null || Officers != null || CreditorsCount != null || Creditors != null || AmountOfClaims != null || ReceivableApplications != null)
             {
-                dataString.AppendLine(string.Format("   Type: {0}, StartDate: {1}, CreditorsCount: {2}, AmountOfClaims: {3}", Type, StartDate, CreditorsCount, AmountOfClaims));
+                dataString.AppendLine(string.Format("   Type: {0} ({1}), StartDate: {2}, CreditorsCount: {3}, AmountOfClaims: {4}", Type, TypeText, StartDate, CreditorsCount, AmountOfClaims));
                 dataString.AppendLine(string.Format("   Officers: {0}", EliteCZResult.JoinParties(Officers)));
                 dataString.AppendLine(string.Format("   Creditors: {0}", EliteCZResult.JoinParties(Creditors)));
                 if (ReceivableApplications != null)
@@ -226,6 +238,28 @@ namespace FinstatApi
             }
             return dataString.ToString();
         }
+    }
+
+    /// <summary>
+    /// ISIR proceeding status (druhStavRizeni) as a language-neutral code; a code unknown to the API maps to Unknown.
+    /// </summary>
+    public enum IsirStatusEnum
+    {
+        Unknown,
+        PendingInsolvencyDecision,
+        Moratorium,
+        Insolvency,
+        Bankruptcy,
+        DebtRelief,
+        Reorganization,
+        Resolved,
+        AnnulledByHighCourt,
+        BankruptcyAfterAnnulment,
+        Reopened,
+        Transferred,
+        Final,
+        Checked,
+        ErroneousRecord,
     }
 
     /// <summary>
@@ -267,6 +301,8 @@ namespace FinstatApi
     [XmlType("Indicator")]
     public class IndicatorResult
     {
+        // same names as the SK Ratios: Profit, Sales, Assets, Equity, FinancialLeverage, ShareCapital, EBIT, EBITDA,
+        // ValueAdded, ROA, ROE, LiabilitiesToAssets, Depreciation, NetTurnover, ROAEbit
         public string Name { get; set; }
         public IndicatorValue[] Values { get; set; }
 
