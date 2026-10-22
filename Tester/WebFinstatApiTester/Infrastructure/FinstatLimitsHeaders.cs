@@ -12,6 +12,8 @@ namespace WebFinstatApiTester.Infrastructure;
 ///   <item>Quota counters from <c>OnResponse</c> → status-bar "Daily X/Y · Monthly X/Y".</item>
 ///   <item>The actual outbound form-POST params from <c>OnRequest</c> (apiKey, StationId,
 ///         StationName, ico, Hash, …) → Request tab in the response-history viewer.</item>
+///   <item>The response body exactly as FinStat sent it, from <c>OnResponseContent</c> →
+///         kept on the request for <see cref="FinstatEnvelopeBuilder"/> (the Raw tab).</item>
 /// </list>
 /// Both hook fire before our response is written, so headers are still mutable.
 /// Works uniformly for JSON envelopes and binary downloads; zero touches at call sites.
@@ -41,6 +43,7 @@ internal static class FinstatLimitsHeaders
                 l.Monthly?.Current ?? 0, l.Monthly?.Max ?? 0);
         };
         client.OnRequest += headers => WriteRequestParams(accessor.HttpContext?.Response, headers);
+        client.OnResponseContent += content => FinstatEnvelopeBuilder.CaptureRawBody(accessor.HttpContext, content);
     }
 
     public static void Attach(CZ::FinstatApi.CommonAbstractApiClient client)
@@ -56,6 +59,7 @@ internal static class FinstatLimitsHeaders
                 l.Monthly?.Current ?? 0, l.Monthly?.Max ?? 0);
         };
         client.OnRequest += headers => WriteRequestParams(accessor.HttpContext?.Response, headers);
+        client.OnResponseContent += content => FinstatEnvelopeBuilder.CaptureRawBody(accessor.HttpContext, content);
     }
 
     private static void WriteLimits(HttpResponse? response, long dc, long dm, long mc, long mm)

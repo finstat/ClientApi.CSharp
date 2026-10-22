@@ -29,6 +29,10 @@ export interface ResponseHistoryItem {
    *  "Curl" button rebuild commands against the settings in effect at the time
    *  of the call, not whatever is in the Settings modal now. */
   headers?: Record<string, string>;
+  /** Per-call response language override (sk|cs), replayed by Rerun; absent when the Settings value applied. */
+  lang?: string;
+  /** Environment profile the call went to (name, plus the port when one was set). */
+  profile?: string;
 }
 
 interface HistoryState {

@@ -3,7 +3,7 @@ import type { BInput } from 'birko-web-components';
 import { toast } from 'birko-web-components';
 
 import { czDetail } from '../../api/cz-detail.js';
-import { applyPendingPrefill, emphasizeAction, parseRouteSegments, runApiCall } from '../page-helpers.js';
+import { applyLangOptions, applyPendingPrefill, emphasizeAction, langSelectMarkup, parseRouteSegments, readLang, runApiCall } from '../page-helpers.js';
 import { PAGE_STYLES } from '../page-styles.js';
 import { t, onLocaleChange } from '../../i18n/index.js';
 
@@ -24,6 +24,7 @@ export class CzDetailPage extends BaseComponent {
       <b-card header="${t('common.parameters')}">
         <div class="row">
           <b-input id="ico" label="${t('common.field.icoCz')}" placeholder="${t('common.field.icoCzPlaceholder')}" required></b-input>
+          ${langSelectMarkup()}
         </div>
         <div class="buttons">
           ${BUTTON_KINDS.map(kind => `<b-button variant="primary" data-kind="${kind}">${t('ribbon.item.' + kind)}</b-button>`).join('')}
@@ -42,7 +43,7 @@ export class CzDetailPage extends BaseComponent {
     window.removeEventListener('hashchange', this._onHashChange);
     this._unsubLocale?.();
   }
-  protected onUpdated() { this._applyRouteAction(); applyPendingPrefill(this.shadowRoot); }
+  protected onUpdated() { applyLangOptions(this.shadowRoot); this._applyRouteAction(); applyPendingPrefill(this.shadowRoot); }
 
   private _onHashChange = () => this._applyRouteAction();
 
@@ -70,7 +71,7 @@ export class CzDetailPage extends BaseComponent {
     icoInput?.removeAttribute('error');
 
     this._busy = true;
-    try { await runApiCall(t(`label.cz.detail.${kind}`), () => czDetail[kind](ico)); }
+    try { await runApiCall(t(`label.cz.detail.${kind}`), () => czDetail[kind](ico, readLang(this.shadowRoot))); }
     finally { this._busy = false; }
   }
 }

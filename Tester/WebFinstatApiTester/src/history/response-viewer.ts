@@ -24,6 +24,14 @@ function prettyJson(value: unknown): string {
   try { return JSON.stringify(value, null, 2); } catch { return String(value); }
 }
 
+/** FinStat's own JSON body when it answered in JSON, else the parsed result. */
+function rawJsonText(item: ResponseHistoryItem): string {
+  if (item.contentType.includes('json') && item.responseText) {
+    try { return prettyJson(JSON.parse(item.responseText)); } catch { return item.responseText; }
+  }
+  return prettyJson(item.responseBody);
+}
+
 /** `/history/:id` page — reads the id from the hash and renders the selected entry. */
 export class ResponseViewer extends BaseComponent {
   private _unsubs: Array<() => void> = [];
@@ -155,7 +163,7 @@ export class ResponseViewer extends BaseComponent {
   private _renderItem(item: ResponseHistoryItem): string {
     const statusClass = item.ok ? 'status-ok' : 'status-fail';
     const paramsText  = prettyJson(item.params);
-    const jsonText    = prettyJson(item.responseBody);
+    const jsonText    = rawJsonText(item);
     const hasXml      = item.contentType.includes('xml') && !!item.responseText;
     const statusText  = item.ok ? t('history.meta.ok') : (item.error ?? t('history.meta.error'));
     const failBadge   = !item.ok && item.failType
@@ -169,6 +177,7 @@ export class ResponseViewer extends BaseComponent {
         <div>
           <b-button variant="primary" id="btn-open">${t('history.button.openAction')}</b-button>
           <b-button variant="primary" id="btn-rerun">${t('history.button.rerun')}</b-button>
+          ${isDownload(item) ? '' : `<b-button variant="ghost" id="btn-compare">${t('history.button.compare')}</b-button>`}
           <b-button variant="ghost"   id="btn-curl">${t('history.button.curl')}</b-button>
           <b-button variant="ghost"   id="btn-remove">${t('history.button.remove')}</b-button>
           <b-button variant="danger"  id="btn-clear">${t('history.button.clearAll')}</b-button>
@@ -177,6 +186,7 @@ export class ResponseViewer extends BaseComponent {
       <b-card>
         <b-definition-list layout="horizontal">
           <dt>${t('history.meta.endpoint')}</dt>    <dd><code>${escapeHtml(item.method)} ${escapeHtml(item.endpoint)}</code></dd>
+          ${item.profile ? `<dt>${t('history.meta.profile')}</dt><dd>${escapeHtml(item.profile)}</dd>` : ''}
           <dt>${t('history.meta.status')}</dt>      <dd class="${statusClass}">${item.status} ${escapeHtml(statusText)}${failBadge}</dd>
           <dt>${t('history.meta.time')}</dt>        <dd>${formatTime(item.timestamp)} (${item.durationMs} ms)</dd>
           <dt>${t('history.meta.contentType')}</dt> <dd>${escapeHtml(item.contentType || '—')}</dd>
@@ -220,7 +230,8 @@ export class ResponseViewer extends BaseComponent {
       const params = (item.params && typeof item.params === 'object')
         ? item.params as Record<string, unknown>
         : {};
-      setPrefill(route, params);
+      // the recorded params carry the sent `Lang` (Settings value included); only the per-call choice fills #lang
+      setPrefill(route, item.lang ? { ...params, lang: item.lang } : params);
       window.location.hash = route;
     });
     this.$('#btn-rerun')?.addEventListener('click', async () => {
@@ -234,6 +245,9 @@ export class ResponseViewer extends BaseComponent {
         toast.error(t('history.toast.rerunFailed', { error }));
       }
       window.location.hash = `#/history/${res.historyId}`;
+    });
+    this.$('#btn-compare')?.addEventListener('click', () => {
+      if (item) window.location.hash = `#/compare/${item.id}`;
     });
     this.$('#btn-curl')?.addEventListener('click', () => {
       if (!item) return;
@@ -252,6 +266,11 @@ export class ResponseViewer extends BaseComponent {
       window.location.hash = '#/history';
     });
   }
+}
+
+/** File downloads have no body to compare. */
+function isDownload(item: ResponseHistoryItem): boolean {
+  return item.endpoint.split('?')[0].endsWith('/download');
 }
 
 function escapeHtml(s: string): string {

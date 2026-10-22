@@ -1,4 +1,5 @@
 import { toast } from 'birko-web-components';
+import type { BSelect } from 'birko-web-components';
 import type { CallResult } from '../api/api-client.js';
 import { hasCredentials } from '../settings/settings-store.js';
 import { OPEN_SETTINGS_EVENT } from '../shell/app-shell.js';
@@ -109,6 +110,32 @@ export function cacheHintMarkup(opts: { id: string; action: string; label: strin
 export function toggleCacheHint(root: ShadowRoot | null | undefined, id: string, hasItems: boolean): void {
   const el = root?.getElementById(id);
   if (el) el.toggleAttribute('hidden', hasItems);
+}
+
+/**
+ * Per-request response language select for the CZ pages (finstat.cz honours Lang, finstat.sk
+ * ignores it, so SK pages have none). The empty value keeps the Settings language.
+ * Drop the markup into the page's parameter row and call `applyLangOptions` from onUpdated().
+ */
+export function langSelectMarkup(): string {
+  return `<b-select id="lang" label="${t('common.field.lang')}"></b-select>`;
+}
+
+export function applyLangOptions(root: ShadowRoot | null | undefined): void {
+  const sel = root?.querySelector<BSelect>('#lang');
+  if (!sel) return;
+  sel.setOptions([
+    { value: '',   label: t('common.field.langSettings') },
+    { value: 'cs', label: 'CS' },
+    { value: 'sk', label: 'SK' },
+  ]);
+  if (!sel.getAttribute('value')) sel.setAttribute('value', '');
+}
+
+/** The selected per-request language, or undefined to send the Settings value. */
+export function readLang(root: ShadowRoot | null | undefined): string | undefined {
+  const value = (root?.querySelector<BSelect>('#lang')?.value ?? '').trim();
+  return value === 'cs' || value === 'sk' ? value : undefined;
 }
 
 /**

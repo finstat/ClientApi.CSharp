@@ -30,6 +30,7 @@ import '../pages/cz/monitoring-ico-queries-page.js';
 import '../pages/cz/monitoring-date-page.js';
 import '../pages/cz/monitoring-date-queries-page.js';
 import '../history/response-viewer.js';
+import '../history/compare-page.js';
 
 const wrap = createShellWrapper('app-shell');
 
@@ -103,6 +104,7 @@ const ROUTES: Route[] = [
 
   { path: '/history',             component: () => wrap('response-viewer') },
   { path: '/history/:id',         component: () => wrap('response-viewer') },
+  { path: '/compare/:id',         component: () => wrap('compare-page') },
   { path: '*',                    component: () => wrap('placeholder-page') },
 ];
 

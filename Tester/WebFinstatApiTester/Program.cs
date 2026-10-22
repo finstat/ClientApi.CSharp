@@ -38,6 +38,7 @@ builder.Services.AddSingleton(sp =>
 var app = builder.Build();
 
 FinstatLimitsHeaders.UseHttpContext(app.Services.GetRequiredService<IHttpContextAccessor>());
+FinstatEnvelopeBuilder.UseHttpContext(app.Services.GetRequiredService<IHttpContextAccessor>());
 
 // Dev-only client certificate config — injects the root_ca_dev_zdrojak.eu cert when the
 // outbound URL targets a dev endpoint. Matches DesktopFinstatApiTester behaviour.

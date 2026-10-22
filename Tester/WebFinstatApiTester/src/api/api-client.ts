@@ -1,4 +1,4 @@
-import { settingsHeaders } from '../settings/settings-store.js';
+import { settingsHeaders, settingsStore, activeProfile, type EnvProfile } from '../settings/settings-store.js';
 import { addHistory, type ResponseHistoryItem } from '../history/response-history.js';
 import { readLimitsFromHeaders } from './limits-store.js';
 
@@ -38,6 +38,33 @@ export interface CallOptions {
   label?: string;
   /** Parameters to record under the "Request" tab (defaults to the request body or query). */
   params?: unknown;
+  /** Response language for this call only (sk|cs), overrides the Settings value sent as `X-Finstat-Lang`. */
+  lang?: string;
+  /** Profile to call instead of the active one (comparison); its quota counters do not reach the status bar. */
+  profile?: EnvProfile;
+  /** Wire format for this call only, overrides the Settings value sent as `X-Finstat-ResponseType`. */
+  responseType?: 'xml' | 'json';
+  /** false keeps the call out of the response history (bulk comparison); `historyId` is then ''. */
+  record?: boolean;
+}
+
+/** Settings headers with the per-call overrides applied — also what history keeps for curl. */
+function callHeaders(opts: CallOptions): Record<string, string> {
+  const headers = settingsHeaders(opts.profile);
+  if (opts.lang) headers['X-Finstat-Lang'] = opts.lang;
+  if (opts.responseType) headers['X-Finstat-ResponseType'] = opts.responseType;
+  return headers;
+}
+
+/** The status bar shows the quota of the active profile only. */
+function isActiveProfileCall(opts: CallOptions): boolean {
+  return !opts.profile || opts.profile.id === settingsStore.get('activeProfileId');
+}
+
+/** Name recorded in history; a port that differs from the stored profile is part of it. */
+function callProfileName(opts: CallOptions): string {
+  const p = opts.profile ?? activeProfile();
+  return p.port ? `${p.name}:${p.port}` : p.name;
 }
 
 function parseBody(contentType: string, text: string): { body: unknown; isJson: boolean } {
@@ -93,7 +120,7 @@ async function request<T>(
   opts: CallOptions,
 ): Promise<CallResult<T>> {
   const start = performance.now();
-  const snapshot = settingsHeaders();
+  const snapshot = callHeaders(opts);
   const headers: Record<string, string> = { ...snapshot };
   if (method === 'POST') headers['Content-Type'] = 'application/json';
 
@@ -115,7 +142,7 @@ async function request<T>(
     status = resp.status;
     ok = resp.ok;
     contentType = resp.headers.get('content-type') ?? '';
-    readLimitsFromHeaders(resp.headers);
+    if (isActiveProfileCall(opts)) readLimitsFromHeaders(resp.headers);
     finstatParams = readFinstatRequestParams(resp.headers);
     rawText = await resp.text();
     data = parseBody(contentType, rawText).body;
@@ -155,10 +182,12 @@ async function request<T>(
     error,
     failType,
     headers: snapshot,
+    lang: opts.lang || undefined,
+    profile: callProfileName(opts),
   };
-  addHistory(item);
+  if (opts.record !== false) addHistory(item);
 
-  return { ok, status, data: data as T, rawText, contentType, historyId: item.id, error, failType };
+  return { ok, status, data: data as T, rawText, contentType, historyId: opts.record !== false ? item.id : '', error, failType };
 }
 
 /**
@@ -201,7 +230,7 @@ async function download(
     if (qs) url += '?' + qs;
   }
   const start = performance.now();
-  const snapshot = settingsHeaders();
+  const snapshot = callHeaders(opts);
   const headers: Record<string, string> = { ...snapshot };
 
   let status = 0;
@@ -220,7 +249,7 @@ async function download(
     status = resp.status;
     ok = resp.ok;
     contentType = resp.headers.get('content-type') ?? '';
-    readLimitsFromHeaders(resp.headers);
+    if (isActiveProfileCall(opts)) readLimitsFromHeaders(resp.headers);
     finstatParams = readFinstatRequestParams(resp.headers);
 
     const disp = resp.headers.get('content-disposition') ?? '';
@@ -269,6 +298,8 @@ async function download(
     error,
     failType,
     headers: snapshot,
+    lang: opts.lang || undefined,
+    profile: callProfileName(opts),
   };
   addHistory(item);
 

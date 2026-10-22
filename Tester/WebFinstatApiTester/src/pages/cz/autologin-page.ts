@@ -3,7 +3,7 @@ import type { BInput } from 'birko-web-components';
 import { toast } from 'birko-web-components';
 
 import { czAuto } from '../../api/cz-auto.js';
-import { applyPendingPrefill, runApiCall } from '../page-helpers.js';
+import { applyLangOptions, applyPendingPrefill, langSelectMarkup, readLang, runApiCall } from '../page-helpers.js';
 import { PAGE_STYLES } from '../page-styles.js';
 import { t, onLocaleChange } from '../../i18n/index.js';
 
@@ -21,6 +21,7 @@ export class CzAutoLoginPage extends BaseComponent {
         <div class="grid grid-2">
           <b-input id="url" label="${t('common.field.url')}" placeholder="${t('common.field.urlPlaceholderCz')}" required></b-input>
           <b-input id="email" type="email" label="${t('common.field.email')}" placeholder="${t('common.field.emailPlaceholderCz')}"></b-input>
+          ${langSelectMarkup()}
         </div>
         <div class="actions">
           <b-button variant="primary" id="run">${t('page.cz.autologin.button')}</b-button>
@@ -32,12 +33,13 @@ export class CzAutoLoginPage extends BaseComponent {
   protected onMount() {
     this.$('#run')?.addEventListener('click', () => void this._run());
     this._unsubLocale = onLocaleChange(() => this.update());
-    applyPendingPrefill(this.shadowRoot);
   }
 
   protected onUnmount() {
     this._unsubLocale?.();
   }
+
+  protected onUpdated() { applyLangOptions(this.shadowRoot); applyPendingPrefill(this.shadowRoot); }
 
   private async _run() {
     if (this._busy) return;
@@ -49,7 +51,7 @@ export class CzAutoLoginPage extends BaseComponent {
     urlInput?.removeAttribute('error');
 
     this._busy = true;
-    try { await runApiCall(t('label.cz.autoLogin'), () => czAuto.autoLogin(url, email)); }
+    try { await runApiCall(t('label.cz.autoLogin'), () => czAuto.autoLogin(url, email, readLang(this.shadowRoot))); }
     finally { this._busy = false; }
   }
 }

@@ -153,9 +153,11 @@ export function clearAllCache(): void {
  *  - apiKey / privateKey swap → different account; clear everything.
  *  - finStatApiUrl swap       → different SK backend; clear SK only.
  *  - finStatApiUrlCZ swap     → different CZ backend; clear CZ only.
+ *  - profile switch           → may bring its own keys; clear everything.
  * Runs at module-load so every page import picks it up without extra wiring.
  */
 settingsStore.onChange('apiKey',          () => clearAllCache());
 settingsStore.onChange('privateKey',      () => clearAllCache());
 settingsStore.onChange('finStatApiUrl',   () => clearSkCache());
 settingsStore.onChange('finStatApiUrlCZ', () => clearCzCache());
+settingsStore.onChange('activeProfileId', () => clearAllCache());

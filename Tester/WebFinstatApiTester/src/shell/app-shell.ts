@@ -12,8 +12,9 @@ registerThemes([BUILTIN_THEMES.finstat]);
 import { TABS, resolveTabForHash, firstHrefForTab } from './ribbon-tabs.js';
 import { historyStore } from '../history/response-history.js';
 import { limitsStore } from '../api/limits-store.js';
-import { settingsStore } from '../settings/settings-store.js';
+import { settingsStore, activeProfile } from '../settings/settings-store.js';
 import { OPEN_ABOUT_EVENT, DOCS_URL } from './about-modal.js';
+import './profile-switcher.js';
 import { t, setLocale, getLocale, onLocaleChange, LOCALES, LOCALE_LABELS, LOCALE_ICONS, type Locale } from '../i18n/index.js';
 
 /** Dispatched on window when the user picks "Settings" in the user menu. */
@@ -66,6 +67,9 @@ export class AppShell extends BAppShell {
 
   protected getUserName() { return 'Local'; }
 
+  // active profile + port, switchable without opening Settings
+  protected renderHeaderActions() { return '<profile-switcher></profile-switcher>'; }
+
   /**
    * Finstat is the only theme on offer. The registry always keeps `'light'` (it is the
    * base `:root` in tokens.css and cannot be unregistered), so narrowing the list here
@@ -108,9 +112,9 @@ export class AppShell extends BAppShell {
     }
   }
 
-  // ── Status bar — current SK/CZ endpoint hosts + desktop tester's Daily/Monthly quota counters.
+  // ── Status bar — active profile, its SK/CZ hosts + desktop tester's Daily/Monthly quota counters.
   protected getStatusText(): string {
-    const parts: string[] = [];
+    const parts: string[] = [activeProfile().name];
     const sk = settingsStore.get('finStatApiUrl');
     const cz = settingsStore.get('finStatApiUrlCZ');
     if (sk) parts.push(`SK: ${shortHost(sk)}`);
@@ -176,6 +180,7 @@ export class AppShell extends BAppShell {
       limitsStore.onChange('monthly',        () => this.refreshStatusBar()),
       settingsStore.onChange('finStatApiUrl',   () => this.refreshStatusBar()),
       settingsStore.onChange('finStatApiUrlCZ', () => this.refreshStatusBar()),
+      settingsStore.onChange('activeProfileId', () => this.refreshStatusBar()),
       onLocaleChange(() => {
         this.refreshRibbon();
         this.refreshStatusBar();

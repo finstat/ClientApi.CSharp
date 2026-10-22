@@ -1,6 +1,6 @@
 import { BaseComponent, define } from 'birko-web-core';
 
-import { hasCredentials, settingsStore } from '../settings/settings-store.js';
+import { hasCredentials, settingsStore, activeProfile } from '../settings/settings-store.js';
 import { OPEN_SETTINGS_EVENT } from './app-shell.js';
 import { DOCS_URL } from './about-modal.js';
 import { t, onLocaleChange } from '../i18n/index.js';
@@ -79,6 +79,8 @@ export class LandingPage extends BaseComponent {
 
       <b-card header="${t('page.landing.endpoints')}">
         <dl class="endpoints">
+          <dt>${t('settings.field.profile')}</dt>
+          <dd>${escapeHtml(activeProfile().name)}</dd>
           <dt>${t('settings.field.finStatApiUrl')}</dt>
           <dd><code>${escapeHtml(sk || t('page.landing.endpointUnset'))}</code></dd>
           <dt>${t('settings.field.finStatApiUrlCZ')}</dt>
@@ -131,6 +133,7 @@ export class LandingPage extends BaseComponent {
       settingsStore.onChange('privateKey',      () => this.update()),
       settingsStore.onChange('finStatApiUrl',   () => this.update()),
       settingsStore.onChange('finStatApiUrlCZ', () => this.update()),
+      settingsStore.onChange('activeProfileId', () => this.update()),
     );
   }
 
