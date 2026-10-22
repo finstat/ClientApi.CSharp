@@ -1,5 +1,5 @@
 import { BaseComponent, define, diffJson, xmlToTree, type JsonDiffOptions, type JsonDiffResult } from 'birko-web-core';
-import type { BSelect, BInput, BCheckbox, BJsonDiff, BTagInput, BAccordion } from 'birko-web-components';
+import type { BSelect, BInput, BCheckbox, BJsonDiff, BTagInput, BAccordion, BTabs } from 'birko-web-components';
 import { historyStore, type ResponseHistoryItem } from './response-history.js';
 import { rerunHistoryItem } from './rerun.js';
 import { runBatch, type BatchHandle } from '../pages/batch/runner.js';
@@ -41,6 +41,8 @@ export class ComparePage extends BaseComponent {
   /** Format of the calls that produced _runs; the bodies are parsed by it. */
   private _format: Format = 'json';
   private _handle: BatchHandle | null = null;
+  /** Rows of the "fields that differ" tab; 0 hides the tab. */
+  private _fieldCount = 0;
 
   static get styles() {
     return PAGE_STYLES + `
@@ -62,7 +64,8 @@ export class ComparePage extends BaseComponent {
       .add-row { margin: 0 0 var(--b-space-sm, 0.5rem); }
       .progress { display: flex; align-items: center; gap: var(--b-space-sm, 0.5rem); margin: var(--b-space-md, 1rem) 0; }
       .progress b-progress { flex: 1 1 auto; max-width: 30rem; }
-      .diff-title { margin-top: var(--b-space-lg, 1.5rem); }
+      .diff-title { margin-top: 0; }
+      .caption { color: var(--b-text-secondary); margin: 0; }
     `;
   }
 
@@ -103,9 +106,13 @@ export class ComparePage extends BaseComponent {
       </b-accordion>
       <div id="progress"></div>
       <div id="results"></div>
-      <div id="fields"></div>
-      <h3 class="diff-title" id="diff-title"></h3>
-      <b-json-diff id="diff" style="display: none"></b-json-diff>
+      <b-tabs id="detail" style="display: none">
+        <div slot="diff">
+          <h3 class="diff-title" id="diff-title"></h3>
+          <b-json-diff id="diff" style="display: none"></b-json-diff>
+        </div>
+        <div slot="fields" id="fields"></div>
+      </b-tabs>
     `;
   }
 
@@ -140,7 +147,9 @@ export class ComparePage extends BaseComponent {
     });
     this.$('#results')?.addEventListener('click', (e: Event) => {
       const cell = (e.target as HTMLElement).closest<HTMLElement>('[data-run]');
-      if (cell) this._show(Number(cell.dataset.run), Number(cell.dataset.col));
+      if (!cell) return;
+      this._show(Number(cell.dataset.run), Number(cell.dataset.col));
+      this.$<BTabs>('#detail')?.setAttribute('active', 'diff');
     });
     this.$('#progress')?.addEventListener('click', (e: Event) => {
       if ((e.target as HTMLElement).closest('#btn-stop')) this._handle?.cancel();
@@ -174,6 +183,24 @@ export class ComparePage extends BaseComponent {
     for (const row of rows) this._addRow(row);
     this._updateRunLabel();
     this._renderResults();
+    this._setDetailTabs();
+  }
+
+  /** Diff tab, plus the fields tab once a list of IČOs found differences; hidden before the first result. */
+  private _setDetailTabs(active?: string) {
+    const tabs = this.$<BTabs>('#detail');
+    if (!tabs) return;
+    const shown = this._runs.some(r => r.cells);
+    tabs.style.display = shown ? '' : 'none';
+    if (!shown) return;
+    const current = active ?? tabs.getAttribute('active') ?? 'diff';
+    tabs.setTabs(
+      [
+        { id: 'diff', label: t('compare.tab.diff') },
+        ...(this._fieldCount > 0 ? [{ id: 'fields', label: t('compare.tab.fields', { count: this._fieldCount }) }] : []),
+      ],
+      current === 'fields' && this._fieldCount > 0 ? 'fields' : 'diff',
+    );
   }
 
   /** The first profile not picked on any side yet; the active one when every profile is already in use. */
@@ -244,6 +271,8 @@ export class ComparePage extends BaseComponent {
     this._format = format;
     this._runs = values.map(value => ({ value, cells: undefined }));
     this._selected = { run: -1, col: -1 };
+    this._fieldCount = 0;
+    this._renderFields();
     this._setupAccordion(false);
     this._renderResults();
     this._renderProgress(0, values.length, true);
@@ -264,6 +293,7 @@ export class ComparePage extends BaseComponent {
       done++;
       this._renderProgress(done, values.length, true);
       this._renderResults();
+      this._setDetailTabs();
       if (this._selected.run < 0) this._showFirst();
     });
     await this._handle.done;
@@ -348,7 +378,12 @@ export class ComparePage extends BaseComponent {
     const host = this.$<HTMLElement>('#fields');
     if (!host) return;
     const runs = this._runs.filter(r => r.cells);
-    if (runs.length < 2) { host.innerHTML = ''; return; }
+    if (runs.length < 2) {
+      host.innerHTML = '';
+      this._fieldCount = 0;
+      this._setDetailTabs();
+      return;
+    }
     const counts = new Map<string, { profile: string; path: string; values: number }>();
     for (const run of runs) {
       for (const c of run.cells!.slice(1)) {
@@ -363,8 +398,10 @@ export class ComparePage extends BaseComponent {
       }
     }
     const sorted = [...counts.values()].sort((a, b) => b.values - a.values || a.path.localeCompare(b.path));
+    this._fieldCount = sorted.length;
+    this._setDetailTabs();
     host.innerHTML = sorted.length === 0 ? '' : `
-      <h3>${t('compare.fields', { total: runs.length })}</h3>
+      <p class="caption">${escapeHtml(t('compare.fields', { total: runs.length }))}</p>
       <table>
         <thead><tr><th>${t('compare.col.profile')}</th><th>${t('compare.col.field')}</th><th>${t('compare.col.values')}</th></tr></thead>
         <tbody>${sorted.slice(0, 50).map(f => `<tr><td>${escapeHtml(f.profile)}</td><td><code>${escapeHtml(f.path || '/')}</code></td><td>${f.values}</td></tr>`).join('')}</tbody>

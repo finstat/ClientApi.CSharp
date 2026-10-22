@@ -318,7 +318,11 @@ export const en = {
     diffTitle: '{a} → {b}',
     htmlAnswer: '(The server answered with a web page instead of the API: the endpoint may not exist on this profile, or it failed there.)',
     summary: '{added} added, {removed} removed, {changed} changed',
-    fields: 'Fields that differ (out of {total} IČOs)',
+    fields: 'Counted over {total} IČOs; positions in a list are merged, so one field counts once per IČO.',
+    tab: {
+      diff: 'Diff',
+      fields: 'Fields that differ ({count})',
+    },
     col: {
       profile: 'Profile',
       field: 'Field',

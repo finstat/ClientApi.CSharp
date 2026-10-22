@@ -318,7 +318,11 @@ export const sk = {
     diffTitle: '{a} → {b}',
     htmlAnswer: '(Server odpovedal webovou stránkou namiesto API: endpoint na tomto profile možno neexistuje alebo na ňom zlyhal.)',
     summary: '{added} pridaných, {removed} odstránených, {changed} zmenených',
-    fields: 'Polia, ktoré sa líšia (z {total} IČO)',
+    fields: 'Spočítané z {total} IČO; pozície v zozname sa zlučujú, takže pole sa ráta raz za IČO.',
+    tab: {
+      diff: 'Rozdiel',
+      fields: 'Polia, ktoré sa líšia ({count})',
+    },
     col: {
       profile: 'Profil',
       field: 'Pole',
