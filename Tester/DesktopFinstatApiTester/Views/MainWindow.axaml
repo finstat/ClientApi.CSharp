@@ -125,11 +125,13 @@
 
         <!-- Birko's ObjectTree walks the response graph itself (POCOs, dictionaries, collections,
              JsonNode) with type-colored monospaced values, and reports the selected node's value +
-             path so the context menu can act on it. -->
+             path so the context menu can act on it. Null members are hidden: one client model serves
+             several products (EliteCZ fills UltimateCZ's classes), so fields a product does not return
+             are null and would read as if FinStat had sent them. -->
         <TabControl x:Name="tabControlResponse" Grid.Column="1">
           <TabItem Header="Data">
             <ScrollViewer>
-              <c:ObjectTree x:Name="objectTreeData" Margin="{DynamicResource MarginSm}">
+              <c:ObjectTree x:Name="objectTreeData" HideNullMembers="True" Margin="{DynamicResource MarginSm}">
                 <c:ObjectTree.ContextMenu>
                   <ContextMenu>
                     <MenuItem Header="Copy Value To Clipboard" Click="treeCopyValueToClipboard_Click" />

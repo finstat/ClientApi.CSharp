@@ -50,6 +50,7 @@ namespace DesktopFinstatApiTester.Views
             client.OnRequest += Client_OnRequest;
             client.OnResponse += Client_OnResponse;
             client.OnErrorResponseContent += Client_OnResponseContent;
+            client.OnResponseContent += Client_OnResponseContent;
             return client;
         }
 

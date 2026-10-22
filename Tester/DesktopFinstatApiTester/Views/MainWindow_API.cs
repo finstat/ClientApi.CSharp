@@ -12,10 +12,21 @@ namespace DesktopFinstatApiTester.Views
     /// </summary>
     public partial class MainWindow
     {
-        /// <summary>Lang argument for the CZ client calls (only finstat.cz honours it), null for <see cref="Model.ResponseLang.Default"/>.</summary>
-        private string RequestLang()
+        /// <summary>Trailing pick on every CZ request (only finstat.cz honours Lang); Default keeps the Settings language.</summary>
+        private static ApiCallParameter LangParameter() => new ApiCallParameter(ParameterTypeEnum.Pick, "Response language (Default = Settings)")
         {
-            var lang = AppInstance?.Settings?.Lang ?? Model.ResponseLang.Default;
+            Values = Enum.GetValues(typeof(Model.ResponseLang)).Cast<object>().ToList(),
+        };
+
+        /// <summary>
+        /// Lang argument for the CZ client calls: the language picked for the request (its last parameter),
+        /// else the Settings one; null for <see cref="Model.ResponseLang.Default"/>.
+        /// </summary>
+        private string RequestLang(IEnumerable<object> parameters = null)
+        {
+            var lang = parameters?.LastOrDefault() is Model.ResponseLang picked && picked != Model.ResponseLang.Default
+                ? picked
+                : AppInstance?.Settings?.Lang ?? Model.ResponseLang.Default;
             return lang == Model.ResponseLang.Default ? null : lang.ToString().ToLowerInvariant();
         }
 

@@ -314,7 +314,7 @@ namespace DesktopFinstatApiTester.Views
             urlParameters.Add("hash", calculatedHash);
             urlParameters.Add("StationId", "curl-test");
             urlParameters.Add("StationName", "curl-test");
-            var lang = RequestLang();
+            var lang = RequestLang(parameters);
             if (item.ApiSource == "CZ" && lang != null && !urlParameters.ContainsKey("lang"))
             {
                 urlParameters.Add("Lang", lang);
@@ -567,8 +567,14 @@ namespace DesktopFinstatApiTester.Views
             return false;
         }
 
-        private static string ToJson(object value) =>
-            JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true });
+        // nulls left out for the same reason the Data tree hides them
+        private static readonly JsonSerializerOptions s_nodeJsonOptions = new()
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        };
+
+        private static string ToJson(object value) => JsonSerializer.Serialize(value, s_nodeJsonOptions);
 
         private void treeCopyValueToClipboard_Click(object sender, RoutedEventArgs e) =>
             _ = FireAsync(async () =>
