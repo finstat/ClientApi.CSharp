@@ -1,5 +1,5 @@
 import { define } from 'birko-web-core';
-import type { RibbonTab, SidebarItem } from 'birko-web-components';
+import type { RibbonTab, SidebarItem, BRibbon } from 'birko-web-components';
 import { registerProvider, type CommandItem } from 'birko-web-components/command';
 import { BAppShell, registerThemes, BUILTIN_THEMES } from 'birko-web-shell/shell';
 import type { MenuItem, ThemeOption } from 'birko-web-shell';
@@ -9,10 +9,11 @@ import type { MenuItem, ThemeOption } from 'birko-web-shell';
 // call alone isn't enough.
 registerThemes([BUILTIN_THEMES.finstat]);
 
-import { TABS, resolveTabForHash, firstHrefForTab } from './ribbon-tabs.js';
+import { TABS, resolveTabForHash, firstHrefForTab, ENVIRONMENT_TAB, RESPONSE_TAB, RESPONSE_SET } from './ribbon-tabs.js';
+import { HISTORY_ACTIONS, HISTORY_ACTION_EVENT, type HistoryAction } from '../history/response-viewer.js';
 import { historyStore } from '../history/response-history.js';
 import { limitsStore } from '../api/limits-store.js';
-import { settingsStore, activeProfile } from '../settings/settings-store.js';
+import { settingsStore, activeProfile, useAndSaveSettings } from '../settings/settings-store.js';
 import { OPEN_ABOUT_EVENT, DOCS_URL } from './about-modal.js';
 import './profile-switcher.js';
 import { t, setLocale, getLocale, onLocaleChange, LOCALES, LOCALE_LABELS, LOCALE_ICONS, type Locale } from '../i18n/index.js';
@@ -127,11 +128,86 @@ export class AppShell extends BAppShell {
   }
 
   // ── BAppShell — ribbon ────────────────────────────────────────────────────
+  /**
+   * A picked tab that owns no route (Environment, the contextual Response tab). Without it every ribbon
+   * refresh, e.g. the one a profile change in the Environment tab causes, would jump back to the tab of
+   * the current page. Navigating clears it.
+   */
+  private _openTab: string | null = null;
+
   protected getRibbonTabs(): RibbonTab[] { return TABS(); }
-  protected getActiveTabId(): string { return resolveTabForHash(window.location.hash); }
+  protected getActiveTabId(): string { return this._openTab ?? resolveTabForHash(window.location.hash); }
   protected onTabChange(tabId: string): void {
+    if (tabId === ENVIRONMENT_TAB || tabId === RESPONSE_TAB) { this._openTab = tabId; return; }
+    this._openTab = null;
     const href = firstHrefForTab(tabId);
     if (href) window.location.hash = href.slice(1); // strip leading '#'
+  }
+
+  protected onItemClick(_tabId: string, _groupId: string, itemId: string): void {
+    if (itemId === 'rt-xml' || itemId === 'rt-json') {
+      useAndSaveSettings({ responseType: itemId === 'rt-json' ? 'json' : 'xml' });
+    } else if (itemId.startsWith('resp-') && HISTORY_ACTIONS.includes(itemId.slice(5) as HistoryAction)) {
+      window.dispatchEvent(new CustomEvent(HISTORY_ACTION_EVENT, { detail: { action: itemId.slice(5) } }));
+    } else if (itemId === 'settings') {
+      window.dispatchEvent(new CustomEvent(OPEN_SETTINGS_EVENT));
+    }
+  }
+
+  /** setTabs() in the base refresh rebuilds the tabs; the contextual Response tab follows the page again. */
+  refreshRibbon(): void {
+    super.refreshRibbon();
+    this._syncContextual();
+  }
+
+  private get _ribbon(): BRibbon | null { return this.$<BRibbon>('#ribbon'); }
+
+  /** The Response tab is shown while a history entry is open. */
+  private _syncContextual(): void {
+    const ribbon = this._ribbon;
+    if (!ribbon) return;
+    if (/^#\/history\/.+/.test(window.location.hash)) ribbon.showContextual(RESPONSE_SET);
+    else {
+      if (this._openTab === RESPONSE_TAB) this._openTab = null;
+      ribbon.hideContextual(RESPONSE_SET);
+    }
+  }
+
+  /** Field changes in the Environment tab are saved as "Use and Save" in Settings would. */
+  private _onRibbonFieldChange = (e: Event): void => {
+    const { itemId, value } = (e as CustomEvent<{ itemId: string; value: string }>).detail;
+    if (itemId === 'env-profile') {
+      useAndSaveSettings({ activeProfileId: value });
+    } else if (itemId === 'env-port') {
+      const port = Number(value);
+      const active = activeProfile();
+      const valid = value.trim() === '' ? null : Number.isInteger(port) && port >= 1 && port <= 65535 ? port : undefined;
+      if (valid === undefined) { this.refreshRibbon(); return; }   // put the saved port back
+      useAndSaveSettings({ profiles: settingsStore.get('profiles').map(p => p.id === active.id ? { ...p, port: valid } : p) });
+    } else if (itemId === 'env-lang') {
+      useAndSaveSettings({ lang: value === 'cs' || value === 'sk' ? value : '' });
+    }
+  };
+
+  /**
+   * The ribbon's contextual sets, Quick Access Toolbar key and events. Re-applied after every shell
+   * render: its morph puts the ribbon's attributes back to the template, which has no qat-key.
+   */
+  private _setupRibbonExtras(first: boolean): void {
+    const ribbon = this._ribbon;
+    if (!ribbon) return;
+    if (ribbon.getAttribute('qat-key') !== this.storagePrefix) ribbon.setAttribute('qat-key', this.storagePrefix);
+    ribbon.setContextualSets([{ id: RESPONSE_SET, label: t('ribbon.contextual.response'), color: 'info' }]);
+    this._syncContextual();
+    if (!first) return;
+    ribbon.setQuickAccess([{ id: 'settings', label: t('shell.menu.settings'), icon: '&#9881;', action: true }]);
+    ribbon.addEventListener('item-change', this._onRibbonFieldChange);
+    ribbon.addEventListener('group-launcher', () => window.dispatchEvent(new CustomEvent(OPEN_SETTINGS_EVENT)));
+  }
+
+  protected onUpdated(): void {
+    super.onUpdated();
+    this._setupRibbonExtras(false);
   }
 
   // ── BSidebarAppShell — left sidebar (response history) ────────────────────
@@ -168,9 +244,12 @@ export class AppShell extends BAppShell {
     // prevActive === nextActive and re-expands the panel. When unpinned, that
     // overlays ribbon-panel-inner over the page on every sidebar click.
     const onHashChange = () => {
+      this._openTab = null;
       if (!window.location.hash.startsWith('#/history/')) this.refreshRibbon();
+      else this._syncContextual();
       this.refreshLeftSidebar();
     };
+    this._setupRibbonExtras(true);
     window.addEventListener('hashchange', onHashChange);
     this._unsubs.push(
       () => window.removeEventListener('hashchange', onHashChange),
@@ -180,7 +259,11 @@ export class AppShell extends BAppShell {
       limitsStore.onChange('monthly',        () => this.refreshStatusBar()),
       settingsStore.onChange('finStatApiUrl',   () => this.refreshStatusBar()),
       settingsStore.onChange('finStatApiUrlCZ', () => this.refreshStatusBar()),
-      settingsStore.onChange('activeProfileId', () => this.refreshStatusBar()),
+      settingsStore.onChange('activeProfileId', () => { this.refreshStatusBar(); this.refreshRibbon(); }),
+      // the Environment tab and the tooltips show these, and the profile list may have changed
+      settingsStore.onChange('profiles',     () => this.refreshRibbon()),
+      settingsStore.onChange('responseType', () => this.refreshRibbon()),
+      settingsStore.onChange('lang',         () => this.refreshRibbon()),
       onLocaleChange(() => {
         this.refreshRibbon();
         this.refreshStatusBar();

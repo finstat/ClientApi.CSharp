@@ -136,6 +136,14 @@ export const en = {
       diff: 'Diff',
       distraint: 'Distraint',
       bankruptcy: 'Bankruptcy / Restructuring',
+      environment: 'Environment',
+      response: 'Response',
+    },
+    contextual: {
+      response: 'History entry',
+    },
+    tooltip: {
+      endpoint: '{api} API on {host} · {path}',
     },
     group: {
       skDetail: 'SK Detail',
@@ -158,6 +166,10 @@ export const en = {
       disResults: 'Results',
       bkPersons: 'Persons',
       bkIco: 'ICO',
+      envProfile: 'Profile',
+      envResponse: 'Response',
+      respCall: 'Call',
+      respHistory: 'History',
     },
     item: {
       basic: 'Basic',

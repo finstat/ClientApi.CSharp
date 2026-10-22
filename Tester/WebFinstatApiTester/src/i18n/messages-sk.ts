@@ -136,6 +136,14 @@ export const sk = {
       diff: 'Diff',
       distraint: 'Exekúcie',
       bankruptcy: 'Konkurz / Reštrukturalizácia',
+      environment: 'Prostredie',
+      response: 'Odpoveď',
+    },
+    contextual: {
+      response: 'Záznam histórie',
+    },
+    tooltip: {
+      endpoint: 'API {api} na {host} · {path}',
     },
     group: {
       skDetail: 'SK Detail',
@@ -158,6 +166,10 @@ export const sk = {
       disResults: 'Výsledky',
       bkPersons: 'Osoby',
       bkIco: 'IČO',
+      envProfile: 'Profil',
+      envResponse: 'Odpoveď',
+      respCall: 'Volanie',
+      respHistory: 'História',
     },
     item: {
       basic: 'Basic',

@@ -7,6 +7,7 @@ import {
   selectHistory,
   removeHistory,
   clearHistory,
+  getSelected,
   type ResponseHistoryItem,
 } from './response-history.js';
 import { rerunHistoryItem } from './rerun.js';
@@ -31,6 +32,12 @@ function rawJsonText(item: ResponseHistoryItem): string {
   }
   return prettyJson(item.responseBody);
 }
+
+/** Actions on the shown history entry; the ribbon's contextual Response tab sends them as HISTORY_ACTION_EVENT. */
+export const HISTORY_ACTIONS = ['open', 'rerun', 'compare', 'curl', 'remove', 'clear'] as const;
+export type HistoryAction = typeof HISTORY_ACTIONS[number];
+export const HISTORY_ACTION_EVENT = 'finstat:history-action';
+export interface HistoryActionDetail { action: HistoryAction; }
 
 /** `/history/:id` page — reads the id from the hash and renders the selected entry. */
 export class ResponseViewer extends BaseComponent {
@@ -74,7 +81,10 @@ export class ResponseViewer extends BaseComponent {
   render() { return `<div id="host"></div>`; }
 
   protected onMount() {
+    const onAction = (e: Event) => void this._runAction((e as CustomEvent<HistoryActionDetail>).detail.action, getSelected());
+    window.addEventListener(HISTORY_ACTION_EVENT, onAction);
     this._unsubs.push(
+      () => window.removeEventListener(HISTORY_ACTION_EVENT, onAction),
       historyStore.on('items',      () => this._refresh()),
       historyStore.on('selectedId', () => this._refresh()),
       onLocaleChange(() => this._refresh()),
@@ -223,48 +233,56 @@ export class ResponseViewer extends BaseComponent {
   }
 
   private _wireButtons(item: ResponseHistoryItem | null): void {
-    this.$('#btn-open')?.addEventListener('click', () => {
-      if (!item) return;
-      const route = endpointToRouteHash(item.endpoint);
-      if (!route) { toast.info(t('history.toast.openActionNoRoute')); return; }
-      const params = (item.params && typeof item.params === 'object')
-        ? item.params as Record<string, unknown>
-        : {};
-      // the recorded params carry the sent `Lang` (Settings value included); only the per-call choice fills #lang
-      setPrefill(route, item.lang ? { ...params, lang: item.lang } : params);
-      window.location.hash = route;
-    });
-    this.$('#btn-rerun')?.addEventListener('click', async () => {
-      if (!item) return;
-      const res = await rerunHistoryItem(item);
-      if (res.ok) toast.success(t('history.toast.rerunOk'));
-      else {
-        const failType = failTypeLabel(res.failType);
-        const baseError = res.error ?? t('common.httpStatus', { status: res.status });
-        const error = failType ? `${failType} — ${baseError}` : baseError;
-        toast.error(t('history.toast.rerunFailed', { error }));
-      }
-      window.location.hash = `#/history/${res.historyId}`;
-    });
-    this.$('#btn-compare')?.addEventListener('click', () => {
-      if (item) window.location.hash = `#/compare/${item.id}`;
-    });
-    this.$('#btn-curl')?.addEventListener('click', () => {
-      if (!item) return;
-      const path = item.endpoint.split('?')[0];
-      openCurlModal(path, item.params, item.label, item.headers);
-    });
-    this.$('#btn-remove')?.addEventListener('click', () => {
-      if (!item) return;
-      removeHistory(item.id);
-      toast.info(t('history.toast.entryRemoved'));
-      window.location.hash = '#/history';
-    });
-    this.$('#btn-clear')?.addEventListener('click', () => {
+    for (const action of HISTORY_ACTIONS) {
+      this.$(`#btn-${action}`)?.addEventListener('click', () => this._runAction(action, item));
+    }
+  }
+
+  /** The toolbar buttons and the ribbon's contextual Response tab (HISTORY_ACTION_EVENT) both land here. */
+  private async _runAction(action: HistoryAction, item: ResponseHistoryItem | null): Promise<void> {
+    if (action === 'clear') {
       clearHistory();
       toast.info(t('history.toast.historyCleared'));
       window.location.hash = '#/history';
-    });
+      return;
+    }
+    if (!item) return;
+    switch (action) {
+      case 'open': {
+        const route = endpointToRouteHash(item.endpoint);
+        if (!route) { toast.info(t('history.toast.openActionNoRoute')); return; }
+        const params = (item.params && typeof item.params === 'object')
+          ? item.params as Record<string, unknown>
+          : {};
+        // the recorded params carry the sent `Lang` (Settings value included); only the per-call choice fills #lang
+        setPrefill(route, item.lang ? { ...params, lang: item.lang } : params);
+        window.location.hash = route;
+        return;
+      }
+      case 'rerun': {
+        const res = await rerunHistoryItem(item);
+        if (res.ok) toast.success(t('history.toast.rerunOk'));
+        else {
+          const failType = failTypeLabel(res.failType);
+          const baseError = res.error ?? t('common.httpStatus', { status: res.status });
+          const error = failType ? `${failType} — ${baseError}` : baseError;
+          toast.error(t('history.toast.rerunFailed', { error }));
+        }
+        window.location.hash = `#/history/${res.historyId}`;
+        return;
+      }
+      case 'compare':
+        if (!isDownload(item)) window.location.hash = `#/compare/${item.id}`;
+        return;
+      case 'curl':
+        openCurlModal(item.endpoint.split('?')[0], item.params, item.label, item.headers);
+        return;
+      case 'remove':
+        removeHistory(item.id);
+        toast.info(t('history.toast.entryRemoved'));
+        window.location.hash = '#/history';
+        return;
+    }
   }
 }
 

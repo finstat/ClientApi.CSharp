@@ -1,6 +1,7 @@
-import type { RibbonTab } from 'birko-web-components';
+import type { RibbonTab, RibbonItem } from 'birko-web-components';
 
 import { t } from '../i18n/index.js';
+import { settingsStore, activeProfile } from '../settings/settings-store.js';
 
 /** HTML-entity icons used across the ribbon. Centralised so similar actions share a glyph. */
 const ICON = {
@@ -12,6 +13,8 @@ const ICON = {
   diff:       '&#916;',    // Δ delta
   distraint:  '&#9878;',   // ⚖ balance scale
   bankruptcy: '&#9888;',   // ⚠ warning
+  environment: '&#9881;',  // ⚙ gear
+  response:   '&#128196;', // 📄 page
 
   // Common item actions
   list:        '&#128203;', // 📋 clipboard
@@ -27,14 +30,25 @@ const ICON = {
   company:     '&#127970;', // 🏢
   tier:        '&#128290;', // 🔢 input numbers
   login:       '&#128273;', // 🔑
+  rerun:       '&#8635;',   // ↻
+  compare:     '&#8644;',   // ⇄
+  curl:        '&#62;_',    // >_
+  open:        '&#8599;',   // ↗
+  clear:       '&#10005;',  // ✕
 } as const;
+
+/** Tabs outside the endpoint tabs: they own no route, so the shell keeps them open while they are used. */
+export const ENVIRONMENT_TAB = 'environment';
+export const RESPONSE_TAB = 'response';
+/** Contextual set of the Response tab, shown while a history entry is open. */
+export const RESPONSE_SET = 'response';
 
 /**
  * Ribbon structure mirroring DesktopFinstatApiTester's Fluent ribbon.
  * Returns a fresh array each call so labels re-resolve when the locale changes.
  */
 export function TABS(): RibbonTab[] {
-  return [
+  return withTooltips([
     {
       id: 'detail', label: t('ribbon.tab.detail'), icon: ICON.detail,
       groups: [
@@ -206,7 +220,86 @@ export function TABS(): RibbonTab[] {
         },
       ],
     },
-  ];
+  ]).concat(environmentTab(), responseTab());
+}
+
+/** The endpoint a link calls, on which host: "CZ API on zdrojakcz.eu:5009 · cz/detail/elite". */
+function withTooltips(tabs: RibbonTab[]): RibbonTab[] {
+  const profile = activeProfile();
+  const port = profile.port ? `:${profile.port}` : '';
+  const describe = (item: RibbonItem): RibbonItem => {
+    const path = item.href?.replace(/^#\//, '');
+    if (!path) return item;
+    const cz = path.startsWith('cz/');
+    return {
+      ...item,
+      description: t('ribbon.tooltip.endpoint', { api: cz ? 'CZ' : 'SK', host: `${cz ? profile.czHost : profile.skHost}${port}`, path }),
+    };
+  };
+  return tabs.map(tab => ({ ...tab, groups: tab.groups.map(g => ({ ...g, items: g.items.map(describe) })) }));
+}
+
+/** Profile, port, response type and language without opening Settings; the group launcher opens Settings. */
+function environmentTab(): RibbonTab {
+  const s = settingsStore.snapshot();
+  const profile = activeProfile();
+  return {
+    id: ENVIRONMENT_TAB, label: t('ribbon.tab.environment'), icon: ICON.environment,
+    groups: [
+      {
+        id: 'env-profile', label: t('ribbon.group.envProfile'), launcher: true, launcherLabel: t('shell.menu.settings'),
+        items: [
+          {
+            id: 'env-profile', label: t('settings.field.profile'),
+            field: { type: 'select', value: profile.id, options: s.profiles.map(p => ({ value: p.id, label: p.name })), width: 14, caption: 'above' },
+          },
+          {
+            id: 'env-port', label: t('settings.field.port'),
+            field: { type: 'number', value: profile.port ? String(profile.port) : '', placeholder: '443', min: 1, max: 65535, width: 6, caption: 'above' },
+          },
+        ],
+      },
+      {
+        id: 'env-response', label: t('ribbon.group.envResponse'),
+        items: [
+          { id: 'rt-xml',  label: 'XML',  toggle: true, toggleGroup: 'responseType', pressed: s.responseType === 'xml',  description: t('settings.field.responseTypeHint') },
+          { id: 'rt-json', label: 'JSON', toggle: true, toggleGroup: 'responseType', pressed: s.responseType === 'json', description: t('settings.field.responseTypeHint') },
+          {
+            id: 'env-lang', label: t('settings.field.lang'), description: t('settings.field.langHint'),
+            field: {
+              type: 'select', value: s.lang, width: 12, caption: 'above',
+              options: [{ value: '', label: t('settings.field.langDefault') }, { value: 'cs', label: 'CS' }, { value: 'sk', label: 'SK' }],
+            },
+          },
+        ],
+      },
+    ],
+  };
+}
+
+/** The shown history entry's actions, as the buttons on the response page. */
+function responseTab(): RibbonTab {
+  const action = (id: string, label: string, icon: string, variant?: 'danger'): RibbonItem =>
+    ({ id: `resp-${id}`, label, icon, action: true, ...(variant ? { variant } : {}) });
+  return {
+    id: RESPONSE_TAB, label: t('ribbon.tab.response'), icon: ICON.response, contextualSet: RESPONSE_SET,
+    groups: [
+      {
+        id: 'resp-call', label: t('ribbon.group.respCall'), items: [
+          action('rerun',   t('history.button.rerun'),      ICON.rerun),
+          action('compare', t('history.button.compare'),    ICON.compare),
+          action('curl',    t('history.button.curl'),       ICON.curl),
+          action('open',    t('history.button.openAction'), ICON.open),
+        ],
+      },
+      {
+        id: 'resp-history', label: t('ribbon.group.respHistory'), items: [
+          action('remove', t('history.button.remove'),   ICON.remove),
+          action('clear',  t('history.button.clearAll'), ICON.clear, 'danger'),
+        ],
+      },
+    ],
+  };
 }
 
 /** Flat list of hrefs keyed by tab — keeps resolveTabForHash cheap & language-agnostic. */
