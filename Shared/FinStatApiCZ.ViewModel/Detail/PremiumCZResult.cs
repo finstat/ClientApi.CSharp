@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace FinstatApi
 {
@@ -16,11 +17,15 @@ namespace FinstatApi
         public bool? UnReliability { get; set; }
         public string RegisterNumberText { get; set; }
         public string TradeLicensingOffice { get; set; }
+        // PremiumCZ only; EliteCZ/UltimateCZ send the values per year in FinancialIndicators, so these stay null
         public int? ActualYear { get; set; }
         public double? SalesActual { get; set; }
         public double? ProfitActual { get; set; }
         // EliteCZ/UltimateCZ leave Sales and Profit out without financial data, so they read as Unknown
+        // EliteCZ/UltimateCZ send them as text, PremiumCZ as numbers; the converter reads both
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public SalesTypeEnum Sales { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ProfitTypeEnum Profit { get; set; }
         public TurnoverCategory TurnoverCategory { get; set; }
         public DateTime? SuspendedAsPersonUntil { get; set; }

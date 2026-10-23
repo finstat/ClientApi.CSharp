@@ -96,6 +96,7 @@ namespace FinstatApi
     {
         public int Year { get; set; }
         public decimal? Value { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public CreditScoreStateEnum? State { get; set; }
     }
 
@@ -109,6 +110,7 @@ namespace FinstatApi
 
         public string FullName { get; set; }
         public DateTime? BirthDate { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FunctionEnum Function { get; set; }
         public DateTime? FunctionFrom { get; set; }
         // trade licences the responsible person answers for, empty for Entrepreneur
