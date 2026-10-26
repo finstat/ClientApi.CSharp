@@ -40,10 +40,11 @@
 
         <StackPanel x:Name="panelValues" Spacing="4" MaxWidth="640" HorizontalAlignment="Left">
           <TextBlock Classes="caption" Text="IČOs" />
-          <TextBox x:Name="textBoxValues" AcceptsReturn="True" TextWrapping="Wrap" Height="72" Width="640"
-                   Watermark="One IČO per line, or separated by commas or spaces"
-                   TextChanged="textBoxValues_TextChanged" />
-          <TextBlock Text="A list of IČOs is compared one by one; the history keeps the comparison, not its calls."
+          <!-- A comma, semicolon, space, new line or tab ends an IČO, so a pasted list splits on its own. -->
+          <c:TagInput x:Name="tagInputValues" Width="640" Separators=",; &#10;&#9;"
+                      TagsChanged="tagInputValues_TagsChanged" />
+          <TextBlock Text="Type or paste IČOs; a comma, space or new line ends each one. A list is compared one by one; the history keeps the comparison, not its calls."
+                     TextWrapping="Wrap"
                      Foreground="{DynamicResource BTextMutedBrush}" FontSize="{DynamicResource BTextSm}" />
         </StackPanel>
 

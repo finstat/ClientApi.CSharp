@@ -63,9 +63,8 @@ namespace DesktopFinstatApiTester.Views
             panelValues.IsVisible = panelConcurrency.IsVisible = _icoIndex >= 0;
             if (_icoIndex >= 0)
             {
-                textBoxValues.Text = saved != null
-                    ? string.Join(Environment.NewLine, saved.Values)
-                    : Convert.ToString(_request.Parameters?.ElementAtOrDefault(_icoIndex));
+                var recorded = Convert.ToString(_request.Parameters?.ElementAtOrDefault(_icoIndex));
+                tagInputValues.SetTags(saved != null ? saved.Values : new[] { recorded }.Where(v => !string.IsNullOrWhiteSpace(v)));
             }
             checkBoxHideHosts.IsChecked = saved?.HideHosts ?? true;
             UpdateRunLabel();
@@ -148,15 +147,14 @@ namespace DesktopFinstatApiTester.Views
             return profile;
         }
 
-        /// <summary>IČOs typed in the box, in order, without repeats; the recorded request as is when there are none.</summary>
+        /// <summary>The IČOs entered, in order (the tag input refuses repeats); the recorded request as is when there are none.</summary>
         private List<string> Values()
         {
             if (_icoIndex < 0)
             {
                 return new List<string> { null };
             }
-            var values = Regex.Split(textBoxValues.Text ?? string.Empty, @"[\s,;]+")
-                .Where(v => v.Length > 0).Distinct().ToList();
+            var values = tagInputValues.Tags.Select(v => v.Trim()).Where(v => v.Length > 0).ToList();
             return values.Count > 0 ? values : new List<string> { null };
         }
 
@@ -173,7 +171,7 @@ namespace DesktopFinstatApiTester.Views
             UpdateRunLabel();
         }
 
-        private void textBoxValues_TextChanged(object sender, TextChangedEventArgs e) => UpdateRunLabel();
+        private void tagInputValues_TagsChanged(object sender, EventArgs e) => UpdateRunLabel();
 
         private void checkBoxHideHosts_Changed(object sender, RoutedEventArgs e)
         {
