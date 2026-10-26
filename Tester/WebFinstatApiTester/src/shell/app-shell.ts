@@ -13,7 +13,7 @@ import { TABS, resolveTabForHash, firstHrefForTab, ENVIRONMENT_TAB, RESPONSE_TAB
 import { HISTORY_ACTIONS, HISTORY_ACTION_EVENT, type HistoryAction } from '../history/response-viewer.js';
 import { historyStore, type ResponseHistoryItem } from '../history/response-history.js';
 import { limitsStore } from '../api/limits-store.js';
-import { settingsStore, activeProfile, useAndSaveSettings } from '../settings/settings-store.js';
+import { settingsStore, activeProfile, useAndSaveSettings, profileColorCss } from '../settings/settings-store.js';
 import { OPEN_ABOUT_EVENT, DOCS_URL } from './about-modal.js';
 import './profile-switcher.js';
 import { t, setLocale, getLocale, onLocaleChange, LOCALES, LOCALE_LABELS, LOCALE_ICONS, type Locale } from '../i18n/index.js';
@@ -125,6 +125,14 @@ export class AppShell extends BAppShell {
     if (d) parts.push(t('shell.status.daily', { current: d.current, max: d.max }));
     if (m) parts.push(t('shell.status.monthly', { current: m.current, max: m.max }));
     return parts.join(' · ');
+  }
+
+  /** A stripe in the active profile's colour along the top of the status bar. */
+  refreshStatusBar(): void {
+    super.refreshStatusBar();
+    const bar = this.$<HTMLElement>('.app-status-bar');
+    const color = profileColorCss(activeProfile().color);
+    if (bar) bar.style.boxShadow = color ? `inset 0 3px 0 ${color}` : '';
   }
 
   // ── BAppShell — ribbon ────────────────────────────────────────────────────
@@ -280,7 +288,7 @@ export class AppShell extends BAppShell {
       settingsStore.onChange('finStatApiUrlCZ', () => this.refreshStatusBar()),
       settingsStore.onChange('activeProfileId', () => { this.refreshStatusBar(); this.refreshRibbon(); }),
       // the Environment tab and the tooltips show these, and the profile list may have changed
-      settingsStore.onChange('profiles',     () => this.refreshRibbon()),
+      settingsStore.onChange('profiles',     () => { this.refreshRibbon(); this.refreshStatusBar(); }),
       settingsStore.onChange('responseType', () => this.refreshRibbon()),
       settingsStore.onChange('lang',         () => this.refreshRibbon()),
       onLocaleChange(() => {

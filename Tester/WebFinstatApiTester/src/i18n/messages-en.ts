@@ -224,7 +224,7 @@ export const en = {
       finStatApiUrl: 'FinStat SK URL',
       finStatApiUrlCZ: 'FinStat CZ URL',
       profile: 'Profile',
-      profileHint: 'Which FinStat servers the tester calls. Built-in profiles allow changing only the port and the keys; duplicate one to change its hosts.',
+      profileHint: 'Which FinStat servers the tester calls. Built-in profiles allow changing only the port, the keys and the colour; duplicate one to change its hosts.',
       profileName: 'Profile name',
       profileCopy: '{name} (copy)',
       skHost: 'SK API host',
@@ -235,6 +235,14 @@ export const en = {
       profileApiKey: 'API Key for this profile',
       profilePrivateKey: 'Private Key for this profile',
       profileKeyHint: 'Empty = the API keys above.',
+      profileColor: 'Colour',
+      profileColorHint: 'Shown next to the profile in the header and along the status bar while the profile is active.',
+    },
+    color: {
+      none: 'None',
+      green: 'Green',
+      amber: 'Amber',
+      red: 'Red',
     },
     button: {
       cancel: 'Cancel',

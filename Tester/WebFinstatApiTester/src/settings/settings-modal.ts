@@ -72,6 +72,7 @@ import {
   hasCredentials,
   findProfile,
   profileUrl,
+  PROFILE_COLORS,
   type EnvProfile,
 } from './settings-store.js';
 
@@ -142,6 +143,10 @@ function buildEnvSchema(profiles: readonly EnvProfile[]): FormSchema {
           },
           { name: 'skHost', type: 'text', label: t('settings.field.skHost'), required: true },
           { name: 'czHost', type: 'text', label: t('settings.field.czHost'), required: true },
+          {
+            name: 'color', type: 'select', label: t('settings.field.profileColor'), hint: t('settings.field.profileColorHint'),
+            options: PROFILE_COLORS.map(c => ({ value: c, label: t(`settings.color.${c || 'none'}`) })),
+          },
           { name: 'apiKey',     type: 'text',     label: t('settings.field.profileApiKey'),     hint: t('settings.field.profileKeyHint') },
           { name: 'privateKey', type: 'password', label: t('settings.field.profilePrivateKey'), hint: t('settings.field.profileKeyHint') },
         ],
@@ -151,7 +156,7 @@ function buildEnvSchema(profiles: readonly EnvProfile[]): FormSchema {
 }
 
 function profileFormValues(p: EnvProfile) {
-  return { profileId: p.id, name: p.name, port: p.port ?? '', skHost: p.skHost, czHost: p.czHost, apiKey: p.apiKey, privateKey: p.privateKey };
+  return { profileId: p.id, name: p.name, port: p.port ?? '', skHost: p.skHost, czHost: p.czHost, color: p.color, apiKey: p.apiKey, privateKey: p.privateKey };
 }
 
 /** Flatten current settings into the nested shape the General form expects. */
@@ -195,6 +200,7 @@ function readProfile(base: EnvProfile, env: Record<string, unknown>): EnvProfile
     port:       env.port === '' || env.port == null || !Number.isFinite(port) || port <= 0 ? null : port,
     apiKey:     String(env.apiKey ?? '').trim(),
     privateKey: String(env.privateKey ?? '').trim(),
+    color:      PROFILE_COLORS.find(c => c === env.color) ?? '',
   };
 }
 

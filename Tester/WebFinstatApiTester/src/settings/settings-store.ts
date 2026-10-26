@@ -1,5 +1,20 @@
 import { Store } from 'birko-web-core/state';
 
+/** Marks a profile wherever the active one is shown, so production is not called by mistake; '' = none. */
+export type ProfileColor = '' | 'green' | 'amber' | 'red';
+
+export const PROFILE_COLORS: readonly ProfileColor[] = ['', 'green', 'amber', 'red'];
+
+/** The theme colour of a profile colour; '' for none. */
+export function profileColorCss(color: ProfileColor | undefined): string {
+  switch (color) {
+    case 'green': return 'var(--b-color-success)';
+    case 'amber': return 'var(--b-color-warning)';
+    case 'red':   return 'var(--b-color-danger)';
+    default:      return '';
+  }
+}
+
 /**
  * A named FinStat environment: the SK and the CZ API host the tester calls, one port for both,
  * and optional API keys that replace the global ones.
@@ -7,7 +22,7 @@ import { Store } from 'birko-web-core/state';
 export interface EnvProfile {
   id: string;
   name: string;
-  /** Built-in profiles keep their name and hosts; only the port and the keys can change. */
+  /** Built-in profiles keep their name and hosts; only the port, the keys and the colour can change. */
   builtIn: boolean;
   skHost: string;
   czHost: string;
@@ -16,17 +31,18 @@ export interface EnvProfile {
   /** '' = use the global key. */
   apiKey: string;
   privateKey: string;
+  color: ProfileColor;
 }
 
 export const BUILT_IN_PROFILES: readonly EnvProfile[] = [
-  builtIn('finstat-sk',   'finstat.sk',   'www.finstat.sk',  'cz.finstat.sk'),
-  builtIn('finstat-cz',   'finstat.cz',   'sk.finstat.cz',   'www.finstat.cz'),
+  builtIn('finstat-sk',   'finstat.sk',   'www.finstat.sk',  'cz.finstat.sk', 'red'),
+  builtIn('finstat-cz',   'finstat.cz',   'sk.finstat.cz',   'www.finstat.cz', 'red'),
   builtIn('zdrojak-eu',   'zdrojak.eu',   'zdrojak.eu',      'cz.zdrojak.eu'),
   builtIn('zdrojakcz-eu', 'zdrojakcz.eu', 'sk.zdrojakcz.eu', 'zdrojakcz.eu'),
 ];
 
-function builtIn(id: string, name: string, skHost: string, czHost: string): EnvProfile {
-  return { id, name, builtIn: true, skHost, czHost, port: null, apiKey: '', privateKey: '' };
+function builtIn(id: string, name: string, skHost: string, czHost: string, color: ProfileColor = ''): EnvProfile {
+  return { id, name, builtIn: true, skHost, czHost, port: null, apiKey: '', privateKey: '', color };
 }
 
 export function profileUrl(host: string, port: number | null): string {
@@ -77,14 +93,21 @@ function withUrls(s: Settings): Settings {
   return { ...s, activeProfileId: p.id, finStatApiUrl: profileUrl(p.skHost, p.port), finStatApiUrlCZ: profileUrl(p.czHost, p.port) };
 }
 
-/** Built-ins always come from code (a stored copy only keeps its port and keys), custom profiles as stored. */
+/**
+ * Built-ins always come from code (a stored copy only keeps its port, keys and colour), custom profiles
+ * as stored. Profiles saved before colours existed get the built-in's colour, a custom one none.
+ */
 function mergeProfiles(stored: EnvProfile[] | undefined): EnvProfile[] {
   const builtIns = BUILT_IN_PROFILES.map(p => {
     const s = stored?.find(x => x.id === p.id);
-    return { ...p, port: s?.port ?? null, apiKey: s?.apiKey ?? '', privateKey: s?.privateKey ?? '' };
+    return { ...p, port: s?.port ?? null, apiKey: s?.apiKey ?? '', privateKey: s?.privateKey ?? '', color: validColor(s?.color) ?? p.color };
   });
-  const custom = (stored ?? []).filter(p => !BUILT_IN_PROFILES.some(b => b.id === p.id)).map(p => ({ ...p, builtIn: false }));
+  const custom = (stored ?? []).filter(p => !BUILT_IN_PROFILES.some(b => b.id === p.id)).map(p => ({ ...p, builtIn: false, color: validColor(p.color) ?? '' }));
   return [...builtIns, ...custom];
+}
+
+function validColor(color: unknown): ProfileColor | undefined {
+  return PROFILE_COLORS.find(c => c === color);
 }
 
 /** Settings saved before profiles existed hold two URLs: pick the built-in they point at, or keep them as a custom profile. */
@@ -99,7 +122,7 @@ function migrateUrls(sk: string | undefined, cz: string | undefined): { profiles
     match.port = port;
     return { profiles, activeProfileId: match.id };
   }
-  const custom: EnvProfile = { id: crypto.randomUUID(), name: a.host, builtIn: false, skHost: a.host, czHost: b.host, port, apiKey: '', privateKey: '' };
+  const custom: EnvProfile = { id: crypto.randomUUID(), name: a.host, builtIn: false, skHost: a.host, czHost: b.host, port, apiKey: '', privateKey: '', color: '' };
   return { profiles: [...profiles, custom], activeProfileId: custom.id };
 }
 

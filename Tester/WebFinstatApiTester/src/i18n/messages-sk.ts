@@ -224,7 +224,7 @@ export const sk = {
       finStatApiUrl: 'FinStat SK URL',
       finStatApiUrlCZ: 'FinStat CZ URL',
       profile: 'Profil',
-      profileHint: 'Na ktoré servery FinStatu tester volá. Vstavaným profilom sa dá zmeniť iba port a kľúče; na zmenu hostov profil skopírujte.',
+      profileHint: 'Na ktoré servery FinStatu tester volá. Vstavaným profilom sa dá zmeniť iba port, kľúče a farba; na zmenu hostov profil skopírujte.',
       profileName: 'Názov profilu',
       profileCopy: '{name} (kópia)',
       skHost: 'Host SK API',
@@ -235,6 +235,14 @@ export const sk = {
       profileApiKey: 'API kľúč pre tento profil',
       profilePrivateKey: 'Privátny kľúč pre tento profil',
       profileKeyHint: 'Prázdne = API kľúče vyššie.',
+      profileColor: 'Farba',
+      profileColorHint: 'Zobrazí sa pri profile v hlavičke a pozdĺž stavového riadku, kým je profil aktívny.',
+    },
+    color: {
+      none: 'Žiadna',
+      green: 'Zelená',
+      amber: 'Oranžová',
+      red: 'Červená',
     },
     button: {
       cancel: 'Zrušiť',
