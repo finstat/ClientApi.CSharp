@@ -13,7 +13,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.Add((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -26,7 +26,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.Remove((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -38,7 +38,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetMonitorings((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -50,7 +50,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetReport((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -61,7 +61,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetProceedings(IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -72,7 +72,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetCategories(IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

@@ -112,6 +112,7 @@
             <ContextMenu>
               <MenuItem Header="CURL Command" Click="dataGridCurlCommand_Click" />
               <MenuItem Header="Repeat Request" Click="dataGridRepeatRequest_Click" />
+              <MenuItem Header="Compare Across Profiles" Click="dataGridCompare_Click" />
               <Separator />
               <MenuItem Header="Show Error Response" Click="dataGridShowResponseOutputWindow_Click" />
             </ContextMenu>
@@ -122,7 +123,7 @@
                  clipping it away, falling back to a horizontal scrollbar on a narrow window. -->
             <DataGridTextColumn Header="Source" Width="Auto" MinWidth="70" Binding="{Binding ApiSource}" />
             <DataGridTextColumn Header="Profile" Width="Auto" MinWidth="80" Binding="{Binding Profile}" />
-            <DataGridTextColumn Header="Request" Width="2*" MinWidth="95" Binding="{Binding Request}" />
+            <DataGridTextColumn Header="Request" Width="2*" MinWidth="95" Binding="{Binding DisplayRequest}" />
             <DataGridTextColumn Header="Parameters" Width="3*" MinWidth="115" Binding="{Binding Parameter}" />
             <DataGridTextColumn Header="Send" Width="Auto" MinWidth="95"
                                 Binding="{Binding Send, StringFormat='{}{0:dd.MM.yy HH:mm:ss}'}" />

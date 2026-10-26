@@ -13,7 +13,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.AddDate((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -26,7 +26,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.RemoveDate((string)parameters[0], (string)parameters[1], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -38,7 +38,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetDateMonitorings((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -50,7 +50,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetDateReport((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -61,7 +61,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiMonitoringClient();
             var result = client.GetDateProceedings(IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

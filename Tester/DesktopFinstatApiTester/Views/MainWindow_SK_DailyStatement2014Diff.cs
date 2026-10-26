@@ -15,7 +15,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiDailyStatement2014DiffClient();
             var result = client.RequestListOfDailyStatement2014Diffs(IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -28,7 +28,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiDailyStatement2014DiffClient();
             var result = client.DownloadDailyStatement2014DiffFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -52,7 +52,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiDailyStatement2014DiffClient();
             var result = client.RequestStatement2014Legend().GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

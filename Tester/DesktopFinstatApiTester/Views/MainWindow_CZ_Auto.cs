@@ -15,7 +15,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiClient();
             var result = client.RequestAutocomplete((string)parameters[0], IsJSON(), RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -29,7 +29,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiClient();
             var result = client.RequestAutoLogin((string)parameters[0], parameters.Length > 1 ? (string)parameters[1] : null, lang: RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

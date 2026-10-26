@@ -10,7 +10,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiReportingClient();
             var result = client.RequestTopics().GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -22,7 +22,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiReportingClient();
             var result = client.RequestList((string)parameters[0]).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -35,7 +35,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiReportingClient();
             var result = client.DownloadReportFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

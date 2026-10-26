@@ -12,7 +12,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiClient();
             var result = client.RequestAutocomplete((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -25,7 +25,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiClient();
             var result = client.RequestAutoLogin((string)parameters[0], parameters.Length > 1 ? (string)parameters[1] : null).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

@@ -16,7 +16,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiMonitoringClient();
             var result = client.Add((string)parameters[0], (string)parameters[1], IsJSON(), RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -30,7 +30,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiMonitoringClient();
             var result = client.Remove((string)parameters[0], (string)parameters[1], IsJSON(), RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -43,7 +43,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiMonitoringClient();
             var result = client.GetMonitorings((string)parameters[0], IsJSON(), RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -56,7 +56,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiMonitoringClient();
             var result = client.GetReport((string)parameters[0], IsJSON(), RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -69,7 +69,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateCZApiMonitoringClient();
             var result = client.GetCategories(IsJSON(), RequestLang(parameters)).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

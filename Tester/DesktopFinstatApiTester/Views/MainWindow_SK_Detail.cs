@@ -12,7 +12,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiClient();
             var result = client.RequestBasic((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -24,7 +24,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiClient();
             var result = client.RequestDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -36,7 +36,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiClient();
             var result = client.RequestExtendedDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -48,7 +48,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiClient();
             var result = client.RequestUltimateDetail((string)parameters[0], IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
     }

@@ -78,6 +78,7 @@ namespace DesktopFinstatApiTester.Views
 
             BuildRibbon();
             InitializeRibbonExtras();
+            InitializeComparisons();
             InitializeThemeSwitcher();
 
             // Ctrl+K opens the palette of every ribbon command.

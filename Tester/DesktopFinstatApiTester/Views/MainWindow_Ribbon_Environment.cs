@@ -26,6 +26,7 @@ namespace DesktopFinstatApiTester.Views
             public const string Response = "📄";
             public const string Rerun = "↻";
             public const string Curl = ">_";
+            public const string Compare = "⇄";
             public const string Body = "📄";
             public const string Remove = "➖";
             public const string Clear = "✕";
@@ -141,6 +142,7 @@ namespace DesktopFinstatApiTester.Views
                         Items = new[]
                         {
                             Action("rerun", "Rerun",         EnvGlyph.Rerun, () => dataGridRepeatRequest_Click(null, null)),
+                            Action("compare", "Compare",     EnvGlyph.Compare, () => _ = FireAsync(() => OpenComparisonAsync(datagridResponse.SelectedItem as ViewModel.ResponseItem))),
                             Action("curl",  "curl",          EnvGlyph.Curl,  () => dataGridCurlCommand_Click(null, null)),
                             Action("body",  "Response body", EnvGlyph.Body,  () => dataGridShowResponseOutputWindow_Click(null, null)),
                         },
@@ -164,7 +166,7 @@ namespace DesktopFinstatApiTester.Views
         {
             if (datagridResponse.SelectedItem is ViewModel.ResponseItem item)
             {
-                AppInstance.ResponseItems.Remove(item);
+                AppInstance.Remove(item);
             }
         }
 

@@ -73,6 +73,39 @@ namespace DesktopFinstatApiTester.ViewModel
             return null;
         }
 
+        /// <summary>A call made by a comparison goes under the comparison's row, after the calls already there.</summary>
+        internal ResponseItem AddToGroup(ResponseItem parent, ResponseItem item)
+        {
+            var index = ResponseItems.IndexOf(parent);
+            if (index < 0)
+            {
+                return Add(item);
+            }
+            item.GroupId = parent.Compare.Id;
+            index++;
+            while (index < ResponseItems.Count && ResponseItems[index].GroupId == item.GroupId)
+            {
+                index++;
+            }
+            ResponseItems.Insert(index, item);
+            RaisePropertyChanged(ResponseItemsProperty);
+            return item;
+        }
+
+        /// <summary>Removes a row; a comparison's row takes its calls with it.</summary>
+        internal void Remove(ResponseItem item)
+        {
+            ResponseItems.Remove(item);
+            if (item.Compare != null)
+            {
+                foreach (var child in ResponseItems.Where(i => i.GroupId == item.Compare.Id).ToList())
+                {
+                    ResponseItems.Remove(child);
+                }
+            }
+            RaisePropertyChanged(ResponseItemsProperty);
+        }
+
         internal ResponseItem RemoveAt(int index)
         {
             if (index < ResponseItems.Count)

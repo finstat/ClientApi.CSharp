@@ -42,6 +42,14 @@ namespace DesktopFinstatApiTester.Views
 #endif
         }
 
+        private void UpdateLimits(FinstatApi.ViewModel.Limits limits)
+        {
+            if (IsActiveProfileCall())
+            {
+                AppInstance.Limits.FromModel(limits);
+            }
+        }
+
         /// <summary>Wire the shared per-request instrumentation every SK client needs.</summary>
         private T ConfigureSKClient<T>(T client, Model.EnvProfile profile) where T : FinstatApi.CommonAbstractApiClient
         {

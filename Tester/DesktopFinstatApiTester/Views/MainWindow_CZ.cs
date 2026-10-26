@@ -44,6 +44,14 @@ namespace DesktopFinstatApiTester.Views
 #endif
         }
 
+        private void UpdateLimits(CZ::FinstatApi.ViewModel.Limits limits)
+        {
+            if (IsActiveProfileCall())
+            {
+                AppInstance.Limits.FromModel(limits);
+            }
+        }
+
         private T ConfigureCZClient<T>(T client, Model.EnvProfile profile) where T : CZ::FinstatApi.CommonAbstractApiClient
         {
             ConfigureDevSslHandlerCZ(client, profile.CzUrl);

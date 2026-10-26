@@ -96,6 +96,15 @@ namespace DesktopFinstatApiTester.ViewModel
             }
         }
 
+        /// <summary>The comparison this row's call was made by; the grid lists it under that comparison's row.</summary>
+        public string GroupId { get; set; }
+
+        /// <summary>The Request column: a comparison's call is marked as sitting under the comparison's row.</summary>
+        public string DisplayRequest => GroupId != null ? "↳ " + Request : Request;
+
+        /// <summary>Set on a comparison's own row: opening it brings the comparison back as it was left.</summary>
+        public CompareSession Compare { get; set; }
+
         private string _profile;
         /// <summary>Environment profile the call went to (name, plus the port when one was set).</summary>
         public string Profile

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Birko.Xaml.Core.Dialogs;
 
@@ -32,11 +33,69 @@ namespace DesktopFinstatApiTester.Views
 
         private bool IsJSON()
         {
-            return AppInstance?.Settings?.ResponseType == Model.ResponseType.JSON;
+            return s_override.Value?.Json ?? AppInstance?.Settings?.ResponseType == Model.ResponseType.JSON;
         }
 
-        /// <summary>The profile a call goes to: the given one (comparison), else the active one.</summary>
-        private Model.EnvProfile CallProfile(Model.EnvProfile profile) => profile ?? AppInstance.Settings.ActiveProfile;
+        /// <summary>
+        /// A call made for a comparison: the profile and format it goes to, and what came back. While one is set
+        /// (it flows with the call through <see cref="AsyncLocal{T}"/>), the client hooks write here instead of
+        /// onto the newest history row, and the status bar's limits stay those of the active profile.
+        /// </summary>
+        internal sealed class CallOverride
+        {
+            public Model.EnvProfile Profile { get; set; }
+            public bool Json { get; set; }
+            public byte[] Content { get; set; }
+            public Dictionary<string, string[]> RequestHeaders { get; set; }
+            public Dictionary<string, string[]> ResponseHeaders { get; set; }
+        }
+
+        private static readonly AsyncLocal<CallOverride> s_override = new AsyncLocal<CallOverride>();
+
+        /// <summary>The profile a call goes to: the given one, else a comparison's, else the active one.</summary>
+        private Model.EnvProfile CallProfile(Model.EnvProfile profile) =>
+            profile ?? s_override.Value?.Profile ?? AppInstance.Settings.ActiveProfile;
+
+        /// <summary>The status bar shows the quota of the active profile only.</summary>
+        private bool IsActiveProfileCall() =>
+            s_override.Value == null || s_override.Value.Profile.Id == AppInstance.Settings.ActiveProfileId;
+
+        /// <summary>The outcome of one comparison call.</summary>
+        internal sealed class ComparisonCall
+        {
+            public object Result { get; set; }
+            public Exception Error { get; set; }
+            public CallOverride Call { get; set; }
+            public string Body => Call.Content == null ? null : System.Text.Encoding.UTF8.GetString(Call.Content);
+        }
+
+        /// <summary>
+        /// Sends a recorded request (with <paramref name="args"/> in place of its parameters) to a profile in the given
+        /// format, off the UI thread, without recording it. Null when the request cannot be repeated.
+        /// </summary>
+        internal async Task<ComparisonCall> CallForComparisonAsync(ViewModel.ResponseItem item, object[] args, Model.EnvProfile profile, bool json)
+        {
+            var apiCall = ApiCallFor(item);
+            if (apiCall == null)
+            {
+                return null;
+            }
+            var call = new CallOverride { Profile = profile, Json = json };
+            var outcome = new ComparisonCall { Call = call };
+            await Task.Run(() =>
+            {
+                s_override.Value = call;
+                try
+                {
+                    outcome.Result = apiCall(args);
+                }
+                catch (Exception ex)
+                {
+                    outcome.Error = ex;
+                }
+            });
+            return outcome;
+        }
 
         /// <summary>
         /// The profile a history row went to: recorded by name, plus ":port" when one was set. Older rows
@@ -59,6 +118,11 @@ namespace DesktopFinstatApiTester.Views
 
         private void Client_OnResponse(Dictionary<string, string[]> header)
         {
+            if (s_override.Value is CallOverride call)
+            {
+                call.ResponseHeaders = header;
+                return;
+            }
             var first = AppInstance?.ResponseItems?.FirstOrDefault();
             if (first != null)
             {
@@ -68,6 +132,11 @@ namespace DesktopFinstatApiTester.Views
 
         private void Client_OnRequest(Dictionary<string, string[]> header)
         {
+            if (s_override.Value is CallOverride call)
+            {
+                call.RequestHeaders = header;
+                return;
+            }
             var first = AppInstance?.ResponseItems?.FirstOrDefault();
             if (first != null)
             {
@@ -77,6 +146,11 @@ namespace DesktopFinstatApiTester.Views
 
         private void Client_OnResponseContent(byte[] content)
         {
+            if (s_override.Value is CallOverride call)
+            {
+                call.Content = content;
+                return;
+            }
             var first = AppInstance?.ResponseItems?.FirstOrDefault();
             if (first != null)
             {

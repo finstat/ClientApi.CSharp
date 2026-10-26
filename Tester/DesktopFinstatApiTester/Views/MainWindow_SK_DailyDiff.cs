@@ -14,7 +14,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiDailyDiffClient();
             var result = client.RequestListOfDailyDiffs(IsJSON()).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 
@@ -27,7 +27,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var client = CreateSKApiDailyDiffClient();
             var result = client.DownloadDailyDiffFile((string)parameters[0], (string)parameters[1]).GetAwaiter().GetResult();
-            AppInstance.Limits.FromModel(client.Limits);
+            UpdateLimits(client.Limits);
             return result;
         }
 

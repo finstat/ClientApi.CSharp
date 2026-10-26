@@ -344,6 +344,19 @@ namespace DesktopFinstatApiTester.Views
                 return;
             }
 
+            var apiCall = ApiCallFor(item);
+            if (apiCall == null)
+            {
+                await _dialogs.AlertAsync("No suitable API method", "Attention");
+                return;
+            }
+
+            await RunApiRequestAsync(item.Request, item.ApiSource, apiCall, item.Parameters);
+        }
+
+        /// <summary>The client call that made a history row, to repeat it; null for a comparison row or a local command.</summary>
+        private Func<object[], object> ApiCallFor(ViewModel.ResponseItem item)
+        {
             Func<object[], object> apiCall = null;
             switch (item.Request)
             {
@@ -532,13 +545,7 @@ namespace DesktopFinstatApiTester.Views
                     break;
             }
 
-            if (apiCall == null)
-            {
-                await _dialogs.AlertAsync("No suitable API method", "Attention");
-                return;
-            }
-
-            await RunApiRequestAsync(item.Request, item.ApiSource, apiCall, item.Parameters);
+            return apiCall;
         }
 
         #endregion
