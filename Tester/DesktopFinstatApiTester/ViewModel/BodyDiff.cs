@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
-using System.Xml.Linq;
 using Birko.Xaml.Core.Diff;
 
 namespace DesktopFinstatApiTester.ViewModel
@@ -28,13 +27,11 @@ namespace DesktopFinstatApiTester.ViewModel
     }
 
     /// <summary>
-    /// Compares two bodies with Birko.Xaml.Core's diff engine (the port of birko-web-core's <c>diffJson</c>), strings
-    /// passed through a normalizer on both sides. An XML body is read here as a tree (repeated elements become a list,
-    /// attributes <c>@name</c>, xsi:nil null) until Birko.Xaml.Core ships <c>xmlToTree</c> (Birko.Framework TASK-771).
+    /// Compares two bodies with Birko.Xaml.Core's diff engine (the ports of birko-web-core's <c>diffJson</c> and
+    /// <c>xmlToTree</c>), strings passed through a normalizer on both sides.
     /// </summary>
     public static class BodyDiffer
     {
-        private static readonly XNamespace Xsi = "http://www.w3.org/2001/XMLSchema-instance";
 
         public static BodyDiff Diff(string a, string b, bool xml, Func<string, string> normalize)
         {
@@ -63,38 +60,18 @@ namespace DesktopFinstatApiTester.ViewModel
             {
                 return JsonValue.Create(text ?? string.Empty);
             }
+            if (xml)
+            {
+                return XmlTree.TryToTree(text, out var tree) ? tree : JsonValue.Create(text);
+            }
             try
             {
-                return xml ? FromXml(XDocument.Parse(text).Root) : JsonNode.Parse(text);
+                return JsonNode.Parse(text);
             }
             catch (Exception)
             {
                 return JsonValue.Create(text);
             }
-        }
-
-        private static JsonNode FromXml(XElement e)
-        {
-            if ((string)e.Attribute(Xsi + "nil") == "true")
-            {
-                return null;
-            }
-            var attributes = e.Attributes().Where(a => !a.IsNamespaceDeclaration && a.Name.Namespace != Xsi).ToList();
-            if (!e.HasElements && attributes.Count == 0)
-            {
-                return JsonValue.Create(e.Value);
-            }
-            var map = new JsonObject();
-            foreach (var a in attributes)
-            {
-                map["@" + a.Name.LocalName] = a.Value;
-            }
-            foreach (var group in e.Elements().GroupBy(c => c.Name.LocalName))
-            {
-                var items = group.Select(FromXml).ToList();
-                map[group.Key] = items.Count == 1 ? items[0] : new JsonArray(items.ToArray());
-            }
-            return map;
         }
 
         private static string Show(JsonNode value)
