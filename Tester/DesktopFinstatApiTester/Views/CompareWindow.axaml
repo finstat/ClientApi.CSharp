@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Birko.Xaml.Avalonia.Controls;assembly=Birko.Xaml.Avalonia"
         x:Class="DesktopFinstatApiTester.Views.CompareWindow"
         Title="Compare" Width="1100" Height="780"
         WindowStartupLocation="CenterOwner"
@@ -85,8 +86,9 @@
               <Button x:Name="buttonBodyA" Content="Baseline body" Click="buttonBodyA_Click" />
               <Button x:Name="buttonBodyB" Content="Compared body" Click="buttonBodyB_Click" />
             </StackPanel>
-            <TextBox x:Name="textBoxDiff" Classes="mono" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            <!-- Birko's diff viewer (b-json-diff's tree view): changed branches start open; its toolbar can hide
+                 the equal ones. -->
+            <c:JsonDiffViewer x:Name="diffViewer" />
           </DockPanel>
         </TabItem>
         <TabItem x:Name="tabItemFields" Header="Fields that differ">

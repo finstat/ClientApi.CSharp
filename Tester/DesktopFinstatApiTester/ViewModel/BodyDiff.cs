@@ -33,7 +33,8 @@ namespace DesktopFinstatApiTester.ViewModel
     public static class BodyDiffer
     {
 
-        public static BodyDiff Diff(string a, string b, bool xml, Func<string, string> normalize)
+        /// <summary>The engine's options for a comparison: every string on both sides goes through <paramref name="normalize"/>.</summary>
+        public static JsonDiffOptions Options(Func<string, string> normalize)
         {
             var options = new JsonDiffOptions();
             if (normalize != null)
@@ -41,7 +42,12 @@ namespace DesktopFinstatApiTester.ViewModel
                 options.Normalize.Add(new JsonNormalizer("**", (value, _) =>
                     value is JsonValue v && v.TryGetValue<string>(out var text) ? JsonValue.Create(normalize(text)) : value));
             }
-            var result = JsonDiff.Diff(Parse(a, xml), Parse(b, xml), options);
+            return options;
+        }
+
+        public static BodyDiff Diff(string a, string b, bool xml, Func<string, string> normalize)
+        {
+            var result = JsonDiff.Diff(Parse(a, xml), Parse(b, xml), Options(normalize));
             var diff = new BodyDiff();
             diff.Changes.AddRange(result.Changes.Select(c => new BodyChange
             {

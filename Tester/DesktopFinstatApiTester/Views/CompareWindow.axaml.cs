@@ -473,7 +473,7 @@ namespace DesktopFinstatApiTester.Views
             if (baseline == null || other?.Diff == null)
             {
                 textBlockDiffTitle.Text = string.Empty;
-                textBoxDiff.Text = string.Empty;
+                diffViewer.SetData(null, null);
                 buttonBodyA.IsVisible = buttonBodyB.IsVisible = false;
                 RenderResults();
                 return;
@@ -481,22 +481,12 @@ namespace DesktopFinstatApiTester.Views
             var value = _session.Runs[run].Value;
             textBlockDiffTitle.Text = string.Format("{0}{1} vs {2}", value != null ? value + ": " : string.Empty, Label(baseline.Profile), Label(other.Profile));
             buttonBodyA.IsVisible = buttonBodyB.IsVisible = true;
-            var text = new StringBuilder();
-            if (other.Diff.Equal)
-            {
-                text.AppendLine("No differences.");
-            }
-            foreach (var change in other.Diff.Changes)
-            {
-                var path = change.Path.Length == 0 ? "/" : change.Path;
-                switch (change.Kind)
-                {
-                    case "added": text.AppendFormat("+ {0}: {1}", path, change.NewValue).AppendLine(); break;
-                    case "removed": text.AppendFormat("- {0}: {1}", path, change.OldValue).AppendLine(); break;
-                    default: text.AppendFormat("~ {0}: {1}  →  {2}", path, change.OldValue, change.NewValue).AppendLine(); break;
-                }
-            }
-            textBoxDiff.Text = text.ToString();
+            diffViewer.LabelA = Label(baseline.Profile);
+            diffViewer.LabelB = Label(other.Profile);
+            diffViewer.Format = _session.Json ? Birko.Xaml.Avalonia.Controls.JsonDiffFormat.Json : Birko.Xaml.Avalonia.Controls.JsonDiffFormat.Xml;
+            // the same options the results table counted with, so the viewer agrees with it
+            diffViewer.Options = BodyDiffer.Options(_session.HideHosts ? HostNormalizer(baseline.Profile, other.Profile) : null);
+            diffViewer.SetData(baseline.Body, other.Body);
             RenderResults();
         }
 
