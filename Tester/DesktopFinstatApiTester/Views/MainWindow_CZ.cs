@@ -44,9 +44,9 @@ namespace DesktopFinstatApiTester.Views
 #endif
         }
 
-        private T ConfigureCZClient<T>(T client) where T : CZ::FinstatApi.CommonAbstractApiClient
+        private T ConfigureCZClient<T>(T client, Model.EnvProfile profile) where T : CZ::FinstatApi.CommonAbstractApiClient
         {
-            ConfigureDevSslHandlerCZ(client, AppInstance.Settings.FinStatApiUrlCZ);
+            ConfigureDevSslHandlerCZ(client, profile.CzUrl);
             client.OnRequest += Client_OnRequest;
             client.OnResponse += Client_OnResponse;
             client.OnErrorResponseContent += Client_OnResponseContent;
@@ -54,10 +54,10 @@ namespace DesktopFinstatApiTester.Views
             return client;
         }
 
-        private CZ::FinstatApi.ApiClient CreateCZApiClient() =>
-            ConfigureCZClient(new CZ::FinstatApi.ApiClient(AppInstance.Settings.FinStatApiUrlCZ, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private CZ::FinstatApi.ApiClient CreateCZApiClient(Model.EnvProfile profile = null) =>
+            ConfigureCZClient(new CZ::FinstatApi.ApiClient(CallProfile(profile).CzUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private CZ::FinstatApi.ApiMonitoringClient CreateCZApiMonitoringClient() =>
-            ConfigureCZClient(new CZ::FinstatApi.ApiMonitoringClient(AppInstance.Settings.FinStatApiUrlCZ, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private CZ::FinstatApi.ApiMonitoringClient CreateCZApiMonitoringClient(Model.EnvProfile profile = null) =>
+            ConfigureCZClient(new CZ::FinstatApi.ApiMonitoringClient(CallProfile(profile).CzUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
     }
 }

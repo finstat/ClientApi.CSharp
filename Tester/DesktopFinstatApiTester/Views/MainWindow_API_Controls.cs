@@ -300,13 +300,13 @@ namespace DesktopFinstatApiTester.Views
                 return;
             }
 
-            var userApiKey = AppInstance.Settings.ApiKeys.PublicKey;
-            var privateKey = AppInstance.Settings.ApiKeys.PrivateKey;
+            // the profile the call went to, so the commands reach the same server with the same keys
+            var profile = ProfileOfItem(item);
+            var userApiKey = AppInstance.Settings.PublicKeyFor(profile);
+            var privateKey = AppInstance.Settings.PrivateKeyFor(profile);
             var calculatedHash = CommonAbstractApiClient.ComputeVerificationHash(userApiKey, privateKey, hashParam);
 
-            var url = (item.ApiSource == "CZ")
-                ? AppInstance.Settings.FinStatApiUrlCZ
-                : AppInstance.Settings.FinStatApiUrl;
+            var url = (item.ApiSource == "CZ") ? profile.CzUrl : profile.SkUrl;
             url = url.TrimEnd('/');
             var urlSuffix = IsJSON() ? ".json" : null;
 

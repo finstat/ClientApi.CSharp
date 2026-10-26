@@ -83,7 +83,8 @@ namespace DesktopFinstatApiTester.Views
             AddHandler(KeyDownEvent, OnWindowKeyDown, RoutingStrategies.Tunnel);
 
             LoadSettingsViewModel();
-            if (string.IsNullOrEmpty(AppInstance?.Settings?.ApiKeys?.PublicKey))
+            RefreshProfileChrome();
+            if (string.IsNullOrEmpty(AppInstance?.Settings?.PublicKeyFor(AppInstance.Settings.ActiveProfile)))
             {
                 settingsModal.IsOpen = true;
             }
@@ -258,7 +259,7 @@ namespace DesktopFinstatApiTester.Views
         /// each one to the matching <see cref="ViewModel.Settings"/> property.</summary>
         private static IReadOnlyList<FormField> SettingsFields() => new[]
         {
-            new FormField { Name = nameof(ViewModel.Settings.PublicKey),      Label = "Public Key",  Required = true },
+            new FormField { Name = nameof(ViewModel.Settings.PublicKey),      Label = "Public Key",  Hint = "Used by every profile without a key of its own." },
             new FormField { Name = nameof(ViewModel.Settings.PrivateKey),     Label = "Private Key", Type = FieldType.Password },
             new FormField { Name = nameof(ViewModel.Settings.StationName),    Label = "Station Name", Required = true },
             new FormField { Name = nameof(ViewModel.Settings.StationID),      Label = "Station ID",   Required = true },
@@ -267,8 +268,6 @@ namespace DesktopFinstatApiTester.Views
                             Options = Enum.GetValues(typeof(ResponseType)).Cast<object>().ToList() },
             new FormField { Name = nameof(ViewModel.Settings.Lang),           Label = "Language",     Type = FieldType.Select,
                             Options = Enum.GetValues(typeof(ResponseLang)).Cast<object>().ToList() },
-            new FormField { Name = nameof(ViewModel.Settings.FinStatApiUrl),   Label = "FinStat API URL",    Required = true },
-            new FormField { Name = nameof(ViewModel.Settings.FinStatApiUrlCZ), Label = "FinStat API CZ URL", Required = true },
         };
 
         private void LoadSettingsViewModel()
@@ -284,6 +283,7 @@ namespace DesktopFinstatApiTester.Views
             settingsForm.Model = null;
             settingsForm.Model = _settingsViewModel;
             textBlockSettingsErrors.IsVisible = false;
+            ShowProfileInSettings(_settingsViewModel.ActiveProfileId);
         }
 
         private void buttonSettings_Click(object sender, RoutedEventArgs e)
@@ -312,6 +312,7 @@ namespace DesktopFinstatApiTester.Views
                 {
                     AppInstance.Save();
                 }
+                RefreshProfileChrome();
                 textBlockSettingsErrors.IsVisible = false;
                 settingsModal.IsOpen = false;
                 return;

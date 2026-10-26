@@ -43,9 +43,9 @@ namespace DesktopFinstatApiTester.Views
         }
 
         /// <summary>Wire the shared per-request instrumentation every SK client needs.</summary>
-        private T ConfigureSKClient<T>(T client) where T : FinstatApi.CommonAbstractApiClient
+        private T ConfigureSKClient<T>(T client, Model.EnvProfile profile) where T : FinstatApi.CommonAbstractApiClient
         {
-            ConfigureDevSslHandler(client, AppInstance.Settings.FinStatApiUrl);
+            ConfigureDevSslHandler(client, profile.SkUrl);
             client.OnRequest += Client_OnRequest;
             client.OnResponse += Client_OnResponse;
             client.OnErrorResponseContent += Client_OnResponseContent;
@@ -53,34 +53,34 @@ namespace DesktopFinstatApiTester.Views
             return client;
         }
 
-        private FinstatApi.ApiClient CreateSKApiClient() =>
-            ConfigureSKClient(new FinstatApi.ApiClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiClient CreateSKApiClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiMonitoringClient CreateSKApiMonitoringClient() =>
-            ConfigureSKClient(new FinstatApi.ApiMonitoringClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiMonitoringClient CreateSKApiMonitoringClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiMonitoringClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiDailyDiffClient CreateSKApiDailyDiffClient() =>
-            ConfigureSKClient(new FinstatApi.ApiDailyDiffClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiDailyDiffClient CreateSKApiDailyDiffClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiDailyDiffClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiDailyStatementDiffClient CreateSKApiDailyStatementDiffClient() =>
-            ConfigureSKClient(new FinstatApi.ApiDailyStatementDiffClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiDailyStatementDiffClient CreateSKApiDailyStatementDiffClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiDailyStatementDiffClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiDailyStatement2014DiffClient CreateSKApiDailyStatement2014DiffClient() =>
-            ConfigureSKClient(new FinstatApi.ApiDailyStatement2014DiffClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiDailyStatement2014DiffClient CreateSKApiDailyStatement2014DiffClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiDailyStatement2014DiffClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiStatementClient CreateSKApiStatementClient() =>
-            ConfigureSKClient(new FinstatApi.ApiStatementClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiStatementClient CreateSKApiStatementClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiStatementClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiReportingClient CreateSKApiReportingClient() =>
-            ConfigureSKClient(new FinstatApi.ApiReportingClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiReportingClient CreateSKApiReportingClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiReportingClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiDailyUltimateDiffClient CreateSKApiDailyUltimateDiffClient() =>
-            ConfigureSKClient(new FinstatApi.ApiDailyUltimateDiffClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiDailyUltimateDiffClient CreateSKApiDailyUltimateDiffClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiDailyUltimateDiffClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiDistraintClient CreateSKApiDistraintClient() =>
-            ConfigureSKClient(new FinstatApi.ApiDistraintClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiDistraintClient CreateSKApiDistraintClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiDistraintClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
 
-        private FinstatApi.ApiBankruptcyRestructuringClient CreateSKApiBankruptcyRestructuringClient() =>
-            ConfigureSKClient(new FinstatApi.ApiBankruptcyRestructuringClient(AppInstance.Settings.FinStatApiUrl, AppInstance.Settings.ApiKeys.PublicKey, AppInstance.Settings.ApiKeys.PrivateKey, AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut));
+        private FinstatApi.ApiBankruptcyRestructuringClient CreateSKApiBankruptcyRestructuringClient(Model.EnvProfile profile = null) =>
+            ConfigureSKClient(new FinstatApi.ApiBankruptcyRestructuringClient(CallProfile(profile).SkUrl, AppInstance.Settings.PublicKeyFor(CallProfile(profile)), AppInstance.Settings.PrivateKeyFor(CallProfile(profile)), AppInstance.Settings.StationID, AppInstance.Settings.StationName, AppInstance.Settings.TimeOut), CallProfile(profile));
     }
 }

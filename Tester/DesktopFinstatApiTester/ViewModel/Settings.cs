@@ -15,8 +15,6 @@ namespace DesktopFinstatApiTester.ViewModel
         public const string TimeOutProperty = "TimeOut";
         public const string StationIDProperty = "StationID";
         public const string StationNameProperty = "StationName";
-        public const string FinStatApiUrlProperty = "FinStatApiUrl";
-        public const string FinStatApiUrlPropertyCZ = "FinStatApiUrlCZ";
         public const string SettingsObjectProperty = "SettingsObject";
 
         public Settings()
@@ -104,33 +102,11 @@ namespace DesktopFinstatApiTester.ViewModel
             }
         }
 
-        private string _FinStatApiUrl;
-        public string FinStatApiUrl
-        {
-            get { return _FinStatApiUrl; }
-            set
-            {
-                if (_FinStatApiUrl != value)
-                {
-                    _FinStatApiUrl = value;
-                    RaisePropertyChanged(FinStatApiUrlProperty);
-                }
-            }
-        }
+        /// <summary>Working copies of the profiles while the dialog is open; written back by <see cref="ToModel"/>.</summary>
+        public List<Model.EnvProfile> Profiles { get; private set; } = new List<Model.EnvProfile>();
 
-        private string _FinStatApiUrlCZ;
-        public string FinStatApiUrlCZ
-        {
-            get { return _FinStatApiUrlCZ; }
-            set
-            {
-                if (_FinStatApiUrlCZ != value)
-                {
-                    _FinStatApiUrlCZ = value;
-                    RaisePropertyChanged(FinStatApiUrlPropertyCZ);
-                }
-            }
-        }
+        /// <summary>The profile shown in the dialog, active once the settings are used.</summary>
+        public string ActiveProfileId { get; set; }
 
         private ResponseType _responseType;
         public ResponseType ResponseType
@@ -170,7 +146,7 @@ namespace DesktopFinstatApiTester.ViewModel
 
         private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (new[] { TimeOutProperty, StationNameProperty, StationIDProperty, ApiKeysProperty, ResponseTypeProperty, LangProperty, FinStatApiUrlProperty, FinStatApiUrlPropertyCZ }.Contains(e.PropertyName))
+            if (new[] { TimeOutProperty, StationNameProperty, StationIDProperty, ApiKeysProperty, ResponseTypeProperty, LangProperty }.Contains(e.PropertyName))
             {
                 RaisePropertyChanged(SettingsObjectProperty);
             }
@@ -193,11 +169,20 @@ namespace DesktopFinstatApiTester.ViewModel
                 }
             }
 
-            Require(nameof(PublicKey), PublicKey);
+            // the profile used once these settings apply needs a key, its own or the global one
+            var active = Profiles.FirstOrDefault(p => p.Id == ActiveProfileId);
+            if (string.IsNullOrWhiteSpace(active?.PublicKey))
+            {
+                Require(nameof(PublicKey), PublicKey);
+            }
             Require(StationNameProperty, StationName);
             Require(StationIDProperty, StationID);
-            Require(FinStatApiUrlProperty, FinStatApiUrl);
-            Require(FinStatApiUrlPropertyCZ, FinStatApiUrlCZ);
+            foreach (var profile in Profiles)
+            {
+                Require(string.Format("Profile '{0}' name", profile.Name), profile.Name);
+                Require(string.Format("Profile '{0}' SK host", profile.Name), profile.SkHost);
+                Require(string.Format("Profile '{0}' CZ host", profile.Name), profile.CzHost);
+            }
             if (TimeOut <= 0)
             {
                 errors.Add(TimeOutProperty, new[] { "Value must be greater than zero" });
@@ -223,8 +208,8 @@ namespace DesktopFinstatApiTester.ViewModel
                 TimeOut = model.TimeOut;
                 StationName = model.StationName;
                 StationID = model.StationID;
-                FinStatApiUrl = model.FinStatApiUrl;
-                FinStatApiUrlCZ = model.FinStatApiUrlCZ;
+                Profiles = (model.Profiles ?? Model.EnvProfiles.Merge(null)).Select(p => p.Clone()).ToList();
+                ActiveProfileId = model.ActiveProfileId;
             }
         }
 
@@ -240,8 +225,8 @@ namespace DesktopFinstatApiTester.ViewModel
             model.StationName = StationName;
             model.StationID = StationID;
             model.TimeOut = TimeOut;
-            model.FinStatApiUrl = FinStatApiUrl;
-            model.FinStatApiUrlCZ = FinStatApiUrlCZ;
+            model.Profiles = Model.EnvProfiles.Merge(Profiles);
+            model.ActiveProfileId = Model.EnvProfiles.Find(model.Profiles, ActiveProfileId).Id;
 
             return model;
         }

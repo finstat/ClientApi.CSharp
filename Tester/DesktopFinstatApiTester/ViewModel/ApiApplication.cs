@@ -18,7 +18,7 @@ namespace DesktopFinstatApiTester.ViewModel
         public ApiApplication()
         {
             PropertyChanged += ApiApplication_PropertyChanged;
-            Settings = new Model.Settings();
+            Settings = new Model.Settings().Normalize();
             Load();
         }
 
@@ -88,7 +88,7 @@ namespace DesktopFinstatApiTester.ViewModel
         {
             if (File.Exists(fileName))
             {
-                Settings = JsonSerializer.Deserialize<Model.Settings>(File.ReadAllText(fileName));
+                Settings = (JsonSerializer.Deserialize<Model.Settings>(File.ReadAllText(fileName)) ?? new Model.Settings()).Normalize();
             }
         }
 

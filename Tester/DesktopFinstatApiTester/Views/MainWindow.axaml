@@ -52,6 +52,14 @@
         </c:Ribbon.LeadingContent>
         <c:Ribbon.TrailingContent>
           <StackPanel Orientation="Horizontal" Spacing="6" Margin="8,0">
+            <!-- The active environment profile, switched and saved here as "Use and Save" would; its dot
+                 is the profile's colour (production red). The port is set in Settings. -->
+            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+              <Ellipse x:Name="ellipseProfileColor" Width="10" Height="10" VerticalAlignment="Center" />
+              <ComboBox x:Name="comboBoxProfile" MinWidth="130" VerticalAlignment="Center"
+                        AutomationProperties.Name="Profile"
+                        SelectionChanged="comboBoxProfile_SelectionChanged" />
+            </StackPanel>
             <ComboBox x:Name="comboBoxTheme" MinWidth="120" VerticalAlignment="Center"
                       ToolTip.Tip="Switch the Birko theme"
                       SelectionChanged="comboBoxTheme_SelectionChanged" />
@@ -68,8 +76,9 @@
         </c:Ribbon.TrailingContent>
       </c:Ribbon>
 
-      <!-- ── Status bar: free-text slot on the left, API limits on the right ─── -->
-      <Border DockPanel.Dock="Bottom" Height="{DynamicResource BStatusBarHeight}"
+      <!-- ── Status bar: the active profile and its hosts on the left, API limits on the right; its top
+           edge takes the profile's colour (MainWindow_Profiles.cs). ─── -->
+      <Border x:Name="borderStatusBar" DockPanel.Dock="Bottom" Height="{DynamicResource BStatusBarHeight}"
               Background="{DynamicResource BBgBrush}"
               BorderBrush="{DynamicResource BBorderBrush}" BorderThickness="0,1,0,0">
         <Grid ColumnDefinitions="*,Auto" Margin="12,0">
@@ -109,10 +118,11 @@
             </ContextMenu>
           </DataGrid.ContextMenu>
           <DataGrid.Columns>
-            <!-- Six columns in a ~575dip pane: the fixed-shape columns size to their content and
+            <!-- Seven columns in a ~575dip pane: the fixed-shape columns size to their content and
                  only the two free-text ones stretch. MinWidth keeps every header legible instead of
                  clipping it away, falling back to a horizontal scrollbar on a narrow window. -->
             <DataGridTextColumn Header="Source" Width="Auto" MinWidth="70" Binding="{Binding ApiSource}" />
+            <DataGridTextColumn Header="Profile" Width="Auto" MinWidth="80" Binding="{Binding Profile}" />
             <DataGridTextColumn Header="Request" Width="2*" MinWidth="95" Binding="{Binding Request}" />
             <DataGridTextColumn Header="Parameters" Width="3*" MinWidth="115" Binding="{Binding Parameter}" />
             <DataGridTextColumn Header="Send" Width="Auto" MinWidth="95"
@@ -156,9 +166,22 @@
     <!-- ── Settings (the Fluent Backstage's replacement): Birko Modal + schema-driven Form ── -->
     <c:Modal x:Name="settingsModal" Title="FinStat API Tester — Access">
       <StackPanel Spacing="16">
-        <!-- Eight fields overflow a short window; the buttons stay pinned below the scroll area. -->
+        <!-- The fields overflow a short window; the buttons stay pinned below the scroll area. -->
         <ScrollViewer MaxHeight="460" HorizontalScrollBarVisibility="Disabled">
-          <c:Form x:Name="settingsForm" />
+          <StackPanel Spacing="8">
+            <c:Form x:Name="settingsForm" />
+            <!-- Environment: the profile picked here is the active one once the settings are used. -->
+            <TextBlock Classes="aboutHeading" Text="Environment" Margin="0,8,0,0" />
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+              <ComboBox x:Name="comboBoxProfileEdit" HorizontalAlignment="Stretch"
+                        AutomationProperties.Name="Profile"
+                        ToolTip.Tip="Which FinStat servers the tester calls. Built-in profiles allow changing only the port, the keys and the colour; duplicate one to change its hosts."
+                        SelectionChanged="comboBoxProfileEdit_SelectionChanged" />
+              <Button Grid.Column="1" Content="Duplicate" Click="buttonProfileDuplicate_Click" />
+              <Button Grid.Column="2" x:Name="buttonProfileDelete" Content="Delete" Click="buttonProfileDelete_Click" />
+            </Grid>
+            <c:Form x:Name="profileForm" />
+          </StackPanel>
         </ScrollViewer>
         <TextBlock x:Name="textBlockSettingsErrors"
                    IsVisible="False" TextWrapping="Wrap"

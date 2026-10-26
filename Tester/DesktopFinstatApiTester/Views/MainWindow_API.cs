@@ -35,6 +35,28 @@ namespace DesktopFinstatApiTester.Views
             return AppInstance?.Settings?.ResponseType == Model.ResponseType.JSON;
         }
 
+        /// <summary>The profile a call goes to: the given one (comparison), else the active one.</summary>
+        private Model.EnvProfile CallProfile(Model.EnvProfile profile) => profile ?? AppInstance.Settings.ActiveProfile;
+
+        /// <summary>
+        /// The profile a history row went to: recorded by name, plus ":port" when one was set. Older rows
+        /// and a profile deleted since fall back to the active one.
+        /// </summary>
+        private Model.EnvProfile ProfileOfItem(ViewModel.ResponseItem item)
+        {
+            var active = AppInstance.Settings.ActiveProfile;
+            if (string.IsNullOrEmpty(item?.Profile))
+            {
+                return active;
+            }
+            var match = System.Text.RegularExpressions.Regex.Match(item.Profile, @"^(.*):(\d+)$");
+            var name = match.Success ? match.Groups[1].Value : item.Profile;
+            var profile = (AppInstance.Settings.Profiles.FirstOrDefault(p => p.Name == name) ?? active).Clone();
+            // a row without a port went to the default one, whatever the profile's port is now
+            profile.Port = match.Success ? int.Parse(match.Groups[2].Value) : (int?)null;
+            return profile;
+        }
+
         private void Client_OnResponse(Dictionary<string, string[]> header)
         {
             var first = AppInstance?.ResponseItems?.FirstOrDefault();
@@ -136,6 +158,7 @@ namespace DesktopFinstatApiTester.Views
         {
             var args = parameters.ToArray();
             var item = AppInstance.Add(requestname, apisource, args);
+            item.Profile = AppInstance.Settings.ActiveProfile.Label;
 
             object detail = null;
             Exception error = null;

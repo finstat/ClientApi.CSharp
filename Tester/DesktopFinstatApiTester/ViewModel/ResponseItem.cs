@@ -45,6 +45,7 @@ namespace DesktopFinstatApiTester.ViewModel
         public const string ParameterProperty = "Parameter";
         public const string ParametersProperty = "Parameters";
         public const string ApiSourceProperty = "ApiSource";
+        public const string ProfileProperty = "Profile";
         public const string SendProperty = "Send";
         public const string ReceivedProperty = "Received";
         public const string ContentProperty = "Content";
@@ -91,6 +92,21 @@ namespace DesktopFinstatApiTester.ViewModel
                 {
                     _request = value;
                     RaisePropertyChanged(RequestProperty);
+                }
+            }
+        }
+
+        private string _profile;
+        /// <summary>Environment profile the call went to (name, plus the port when one was set).</summary>
+        public string Profile
+        {
+            get { return _profile; }
+            set
+            {
+                if (_profile != value)
+                {
+                    _profile = value;
+                    RaisePropertyChanged(ProfileProperty);
                 }
             }
         }
