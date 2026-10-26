@@ -68,7 +68,7 @@ export class AppShell extends BAppShell {
 
   protected getUserName() { return 'Local'; }
 
-  // active profile + port, switchable without opening Settings
+  // active profile, switchable without opening Settings; its port is in the Environment tab
   protected renderHeaderActions() { return '<profile-switcher></profile-switcher>'; }
 
   /**
@@ -176,9 +176,7 @@ export class AppShell extends BAppShell {
   /** Field changes in the Environment tab are saved as "Use and Save" in Settings would. */
   private _onRibbonFieldChange = (e: Event): void => {
     const { itemId, value } = (e as CustomEvent<{ itemId: string; value: string }>).detail;
-    if (itemId === 'env-profile') {
-      useAndSaveSettings({ activeProfileId: value });
-    } else if (itemId === 'env-port') {
+    if (itemId === 'env-port') {
       const port = Number(value);
       const active = activeProfile();
       const valid = value.trim() === '' ? null : Number.isInteger(port) && port >= 1 && port <= 65535 ? port : undefined;

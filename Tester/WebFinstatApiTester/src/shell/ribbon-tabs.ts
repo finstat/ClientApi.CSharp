@@ -1,7 +1,7 @@
 import type { RibbonTab, RibbonItem } from 'birko-web-components';
 
 import { t } from '../i18n/index.js';
-import { settingsStore, activeProfile } from '../settings/settings-store.js';
+import { settingsStore, activeProfile, profileUrl } from '../settings/settings-store.js';
 
 /** HTML-entity icons used across the ribbon. Centralised so similar actions share a glyph. */
 const ICON = {
@@ -239,7 +239,7 @@ function withTooltips(tabs: RibbonTab[]): RibbonTab[] {
   return tabs.map(tab => ({ ...tab, groups: tab.groups.map(g => ({ ...g, items: g.items.map(describe) })) }));
 }
 
-/** Profile, port, response type and language without opening Settings; the group launcher opens Settings. */
+/** Port of the active profile, response type and language without opening Settings; the group launcher opens Settings. The profile itself is switched in the header. */
 function environmentTab(): RibbonTab {
   const s = settingsStore.snapshot();
   const profile = activeProfile();
@@ -250,11 +250,9 @@ function environmentTab(): RibbonTab {
         id: 'env-profile', label: t('ribbon.group.envProfile'), launcher: true, launcherLabel: t('shell.menu.settings'),
         items: [
           {
-            id: 'env-profile', label: t('settings.field.profile'),
-            field: { type: 'select', value: profile.id, options: s.profiles.map(p => ({ value: p.id, label: p.name })), width: 14, caption: 'above' },
-          },
-          {
             id: 'env-port', label: t('settings.field.port'),
+            // the header shows which profile is active; the tooltip says whose port this is
+            description: `${profile.name}: ${profileUrl(profile.skHost, profile.port)}, ${profileUrl(profile.czHost, profile.port)}`,
             field: { type: 'number', value: profile.port ? String(profile.port) : '', placeholder: '443', min: 1, max: 65535, width: 6, caption: 'above' },
           },
         ],
