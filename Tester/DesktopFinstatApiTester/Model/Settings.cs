@@ -32,6 +32,9 @@ namespace DesktopFinstatApiTester.Model
         public List<EnvProfile> Profiles { get; set; }
         public string ActiveProfileId { get; set; }
 
+        /// <summary>The ribbon's Quick Access Toolbar as the ribbon's references; null = its defaults.</summary>
+        public List<string> QuickAccess { get; set; }
+
         /// <summary>The two URLs of settings saved before profiles existed; read once by <see cref="Normalize"/>, never written.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string FinStatApiUrl { get; set; }

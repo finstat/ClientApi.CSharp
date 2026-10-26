@@ -46,12 +46,14 @@ namespace DesktopFinstatApiTester.Views
 
         private void BuildRibbon()
         {
-            var tabs = ApplyGroupDefaults(BuildRibbonTabs());
+            // Rebuilt when the active profile changes: the endpoint tooltips and the port show its values.
+            var tabs = ApplyGroupDefaults(BuildRibbonTabs()).Concat(new[] { EnvironmentTab(), ResponseTab() }).ToList();
             ribbon.Tabs = tabs;
 
-            // Every ribbon command, flattened into the palette, grouped by "Tab · Group".
+            // Every ribbon command, flattened into the palette, grouped by "Tab · Group"; the Environment
+            // tab's boxes and toggles are not commands.
             commandPalette.Commands = tabs
-                .SelectMany(tab => tab.Groups.SelectMany(group => group.Items.Select(item => new CommandItem
+                .SelectMany(tab => tab.Groups.SelectMany(group => group.Items.Where(item => item.Run != null).Select(item => new CommandItem
                 {
                     Id = item.Id,
                     Label = string.Format("{0}: {1}", group.Label, item.Label),
@@ -89,9 +91,15 @@ namespace DesktopFinstatApiTester.Views
             {
                 Id = tab.Id,
                 Label = tab.Label,
+                Keytip = tab.Keytip,
+                ContextualSet = tab.ContextualSet,
                 Groups = tab.Groups.Select((group, index) => new RibbonGroup
                 {
+                    Id = group.Id,
                     Label = group.Label,
+                    Keytip = group.Keytip,
+                    Launcher = group.Launcher,
+                    LauncherLabel = group.LauncherLabel,
                     Items = group.Items,
                     Icon = group.Icon ?? (TabGlyphs.TryGetValue(tab.Id, out var glyph) ? glyph : null),
                     MinSize = group.MinSize,
@@ -108,6 +116,7 @@ namespace DesktopFinstatApiTester.Views
                 Id = id,
                 Label = label,
                 Icon = icon,
+                Description = EndpointTooltip(id),
                 Run = () => _ = FireAsync(run),
             };
 

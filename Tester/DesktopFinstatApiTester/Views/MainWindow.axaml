@@ -68,8 +68,7 @@
             <Button x:Name="buttonCommands" Content="🔍  Ctrl+K" Padding="12,4"
                     ToolTip.Tip="Commands (Ctrl+K)" AutomationProperties.Name="Commands"
                     VerticalAlignment="Center" Click="buttonCommands_Click" />
-            <Button x:Name="buttonSettings" Content="Settings" Padding="12,4"
-                    VerticalAlignment="Center" Click="buttonSettings_Click" />
+            <!-- Settings is the Quick Access Toolbar's default (⚙) and the Environment tab's launcher. -->
             <Button x:Name="buttonAbout" Content="About" Padding="12,4"
                     VerticalAlignment="Center" Click="buttonAbout_Click" />
           </StackPanel>

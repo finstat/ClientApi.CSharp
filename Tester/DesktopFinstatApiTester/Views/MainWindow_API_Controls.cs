@@ -41,6 +41,7 @@ namespace DesktopFinstatApiTester.Views
             };
 
             tabControlResponse.SelectedIndex = activeTab;
+            SyncResponseTab();
         }
 
         private void dataGridShowResponseOutputWindow_Click(object sender, RoutedEventArgs e) =>

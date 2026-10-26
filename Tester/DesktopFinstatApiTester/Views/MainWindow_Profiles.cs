@@ -64,6 +64,9 @@ namespace DesktopFinstatApiTester.Views
             // a 3px top edge in the profile's colour, the plain 1px border otherwise
             borderStatusBar.BorderThickness = colorKey != null ? new Thickness(0, 3, 0, 0) : new Thickness(0, 1, 0, 0);
             BindBrush(borderStatusBar, Border.BorderBrushProperty, colorKey ?? "BBorderBrush");
+
+            // the endpoint tooltips and the Environment tab's port show the active profile
+            BuildRibbon();
         }
 
         private static string HostOf(string url) =>

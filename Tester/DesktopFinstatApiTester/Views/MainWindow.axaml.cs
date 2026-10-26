@@ -77,6 +77,7 @@ namespace DesktopFinstatApiTester.Views
             DataContext = AppInstance;
 
             BuildRibbon();
+            InitializeRibbonExtras();
             InitializeThemeSwitcher();
 
             // Ctrl+K opens the palette of every ribbon command.
