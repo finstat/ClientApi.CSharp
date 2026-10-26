@@ -42,8 +42,9 @@
           <TextBlock Classes="caption" Text="IČOs" />
           <!-- A comma, semicolon, space, new line or tab ends an IČO, so a pasted list splits on its own. -->
           <c:TagInput x:Name="tagInputValues" Width="640" Separators=",; &#10;&#9;"
+                      Placeholder="Type or paste IČOs; a comma, space or new line ends each one"
                       TagsChanged="tagInputValues_TagsChanged" />
-          <TextBlock Text="Type or paste IČOs; a comma, space or new line ends each one. A list is compared one by one; the history keeps the comparison, not its calls."
+          <TextBlock Text="A list of IČOs is compared one by one; the history keeps the comparison, not its calls."
                      TextWrapping="Wrap"
                      Foreground="{DynamicResource BTextMutedBrush}" FontSize="{DynamicResource BTextSm}" />
         </StackPanel>
