@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Birko.Xaml.Core.Diff;
 
 namespace DesktopFinstatApiTester.ViewModel
 {
-    /// <summary>One difference between the baseline body (A) and a compared one (B).</summary>
+    /// <summary>One difference between the baseline body (A) and a compared one (B), as the comparison window lists it.</summary>
     public sealed class BodyChange
     {
         /// <summary>added, removed or changed.</summary>
@@ -28,10 +28,9 @@ namespace DesktopFinstatApiTester.ViewModel
     }
 
     /// <summary>
-    /// STOPGAP until Birko.Xaml.Core ships its diff engine (Birko.Framework FEATURE-020, the port of birko-web-core's
-    /// <c>diffJson</c> / <c>xmlToTree</c>); then this file goes and the comparison calls that engine. Kept to what the
-    /// comparison window needs: a structural diff of two bodies, lists compared by position, XML read as a tree
-    /// (repeated elements become a list, attributes <c>@name</c>, xsi:nil null), strings passed through a normalizer.
+    /// Compares two bodies with Birko.Xaml.Core's diff engine (the port of birko-web-core's <c>diffJson</c>), strings
+    /// passed through a normalizer on both sides. An XML body is read here as a tree (repeated elements become a list,
+    /// attributes <c>@name</c>, xsi:nil null) until Birko.Xaml.Core ships <c>xmlToTree</c> (Birko.Framework TASK-771).
     /// </summary>
     public static class BodyDiffer
     {
@@ -39,40 +38,42 @@ namespace DesktopFinstatApiTester.ViewModel
 
         public static BodyDiff Diff(string a, string b, bool xml, Func<string, string> normalize)
         {
-            var result = new BodyDiff();
-            Walk(Parse(a, xml), Parse(b, xml), string.Empty, normalize ?? (s => s), result.Changes);
-            return result;
+            var options = new JsonDiffOptions();
+            if (normalize != null)
+            {
+                options.Normalize.Add(new JsonNormalizer("**", (value, _) =>
+                    value is JsonValue v && v.TryGetValue<string>(out var text) ? JsonValue.Create(normalize(text)) : value));
+            }
+            var result = JsonDiff.Diff(Parse(a, xml), Parse(b, xml), options);
+            var diff = new BodyDiff();
+            diff.Changes.AddRange(result.Changes.Select(c => new BodyChange
+            {
+                Kind = c.Kind.ToString().ToLowerInvariant(),
+                Path = c.Path,
+                OldValue = c.HasOldValue ? Show(c.OldValue) : null,
+                NewValue = c.HasNewValue ? Show(c.NewValue) : null,
+            }));
+            return diff;
         }
 
         /// <summary>A body that does not parse (an HTML error page) is compared as one text value.</summary>
-        private static object Parse(string text, bool xml)
+        private static JsonNode Parse(string text, bool xml)
         {
             if (string.IsNullOrEmpty(text))
             {
-                return text;
+                return JsonValue.Create(text ?? string.Empty);
             }
             try
             {
-                return xml ? FromXml(XDocument.Parse(text).Root) : FromJson(JsonNode.Parse(text));
+                return xml ? FromXml(XDocument.Parse(text).Root) : JsonNode.Parse(text);
             }
             catch (Exception)
             {
-                return text;
+                return JsonValue.Create(text);
             }
         }
 
-        private static object FromJson(JsonNode node)
-        {
-            switch (node)
-            {
-                case null: return null;
-                case JsonObject o: return o.ToDictionary(p => p.Key, p => FromJson(p.Value));
-                case JsonArray arr: return arr.Select(FromJson).ToList();
-                default: return node.ToJsonString().Trim('"');
-            }
-        }
-
-        private static object FromXml(XElement e)
+        private static JsonNode FromXml(XElement e)
         {
             if ((string)e.Attribute(Xsi + "nil") == "true")
             {
@@ -81,9 +82,9 @@ namespace DesktopFinstatApiTester.ViewModel
             var attributes = e.Attributes().Where(a => !a.IsNamespaceDeclaration && a.Name.Namespace != Xsi).ToList();
             if (!e.HasElements && attributes.Count == 0)
             {
-                return e.Value;
+                return JsonValue.Create(e.Value);
             }
-            var map = new Dictionary<string, object>();
+            var map = new JsonObject();
             foreach (var a in attributes)
             {
                 map["@" + a.Name.LocalName] = a.Value;
@@ -91,58 +92,19 @@ namespace DesktopFinstatApiTester.ViewModel
             foreach (var group in e.Elements().GroupBy(c => c.Name.LocalName))
             {
                 var items = group.Select(FromXml).ToList();
-                map[group.Key] = items.Count == 1 ? items[0] : items;
+                map[group.Key] = items.Count == 1 ? items[0] : new JsonArray(items.ToArray());
             }
             return map;
         }
 
-        private static void Walk(object a, object b, string path, Func<string, string> normalize, List<BodyChange> changes)
-        {
-            if (a is Dictionary<string, object> da && b is Dictionary<string, object> db)
-            {
-                foreach (var key in da.Keys.Union(db.Keys))
-                {
-                    var child = Child(path, key);
-                    if (!db.ContainsKey(key)) changes.Add(new BodyChange { Kind = "removed", Path = child, OldValue = Show(da[key]) });
-                    else if (!da.ContainsKey(key)) changes.Add(new BodyChange { Kind = "added", Path = child, NewValue = Show(db[key]) });
-                    else Walk(da[key], db[key], child, normalize, changes);
-                }
-                return;
-            }
-            if (a is List<object> la && b is List<object> lb)
-            {
-                for (int i = 0; i < Math.Max(la.Count, lb.Count); i++)
-                {
-                    var child = string.Format("{0}[{1}]", path, i);
-                    if (i >= lb.Count) changes.Add(new BodyChange { Kind = "removed", Path = child, OldValue = Show(la[i]) });
-                    else if (i >= la.Count) changes.Add(new BodyChange { Kind = "added", Path = child, NewValue = Show(lb[i]) });
-                    else Walk(la[i], lb[i], child, normalize, changes);
-                }
-                return;
-            }
-            var sa = a is string s1 ? normalize(s1) : Show(a);
-            var sb = b is string s2 ? normalize(s2) : Show(b);
-            // a null and the text "null" are different values
-            if (sa != sb || (a == null) != (b == null))
-            {
-                changes.Add(new BodyChange { Kind = "changed", Path = path, OldValue = Show(a), NewValue = Show(b) });
-            }
-        }
-
-        private static readonly Regex Identifier = new Regex(@"^[A-Za-z_$][A-Za-z0-9_$]*$");
-
-        private static string Child(string path, string key) =>
-            Identifier.IsMatch(key) ? (path.Length == 0 ? key : path + "." + key) : string.Format("{0}[\"{1}\"]", path, key);
-
-        private static string Show(object value)
+        private static string Show(JsonNode value)
         {
             switch (value)
             {
                 case null: return "null";
-                case string s: return s;
-                case List<object> l: return string.Format("[{0} items]", l.Count);
-                case Dictionary<string, object> d: return string.Format("{{{0} fields}}", d.Count);
-                default: return value.ToString();
+                case JsonArray l: return string.Format("[{0} items]", l.Count);
+                case JsonObject o: return string.Format("{{{0} fields}}", o.Count);
+                default: return value is JsonValue v && v.TryGetValue<string>(out var s) ? s : value.ToJsonString();
             }
         }
     }
