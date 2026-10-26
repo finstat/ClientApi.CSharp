@@ -322,7 +322,7 @@ export const sk = {
     progress: '{done} / {total}',
     hideHosts: 'Skryť rozdiely v názvoch hostov',
     hideHostsHint: 'Názvy hostov všetkých profilov sa pred porovnaním nahradia za {sk} / {cz}, takže odkazy, ktoré sa líšia iba doménou, sa neukážu.',
-    formatHint: 'Každý profil sa zavolá vo formáte zvolenom nižšie a porovná so základom. Telo v XML sa porovnáva ako strom: opakované elementy sú zoznam, xsi:nil je null. Zoznam IČO sa porovnáva po jednom a nezapisuje sa do histórie.',
+    formatHint: 'Každý profil sa zavolá vo formáte zvolenom nižšie a porovná so základom. Telo v XML sa porovnáva ako strom: opakované elementy sú zoznam, xsi:nil je null. Zoznam IČO sa porovnáva po jednom; história si pamätá porovnanie, nie jeho volania.',
     cost: 'Každé IČO je jedno volanie na profil, ráta sa do limitu jeho kľúča.',
     equal: 'Rovnaké',
     notCompared: 'Neporovnané, volanie zlyhalo',

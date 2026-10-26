@@ -46,6 +46,8 @@ export interface CallOptions {
   responseType?: 'xml' | 'json';
   /** false keeps the call out of the response history (bulk comparison); `historyId` is then ''. */
   record?: boolean;
+  /** Comparison the call belongs to, recorded as the history entry's `groupId`. */
+  group?: string;
 }
 
 /** Settings headers with the per-call overrides applied — also what history keeps for curl. */
@@ -184,6 +186,7 @@ async function request<T>(
     headers: snapshot,
     lang: opts.lang || undefined,
     profile: callProfileName(opts),
+    groupId: opts.group,
   };
   if (opts.record !== false) addHistory(item);
 
@@ -300,6 +303,7 @@ async function download(
     headers: snapshot,
     lang: opts.lang || undefined,
     profile: callProfileName(opts),
+    groupId: opts.group,
   };
   addHistory(item);
 

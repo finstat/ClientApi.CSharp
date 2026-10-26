@@ -322,7 +322,7 @@ export const en = {
     progress: '{done} / {total}',
     hideHosts: 'Hide differences in host names',
     hideHostsHint: 'Host names of all profiles are replaced by {sk} / {cz} before comparing, so links that differ only by domain do not show up.',
-    formatHint: 'Every profile is called in the format picked below and compared with the baseline. An XML body is compared as a tree: repeated elements become a list, xsi:nil becomes null. A list of IČOs is compared one by one and stays out of the history.',
+    formatHint: 'Every profile is called in the format picked below and compared with the baseline. An XML body is compared as a tree: repeated elements become a list, xsi:nil becomes null. A list of IČOs is compared one by one; the history keeps the comparison, not its calls.',
     cost: 'Each IČO is one call per profile, counted against the limits of its key.',
     equal: 'Equal',
     notCompared: 'Not compared, a call failed',

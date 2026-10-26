@@ -11,7 +11,7 @@ registerThemes([BUILTIN_THEMES.finstat]);
 
 import { TABS, resolveTabForHash, firstHrefForTab, ENVIRONMENT_TAB, RESPONSE_TAB, RESPONSE_SET } from './ribbon-tabs.js';
 import { HISTORY_ACTIONS, HISTORY_ACTION_EVENT, type HistoryAction } from '../history/response-viewer.js';
-import { historyStore } from '../history/response-history.js';
+import { historyStore, type ResponseHistoryItem } from '../history/response-history.js';
 import { limitsStore } from '../api/limits-store.js';
 import { settingsStore, activeProfile, useAndSaveSettings } from '../settings/settings-store.js';
 import { OPEN_ABOUT_EVENT, DOCS_URL } from './about-modal.js';
@@ -212,18 +212,38 @@ export class AppShell extends BAppShell {
 
   // ── BSidebarAppShell — left sidebar (response history) ────────────────────
   protected get showLeftSidebar() { return true; }
+  /**
+   * Calls and comparisons, newest first. A comparison's own calls are listed under it while it or one
+   * of them is open, so the way back to the comparison stays in view; b-sidebar draws no nesting, the
+   * arrow in the label does.
+   */
   protected getLeftSidebarItems(): SidebarItem[] {
-    const items = historyStore.get('items').slice(0, 50);
-    if (items.length === 0) return [];
-    return items.map(it => ({
+    const items = historyStore.get('items');
+    const compares = historyStore.get('compares');
+    const groups = new Set(compares.map(c => c.id));
+    const active = this.getActiveLeftSidebarItem();
+    const openGroup = groups.has(active) ? active : items.find(i => i.id === active)?.groupId;
+    const time = (ts: number) => new Date(ts).toLocaleTimeString([], { hour12: false });
+    const call = (it: ResponseHistoryItem, nested: boolean): SidebarItem => ({
       id: it.id,
-      label: `${it.label} · ${new Date(it.timestamp).toLocaleTimeString([], { hour12: false })}`,
+      label: `${nested ? '&#8627; ' : ''}${it.label} · ${time(it.timestamp)}`,
       icon: it.ok ? '&#10003;' : '&#10005;',
       href: `#/history/${it.id}`,
-    }));
+    });
+    const top: Array<{ timestamp: number; entries: () => SidebarItem[] }> = [
+      ...items.filter(i => !i.groupId || !groups.has(i.groupId)).map(it => ({ timestamp: it.timestamp, entries: () => [call(it, false)] })),
+      ...compares.map(c => ({
+        timestamp: c.timestamp,
+        entries: () => [
+          { id: c.id, label: `${c.label} · ${time(c.timestamp)}`, icon: '&#8644;', href: `#/compare/${c.id}` },
+          ...(c.id === openGroup ? items.filter(i => i.groupId === c.id).map(it => call(it, true)) : []),
+        ],
+      })),
+    ];
+    return top.sort((x, y) => y.timestamp - x.timestamp).slice(0, 50).flatMap(e => e.entries());
   }
   protected getActiveLeftSidebarItem() {
-    return window.location.hash.match(/^#\/history\/(.+)$/)?.[1] ?? '';
+    return window.location.hash.match(/^#\/(?:history|compare)\/(.+)$/)?.[1] ?? '';
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -254,6 +274,7 @@ export class AppShell extends BAppShell {
     this._unsubs.push(
       () => window.removeEventListener('hashchange', onHashChange),
       historyStore.onChange('items',      () => this.refreshLeftSidebar()),
+      historyStore.onChange('compares',   () => this.refreshLeftSidebar()),
       historyStore.onChange('selectedId', () => this.refreshLeftSidebar()),
       limitsStore.onChange('daily',          () => this.refreshStatusBar()),
       limitsStore.onChange('monthly',        () => this.refreshStatusBar()),

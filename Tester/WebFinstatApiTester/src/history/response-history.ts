@@ -33,15 +33,30 @@ export interface ResponseHistoryItem {
   lang?: string;
   /** Environment profile the call went to (name, plus the port when one was set). */
   profile?: string;
+  /** The comparison this call was made by; the sidebar lists it under that comparison. */
+  groupId?: string;
+}
+
+/** One run of the compare page; the sidebar entry that leads back to its results. */
+export interface CompareSession {
+  id: string;
+  timestamp: number;
+  label: string;
+  /** The compared request, kept here so the comparison survives removing its history entry. */
+  request: ResponseHistoryItem;
+  /** The compare page's setup and results, owned by the compare page. */
+  state: unknown;
 }
 
 interface HistoryState {
   items: ResponseHistoryItem[];
+  compares: CompareSession[];
   selectedId: string | null;
 }
 
 export const historyStore = new Store<HistoryState>({
   items: [],
+  compares: [],
   selectedId: null,
 });
 
@@ -51,12 +66,21 @@ export function addHistory(item: ResponseHistoryItem): void {
   historyStore.set('selectedId', item.id);
 }
 
+export function addCompare(session: CompareSession): void {
+  historyStore.set('compares', [session, ...historyStore.get('compares')]);
+}
+
+export function findCompare(id: string): CompareSession | null {
+  return historyStore.get('compares').find(c => c.id === id) ?? null;
+}
+
 export function removeHistory(id: string): void {
   historyStore.set('items', historyStore.get('items').filter(i => i.id !== id));
   if (historyStore.get('selectedId') === id) historyStore.set('selectedId', null);
 }
 
 export function clearHistory(): void {
+  historyStore.set('compares', []);
   historyStore.set('items', []);
   historyStore.set('selectedId', null);
 }

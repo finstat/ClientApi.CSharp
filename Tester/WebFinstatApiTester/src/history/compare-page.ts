@@ -1,6 +1,6 @@
 import { BaseComponent, define, diffJson, xmlToTree, type JsonDiffOptions, type JsonDiffResult } from 'birko-web-core';
 import type { BSelect, BInput, BCheckbox, BJsonDiff, BTagInput, BAccordion, BTabs } from 'birko-web-components';
-import { historyStore, type ResponseHistoryItem } from './response-history.js';
+import { historyStore, addCompare, findCompare, type ResponseHistoryItem, type CompareSession } from './response-history.js';
 import { rerunHistoryItem } from './rerun.js';
 import { runBatch, type BatchHandle } from '../pages/batch/runner.js';
 import { PAGE_STYLES } from '../pages/page-styles.js';
@@ -27,11 +27,26 @@ interface Run {
   cells: Cell[] | undefined;
 }
 
+/** What a comparison keeps in its history session, so the sidebar can bring it back. */
+interface CompareState {
+  base: EnvProfile;
+  rows: EnvProfile[];
+  values: string[];
+  format: Format;
+  concurrency: string;
+  hideHosts: boolean;
+  /** The page's own array: calls still running fill it in after the session is saved. */
+  runs: Run[];
+  selected: { run: number; col: number };
+}
+
 const CONCURRENCY_OPTIONS = [1, 2, 4, 8].map(n => ({ value: String(n), label: String(n) }));
 
 /**
  * `/compare/:id` — sends the request recorded in a history entry to a baseline profile and to any
  * number of other profiles, for one IČO or a list of them, and compares each body with the baseline's.
+ * Each run is saved as a comparison in the history and the address changes to its id;
+ * `/compare/<comparison id>` shows that run again.
  */
 export class ComparePage extends BaseComponent {
   private _unsubs: Array<() => void> = [];
@@ -43,6 +58,8 @@ export class ComparePage extends BaseComponent {
   private _handle: BatchHandle | null = null;
   /** Rows of the "fields that differ" tab; 0 hides the tab. */
   private _fieldCount = 0;
+  /** State of the comparison shown, kept in its history session. */
+  private _state: CompareState | null = null;
 
   static get styles() {
     return PAGE_STYLES + `
@@ -69,9 +86,19 @@ export class ComparePage extends BaseComponent {
     `;
   }
 
+  private get _routeId(): string | null {
+    return window.location.hash.match(/^#\/compare\/(.+)$/)?.[1] ?? null;
+  }
+
+  private get _session(): CompareSession | null {
+    const id = this._routeId;
+    return id ? findCompare(id) : null;
+  }
+
   private get _item(): ResponseHistoryItem | null {
-    const id = window.location.hash.match(/^#\/compare\/(.+)$/)?.[1];
-    return id ? historyStore.get('items').find(i => i.id === id) ?? null : null;
+    const id = this._routeId;
+    if (!id) return null;
+    return this._session?.request ?? historyStore.get('items').find(i => i.id === id) ?? null;
   }
 
   render() {
@@ -119,20 +146,23 @@ export class ComparePage extends BaseComponent {
   protected onMount() {
     const item = this._item;
     if (!item) return;
-    this._setupAccordion(true);
-    const profiles = settingsStore.get('profiles');
-    this._fillSide('base', profileOfItem(item, profiles));
-    this._addRow(this._nextProfile());
+    const saved = this._session?.state as CompareState | undefined;
+    this._setupAccordion(!saved);
+    this._fillSide('base', saved?.base ?? profileOfItem(item, settingsStore.get('profiles')));
+    if (saved) saved.rows.forEach(p => this._addRow(p));
+    else this._addRow(this._nextProfile());
 
     const format = this.$<BSelect>('#format');
     format?.setOptions([{ value: 'json', label: 'JSON' }, { value: 'xml', label: 'XML' }]);
     // the format the request was made in, so a comparison sees what that call saw
-    if (format) format.value = (item.headers?.['X-Finstat-ResponseType'] ?? settingsStore.get('responseType')) === 'json' ? 'json' : 'xml';
+    if (format) format.value = saved?.format ?? ((item.headers?.['X-Finstat-ResponseType'] ?? settingsStore.get('responseType')) === 'json' ? 'json' : 'xml');
     const concurrency = this.$<BSelect>('#concurrency');
     concurrency?.setOptions(CONCURRENCY_OPTIONS);
-    if (concurrency) concurrency.value = '2';
+    if (concurrency) concurrency.value = saved?.concurrency ?? '2';
     const icoKey = icoParam(item);
-    if (icoKey) this.$<BTagInput>('#values')?.setTags([String((item.params as Record<string, unknown>)[icoKey])]);
+    if (icoKey) this.$<BTagInput>('#values')?.setTags(saved?.values ?? [String((item.params as Record<string, unknown>)[icoKey])]);
+    const hideHosts = this.$<BCheckbox>('#hide-hosts');
+    if (saved && hideHosts) hideHosts.checked = saved.hideHosts;
 
     // a picked profile brings its own port; the port can still be changed for this comparison
     this.shadowRoot?.addEventListener('change', (e: Event) => {
@@ -158,8 +188,25 @@ export class ComparePage extends BaseComponent {
     this.$('#btn-run')?.addEventListener('click', () => this._run(item));
     this.$<BCheckbox>('#hide-hosts')?.addEventListener('change', () => this._recompare());
     this._updateRunLabel();
+    if (saved) this._restore(saved);
 
     this._unsubs.push(onLocaleChange(() => this._relocalize()));
+  }
+
+  /** Shows a saved comparison as it was left; nothing is called again. */
+  private _restore(state: CompareState) {
+    this._state = state;
+    this._format = state.format;
+    this._runs = state.runs;
+    const total = state.runs.length;
+    const done = state.runs.filter(r => r.cells).length;
+    this._renderProgress(done, total, false);
+    this._renderResults();
+    this._renderFields();
+    this._setDetailTabs();
+    const { run, col } = state.selected;
+    if (this._runs[run]?.cells?.[col]?.diff) this._show(run, col);
+    else this._showFirst();
   }
 
   protected onUnmount() {
@@ -271,6 +318,7 @@ export class ComparePage extends BaseComponent {
     this._format = format;
     this._runs = values.map(value => ({ value, cells: undefined }));
     this._selected = { run: -1, col: -1 };
+    const group = this._save(item, profiles, format);
     this._fieldCount = 0;
     this._renderFields();
     this._setupAccordion(false);
@@ -282,7 +330,7 @@ export class ComparePage extends BaseComponent {
       const value = values[i];
       const request = value !== null && icoKey ? { ...item, params: { ...(item.params as Record<string, unknown>), [icoKey]: value } } : item;
       const results = await Promise.all(profiles.map(profile => rerunHistoryItem(request, {
-        profile, responseType: format, record,
+        profile, responseType: format, record, group,
         label: `${t('history.button.compare')}: ${item.label} (${profileLabel(profile)})`,
       })));
       this._runs[i].cells = profiles.map((profile, c) => ({ profile, result: results[c], diff: null }));
@@ -300,6 +348,33 @@ export class ComparePage extends BaseComponent {
     this._renderProgress(done, values.length, false);
     this._renderFields();
     this._handle = null;
+  }
+
+  /**
+   * Saves the run about to start as a comparison in the history, and moves the address to it without
+   * reloading the page, so the sidebar marks it and a reload or a way back shows this run.
+   */
+  private _save(item: ResponseHistoryItem, profiles: EnvProfile[], format: Format): string {
+    const id = crypto.randomUUID();
+    this._state = {
+      base: profiles[0],
+      rows: profiles.slice(1),
+      values: this.$<BTagInput>('#values')?.getTags() ?? [],
+      format,
+      concurrency: this.$<BSelect>('#concurrency')?.value ?? '2',
+      hideHosts: this.$<BCheckbox>('#hide-hosts')?.checked ?? true,
+      runs: this._runs,
+      selected: this._selected,
+    };
+    window.history.replaceState(null, '', `#/compare/${id}`);
+    addCompare({
+      id,
+      timestamp: Date.now(),
+      label: `${t('history.button.compare')}: ${item.label}`,
+      request: item,
+      state: this._state,
+    });
+    return id;
   }
 
   /** Diff every compared profile of one run against its baseline. A failed call is not compared. */
@@ -432,6 +507,7 @@ export class ComparePage extends BaseComponent {
     const title = this.$<HTMLElement>('#diff-title');
     if (!diff || !title) return;
     this._selected = { run, col };
+    if (this._state) this._state.selected = this._selected;
     if (!base || !other?.diff) {
       diff.style.display = 'none';
       title.textContent = '';

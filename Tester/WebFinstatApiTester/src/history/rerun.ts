@@ -12,7 +12,7 @@ import type { ResponseHistoryItem } from './response-history.js';
  */
 export function rerunHistoryItem(
   item: ResponseHistoryItem,
-  extra: Pick<CallOptions, 'profile' | 'responseType' | 'label' | 'record'> = {},
+  extra: Pick<CallOptions, 'profile' | 'responseType' | 'label' | 'record' | 'group'> = {},
 ): Promise<CallResult> {
   const label = extra.label ?? `Rerun: ${item.label}`;
   const isDownload = item.endpoint.endsWith('/download') || item.endpoint.includes('/download?');
