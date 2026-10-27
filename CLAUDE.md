@@ -25,7 +25,8 @@ wiki (fixed URLs `https://raw.githubusercontent.com/wiki/finstat/ClientApi.CShar
 deliberately **not** as release assets. It force-pushes the wiki as one orphan commit so old binaries don't
 accumulate — hand-written wiki pages survive, their edit history doesn't. Each run rebuilds the desktop tester and
 re-exports `ghcr.io/…/finstat-web-tester:latest` together; it reruns after every successful *Web tester image* run
-on `master`. Files must stay under GitHub's 100 MB per-file limit (today ~39 MB zips, ~59 MB tar).
+on `master`. Files must stay under GitHub's 100 MB per-file limit (today ~39 MB zips; the image tar is
+~124 MB, so it is published gzipped as `finstat-web-tester.tar.gz`).
 
 `web-tester-image.yml` prunes ghcr after each push: keeps every non-`sha-` tag and the newest 5 `sha-*` builds, and
 protects the untagged child manifests of kept images (deleting those breaks pulls of the tagged image).

@@ -7,7 +7,7 @@ name: Tester downloads
 #   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-win-x64.zip
 #   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-linux-x64.zip
 #   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-osx-arm64.zip
-#   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/finstat-web-tester.tar     Portainer import
+#   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/finstat-web-tester.tar.gz  Portainer import
 #
 # The wiki is pushed as a single orphan commit, so older builds don't pile up in
 # its history; hand-written wiki pages are carried over (their edit history is not).
@@ -111,7 +111,9 @@ jobs:
           docker pull "$IMAGE"
           # Re-tag so the tar loads as finstat-web-tester:latest, the name Portainer expects.
           docker tag "$IMAGE" finstat-web-tester:latest
-          docker save finstat-web-tester:latest -o out/finstat-web-tester.tar
+          # gzip: the raw tar (~124 MB) is over GitHub's 100 MB per-file limit; docker load
+          # and Portainer's import both take it compressed.
+          docker save finstat-web-tester:latest | gzip -9 > out/finstat-web-tester.tar.gz
 
       - name: Write Downloads page
         shell: bash
@@ -148,18 +150,18 @@ jobs:
 
           ## Web tester (Docker)
 
-          - [finstat-web-tester.tar](${RAW}/finstat-web-tester.tar) ($(size finstat-web-tester.tar)) — image \`finstat-web-tester:latest\`
+          - [finstat-web-tester.tar.gz](${RAW}/finstat-web-tester.tar.gz) ($(size finstat-web-tester.tar.gz)) — image \`finstat-web-tester:latest\`, gzipped
 
           ### Setup
 
-          **Portainer:** *Images → Import* the tar, then *Containers → Add container* with image
+          **Portainer:** *Images → Import* the \`.tar.gz\` as is (no need to unpack), then *Containers → Add container* with image
           \`finstat-web-tester:latest\` (**Always pull the image** off — it isn't in a registry), port
           host \`5101\` → container \`8080\`, restart policy *Unless stopped*.
 
           **Docker CLI:**
 
           \`\`\`sh
-          docker load -i finstat-web-tester.tar
+          docker load -i finstat-web-tester.tar.gz
           docker run -d --name finstat-web-tester --restart unless-stopped -p 5101:8080 finstat-web-tester:latest
           \`\`\`
 
@@ -193,7 +195,7 @@ jobs:
           cd wiki
           branch="$(git branch --show-current)"
           # Keep hand-written pages, replace everything this workflow owns.
-          rm -f DesktopFinstatApiTester-*.zip finstat-web-tester.tar Downloads.md
+          rm -f DesktopFinstatApiTester-*.zip finstat-web-tester.tar* Downloads.md
           cp ../out/* .
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
