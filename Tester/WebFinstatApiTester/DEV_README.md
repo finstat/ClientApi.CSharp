@@ -186,6 +186,11 @@ Containers → Add container:
 | Volume (Bind, read-only) | host `/run/desktop/mnt/host/c/clientWebCertificates/Certs` → container `/app/certs` |
 | Env `Security__DevCertificate__PfxPath` | `/app/certs/apitester.pfx` (certifikát sa volá `apitester`, nie `dev-cert`) |
 | Env `Security__DevCertificate__PfxPassword` | heslo k PFX |
+
+Alternatíva bez volume: namiesto bindu a `PfxPath` nastav `Security__DevCertificate__PfxBase64` na celý `.pfx` v
+base64 (`[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\clientWebCertificates\Certs\apitester.pfx"))`,
+na Linuxe `base64 -w 0 apitester.pfx`); heslo ostáva v `PfxPassword`. Keď sú nastavené obe, vyhráva `PfxBase64`
+a log ukáže `loaded cert from PfxBase64`.
 | Restart policy | Unless stopped |
 
 - Host beží Docker Desktop (Linux engine): cesta `C:\clientWebCertificates\Certs` v Portaineri zlyhá s

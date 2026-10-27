@@ -168,15 +168,24 @@ jobs:
           Open \`http://<host>:5101\` and enter the API keys in the tester's settings in the browser — they are not
           container settings.
 
-          **Optional — dev environments (zdrojak.eu / zdrojakcz.eu)** need a client certificate. Bind the folder
-          holding the \`.pfx\` read-only to \`/app/certs\` and set:
+          **Optional — dev environments (zdrojak.eu / zdrojakcz.eu)** need a client certificate (\`.pfx\`). Give it
+          to the container in one of two ways, plus its password:
 
           | Env | Value |
           |---|---|
-          | \`Security__DevCertificate__PfxPath\` | \`/app/certs/<name>.pfx\` (default \`/app/certs/dev-cert.pfx\`) |
-          | \`Security__DevCertificate__PfxPassword\` | the PFX password |
+          | \`Security__DevCertificate__PfxBase64\` | **either** the whole \`.pfx\` as base64 — no file or volume needed |
+          | \`Security__DevCertificate__PfxPath\` | **or** \`/app/certs/<name>.pfx\`, with the folder holding the \`.pfx\` bound read-only to \`/app/certs\` (default \`/app/certs/dev-cert.pfx\`) |
+          | \`Security__DevCertificate__PfxPassword\` | the PFX password (both ways) |
 
-          After the first call to zdrojak.eu the container log shows \`DevCertificate … loaded cert from …\`.
+          If both are set, \`PfxBase64\` wins. Get the base64 value with:
+
+          \`\`\`sh
+          base64 -w 0 apitester.pfx                                              # Linux
+          [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\\path\\apitester.pfx"))   # PowerShell
+          \`\`\`
+
+          After the first call to zdrojak.eu the container log shows \`DevCertificate … loaded cert from …\`
+          (\`… from PfxBase64\` for the base64 way).
           Full notes: [DEV_README](https://github.com/${GITHUB_REPOSITORY}/blob/master/Tester/WebFinstatApiTester/DEV_README.md).
 
           Image \`${image}\`
