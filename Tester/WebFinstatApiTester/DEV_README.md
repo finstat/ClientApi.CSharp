@@ -173,6 +173,9 @@ Image sa do Portainera importuje ako tar (Images → Import), tag iba `latest`:
 docker save finstat-web-tester:latest -o finstat-web-tester.tar
 ```
 
+Hotový tar z posledného buildu na `master` je aj na priamom odkaze (workflow *Tester downloads*):
+<https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/finstat-web-tester.tar>
+
 Containers → Add container:
 
 | Nastavenie | Hodnota |

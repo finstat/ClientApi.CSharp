@@ -17,3 +17,15 @@ how-to — build, export, the Portainer settings and how to check the certificat
   `Security__DevCertificate__PfxPassword`
 - build the image from `C:/Source` (`docker build -f ClientApi.CSharp/Dockerfile -t finstat-web-tester:latest C:/Source`)
   and export only `latest` (`docker save finstat-web-tester:latest -o finstat-web-tester.tar`)
+
+## Tester downloads (wiki)
+
+`.github/workflows/tester-downloads.yml` publishes the desktop tester zips and the web tester tar into the repo's
+wiki (fixed URLs `https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/<file>`, index page `Downloads`),
+deliberately **not** as release assets. It force-pushes the wiki as one orphan commit so old binaries don't
+accumulate — hand-written wiki pages survive, their edit history doesn't. Each run rebuilds the desktop tester and
+re-exports `ghcr.io/…/finstat-web-tester:latest` together; it reruns after every successful *Web tester image* run
+on `master`. Files must stay under GitHub's 100 MB per-file limit (today ~39 MB zips, ~59 MB tar).
+
+`web-tester-image.yml` prunes ghcr after each push: keeps every non-`sha-` tag and the newest 5 `sha-*` builds, and
+protects the untagged child manifests of kept images (deleting those breaks pulls of the tagged image).

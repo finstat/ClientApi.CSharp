@@ -112,3 +112,37 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Every build adds an index plus untagged child manifests (platform image,
+      # provenance attestation). Keep anything with a non-sha tag (latest, versions,
+      # branches) and the newest KEEP_SHA sha-* builds; delete the rest. Children of
+      # a kept image are protected — deleting them would break its pulls — and
+      # untagged versions younger than an hour are left for a build still running.
+      - name: Delete old image versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE: orgs/${{ github.repository_owner }}/packages/container/finstat-web-tester
+          KEEP_SHA: 5
+        run: |
+          gh api --paginate "$PACKAGE/versions?per_page=100" | jq -s 'add' > versions.json
+          jq -r --argjson keep "$KEEP_SHA" '
+            ([.[] | select(any(.metadata.container.tags[]; startswith("sha-") | not))]
+             + ([.[] | select(.metadata.container.tags | length > 0)
+                     | select(all(.metadata.container.tags[]; startswith("sha-")))]
+                | sort_by(.created_at) | reverse | .[:$keep]))
+            | .[].name' versions.json | sort -u > kept.txt
+          cp kept.txt protected.txt
+          while read -r digest; do
+            docker buildx imagetools inspect --raw "$IMAGE@$digest" \
+              | jq -r '.manifests[]?.digest' >> protected.txt
+          done < kept.txt
+          cutoff="$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)"
+          jq -r --rawfile protected protected.txt --arg cutoff "$cutoff" '
+            ($protected | split("\n")) as $p
+            | .[] | select(.name as $n | $p | index($n) | not)
+            | select((.metadata.container.tags | length > 0) or .created_at < $cutoff)
+            | "\(.id) \(.name) \(.metadata.container.tags | join(","))"' versions.json \
+          | while read -r id digest tags; do
+              echo "Deleting $digest ${tags:-(untagged)}"
+              gh api -X DELETE "$PACKAGE/versions/$id"
+            done

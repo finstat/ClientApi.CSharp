@@ -1,0 +1,203 @@
+name: Tester downloads
+
+# Publishes the testers to the repo's wiki under fixed URLs, so the newest build
+# is always one direct link away (no release, no login):
+#
+#   https://github.com/finstat/ClientApi.CSharp/wiki/Downloads                                     index
+#   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-win-x64.zip
+#   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-linux-x64.zip
+#   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-osx-arm64.zip
+#   https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/finstat-web-tester.tar     Portainer import
+#
+# The wiki is pushed as a single orphan commit, so older builds don't pile up in
+# its history; hand-written wiki pages are carried over (their edit history is not).
+# Every run rebuilds the desktop tester and re-exports the web tester image
+# together, so all files come from one commit.
+#
+#   push to master       -> when the desktop tester or its inputs change
+#   Web tester image     -> after that workflow pushes a new :latest
+#   manual run           -> optionally against a specific Birko ref
+#
+# One-time setup: create any first page in the wiki (GitHub only creates the
+# wiki's git repo then; a workflow token can't).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'Tester/DesktopFinstatApiTester/**'
+      - 'FinStatApi/**'
+      - 'FinStatApiCZ/**'
+      - 'Shared/**'
+      - 'Directory.Build.props'
+      - 'Directory.Build.targets'
+      - 'global.json'
+      - '.github/workflows/tester-downloads.yml'
+  workflow_run:
+    workflows: ['Web tester image']
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      birko_ref:
+        description: 'Birko.Framework branch, tag or commit'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: tester-downloads
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/finstat/finstat-web-tester:latest
+  BIRKO_REF: ${{ inputs.birko_ref || 'main' }}
+  RAW: https://raw.githubusercontent.com/wiki/${{ github.repository }}
+
+jobs:
+  publish:
+    name: Build and publish
+    # A failed web tester image run leaves :latest as it was; nothing new to publish.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      # The csproj resolves Birko.Xaml.* from ..\Birko\Framework (BirkoSrc), so
+      # keep the C:/Source layout: ClientApi.CSharp/ next to Birko/Framework/.
+      - name: Checkout ClientApi.CSharp
+        uses: actions/checkout@v4
+        with:
+          path: ClientApi.CSharp
+
+      - name: Checkout Birko.Framework
+        uses: actions/checkout@v4
+        with:
+          repository: Birko-Framework/Birko.Framework
+          ref: ${{ env.BIRKO_REF }}
+          path: Birko/Framework
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ClientApi.CSharp/global.json
+          dotnet-version: '8.0.x'
+
+      - name: Publish desktop tester
+        shell: bash
+        run: |
+          mkdir -p out
+          for rid in win-x64 linux-x64 osx-arm64; do
+            dotnet publish ClientApi.CSharp/Tester/DesktopFinstatApiTester/DesktopFinstatApiTester.csproj \
+              -c Release -r "$rid" --self-contained \
+              -o "publish/$rid" \
+              /p:PublishSingleFile=true \
+              /p:IncludeNativeLibrariesForSelfExtract=true \
+              /p:DebugType=None \
+              /p:DebugSymbols=false
+            (cd "publish/$rid" && zip -qr "$GITHUB_WORKSPACE/out/DesktopFinstatApiTester-$rid.zip" .)
+          done
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Export web tester image
+        run: |
+          docker pull "$IMAGE"
+          # Re-tag so the tar loads as finstat-web-tester:latest, the name Portainer expects.
+          docker tag "$IMAGE" finstat-web-tester:latest
+          docker save finstat-web-tester:latest -o out/finstat-web-tester.tar
+
+      - name: Write Downloads page
+        shell: bash
+        run: |
+          built="$(date -u '+%Y-%m-%d %H:%M UTC')"
+          sha="$(git -C ClientApi.CSharp rev-parse --short HEAD)"
+          birko="$(git -C Birko/Framework rev-parse --short HEAD)"
+          image="$(docker image inspect "$IMAGE" --format '{{index .RepoDigests 0}}')"
+          size() { du -h "out/$1" | cut -f1; }
+          cat > out/Downloads.md <<EOF
+          Built ${built} from \`${sha}\` (Birko.Framework \`${birko}\`). This page and the files are
+          overwritten by the *Tester downloads* workflow — edits here are lost.
+
+          ## Desktop tester
+
+          Self-contained single executable, no .NET needed.
+
+          - [Windows x64](${RAW}/DesktopFinstatApiTester-win-x64.zip) ($(size DesktopFinstatApiTester-win-x64.zip))
+          - [Linux x64](${RAW}/DesktopFinstatApiTester-linux-x64.zip) ($(size DesktopFinstatApiTester-linux-x64.zip))
+          - [macOS arm64](${RAW}/DesktopFinstatApiTester-osx-arm64.zip) ($(size DesktopFinstatApiTester-osx-arm64.zip))
+
+          ### Setup
+
+          1. Unzip into its own folder (settings are saved next to the executable, so the folder must be writable).
+          2. Run \`DesktopFinstatApiTester\`. The build is not signed:
+             - **Windows** — SmartScreen: *More info* → *Run anyway*.
+             - **Linux** — \`chmod +x DesktopFinstatApiTester\` if the unzip tool dropped the permission.
+             - **macOS** — \`xattr -d com.apple.quarantine DesktopFinstatApiTester\` once, then run it from Terminal.
+          3. The Settings dialog opens on first start: enter the API **public key** and **private key** (plus
+             station id/name if you have them). **Use** applies them for this session, **Use and Save** writes
+             \`application.json\` next to the executable so they're remembered.
+          4. Pick an endpoint from the ribbon (or **Ctrl+K**), fill in the parameters, read the response in the
+             Data / Headers tabs.
+
+          ## Web tester (Docker)
+
+          - [finstat-web-tester.tar](${RAW}/finstat-web-tester.tar) ($(size finstat-web-tester.tar)) — image \`finstat-web-tester:latest\`
+
+          ### Setup
+
+          **Portainer:** *Images → Import* the tar, then *Containers → Add container* with image
+          \`finstat-web-tester:latest\` (**Always pull the image** off — it isn't in a registry), port
+          host \`5101\` → container \`8080\`, restart policy *Unless stopped*.
+
+          **Docker CLI:**
+
+          \`\`\`sh
+          docker load -i finstat-web-tester.tar
+          docker run -d --name finstat-web-tester --restart unless-stopped -p 5101:8080 finstat-web-tester:latest
+          \`\`\`
+
+          Open \`http://<host>:5101\` and enter the API keys in the tester's settings in the browser — they are not
+          container settings.
+
+          **Optional — dev environments (zdrojak.eu / zdrojakcz.eu)** need a client certificate. Bind the folder
+          holding the \`.pfx\` read-only to \`/app/certs\` and set:
+
+          | Env | Value |
+          |---|---|
+          | \`Security__DevCertificate__PfxPath\` | \`/app/certs/<name>.pfx\` (default \`/app/certs/dev-cert.pfx\`) |
+          | \`Security__DevCertificate__PfxPassword\` | the PFX password |
+
+          After the first call to zdrojak.eu the container log shows \`DevCertificate … loaded cert from …\`.
+          Full notes: [DEV_README](https://github.com/${GITHUB_REPOSITORY}/blob/master/Tester/WebFinstatApiTester/DEV_README.md).
+
+          Image \`${image}\`
+          EOF
+
+      - name: Push to wiki
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          url="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git"
+          if ! git clone --depth 1 "$url" wiki; then
+            echo "::error::Wiki repo not found — create a first wiki page by hand once, then rerun."
+            exit 1
+          fi
+          cd wiki
+          branch="$(git branch --show-current)"
+          # Keep hand-written pages, replace everything this workflow owns.
+          rm -f DesktopFinstatApiTester-*.zip finstat-web-tester.tar Downloads.md
+          cp ../out/* .
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout --orphan fresh
+          git add -A
+          git commit -qm "Tester downloads from ${GITHUB_SHA::7}"
+          git push --force origin "fresh:${branch}"

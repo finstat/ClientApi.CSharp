@@ -14,6 +14,13 @@ code runs on Windows, Linux and macOS.
 dotnet run --project Tester/DesktopFinstatApiTester
 ```
 
+Or download the latest `master` build — a self-contained single executable, no .NET needed:
+[Windows x64](https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-win-x64.zip) ·
+[Linux x64](https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-linux-x64.zip) ·
+[macOS arm64](https://raw.githubusercontent.com/wiki/finstat/ClientApi.CSharp/DesktopFinstatApiTester-osx-arm64.zip)
+(all listed on the wiki's [Downloads](https://github.com/finstat/ClientApi.CSharp/wiki/Downloads) page, built
+by the *Tester downloads* workflow).
+
 Settings (API keys, station id/name, timeout, response type, endpoint URLs) live in the Settings
 modal, which opens automatically until a public key is set. **Use** applies them for the session;
 **Use and Save** also writes `application.json` next to the executable.
