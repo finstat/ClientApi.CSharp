@@ -4,14 +4,16 @@ using System.Text;
 
 namespace FinstatApi.Statement
 {
+    // the server's numbers: JSON sends templates as numbers (XML by name), and the server's enum starts with
+    // Unsupported = 0 and has CZ and analysis templates between TemplateFinancial and TemplateROPO
     public enum TemplateTypeEnum
     {
-        Template2011v2,
-        Template2014,
-        Template2014micro,
-        TemplateFinancial,
-        TemplateROPO,
-        TemplateNujPU
+        Template2011v2 = 1,
+        Template2014 = 2,
+        Template2014micro = 3,
+        TemplateFinancial = 4,
+        TemplateROPO = 8,
+        TemplateNujPU = 9
     }
 
     public abstract class AbstractStatementLegendResult
