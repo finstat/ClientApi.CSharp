@@ -149,7 +149,7 @@ docker build -f ClientApi.CSharp/Dockerfile -t finstat-web-tester:latest C:/Sour
 docker save finstat-web-tester:latest -o finstat-web-tester.tar
 ```
 
-(Súbor `finstat-web-tester.tar` je v repe.)
+(Súbor `finstat-web-tester.tar` vzniká v koreni repa; v gite nie je.)
 
 ### Run
 
@@ -164,6 +164,31 @@ docker run -d -p 8080:8080 \
   -v /host/certs:/app/certs:ro \
   finstat-web-tester:latest
 ```
+
+### Nasadenie cez Portainer (náš server)
+
+Image sa do Portainera importuje ako tar (Images → Import), tag iba `latest`:
+
+```bash
+docker save finstat-web-tester:latest -o finstat-web-tester.tar
+```
+
+Containers → Add container:
+
+| Nastavenie | Hodnota |
+|---|---|
+| Image | `finstat-web-tester:latest`, **Always pull the image** vypnuté (image je importovaný, nie z registry) |
+| Port | host `5101` → container `8080` (TCP) |
+| Volume (Bind, read-only) | host `/run/desktop/mnt/host/c/clientWebCertificates/Certs` → container `/app/certs` |
+| Env `Security__DevCertificate__PfxPath` | `/app/certs/apitester.pfx` (certifikát sa volá `apitester`, nie `dev-cert`) |
+| Env `Security__DevCertificate__PfxPassword` | heslo k PFX |
+| Restart policy | Unless stopped |
+
+- Host beží Docker Desktop (Linux engine): cesta `C:\clientWebCertificates\Certs` v Portaineri zlyhá s
+  `invalid volume specification` — Portainer posiela cestu enginu bez prekladu, preto
+  `/run/desktop/mnt/host/c/...`.
+- Tester potom beží na `http://<host>:5101`; API kľúče sa nezadávajú v Portaineri, ale v nastaveniach testera v prehliadači.
+- Kontrola: po prvom volaní na zdrojak.eu má log kontajnera riadok `DevCertificate … loaded cert from …`.
 
 ---
 
